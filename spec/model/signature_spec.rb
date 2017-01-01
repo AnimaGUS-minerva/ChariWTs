@@ -86,7 +86,7 @@ RSpec.describe CHex do
       bin = CHex.parse(File.open("spec/inputs/a2.ctxt", "rb").read)
       unpacker = CBOR::Unpacker.new(StringIO.new(bin))
       unpacker.each { |req|
-        puts "first is: #{req}"
+        #puts "first is: #{req}"
         expect(req.class).to eq(Hash)
         expect(req[3]).to eq("coap://light.example.com")
         expect(req[8].first[1]).to eq(2)
@@ -94,6 +94,33 @@ RSpec.describe CHex do
         expect(req[8].first[-1]).to eq(1)
         expect(req[8].first[-2]).to_not be_nil
         expect(req[8].first[-3]).to_not be_nil
+      }
+    end
+
+    it "should parse cbor A.3 data into structure" do
+      bin = CHex.parse(File.open("spec/inputs/a3.ctxt", "rb").read)
+      unpacker = CBOR::Unpacker.new(StringIO.new(bin))
+      unpacker.each { |req|
+        expect(req.class).to eq(Hash)
+        expect(req[1]).to eq("coap://as.example.com")
+        expect(req[3]).to eq("coap://light.example.com")
+        expect(req[2]).to eq("erikw")
+
+        expect(req[4]).to eq(Time.new(2015,10,5,13,9,4))
+        expect(req[5]).to eq(Time.new(2015,10,4,3,49,4))
+        expect(req[6]).to eq(Time.new(2015,10,4,3,49,4))
+        expect(req[7]).to eq(2929)
+        expect(req[8].first[1]).to eq(2)
+        expect(req[8].first[2]).to eq('11')
+        expect(req[8].first[-1]).to eq(1)
+        expect(req[8].first[-2]).to_not be_nil
+        expect(req[8].first[-3]).to_not be_nil
+        expect(req[9][0][0]).to eq("/s/light")
+        expect(req[9][0][1]).to eq(1)
+        expect(req[9][1][0]).to eq("/a/led")
+        expect(req[9][1][1]).to eq(5)
+        expect(req[9][2][0]).to eq("/dtls")
+        expect(req[9][2][1]).to eq(2)
       }
     end
   end
