@@ -8,7 +8,7 @@ class CHex
     string.split("").each {|char|
 
       if comment
-        if char == '\n'
+        if char == "\n"
           comment = false
         end
         next
@@ -54,7 +54,7 @@ class CHex
       when '#'
         comment = true
       else
-        puts "  ..skipped"
+        #puts "  ..skipped"
         next
       end
 
