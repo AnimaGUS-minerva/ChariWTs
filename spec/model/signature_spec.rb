@@ -53,8 +53,48 @@ RSpec.describe CHex do
       }
     end
 
-    it "should parse cbor into structure" do
-      pending "XXX"
+    # pseudo-JSON:
+    #{
+    #  "aud": "coap://light.example.com",
+    #  "cks":
+    #    [                       // COSE_Key is a CBOR map with an array of keys
+    #      {
+    #        "kty": "EC",
+    #        "kid": "11",
+    #        "crv": 1, // using P-384
+    #        "x": h'bac5b11cad8f99f9c72b05cf4b9e26d244dc189f745228255a219a86d6a09eff',
+    #        "y": h'20138bf82dc1b6d562be0fa54ab7804a3a64b6d72ccfed6b6fb6ed28bbfc117e'
+    #      }
+    #    ]
+    #}
+    #
+    # CBOR version:
+    #{
+    #  3: "coap://light.example.com",
+    #  8:
+    #  [
+    #    {
+    #      1: 2,
+    #      2: "11",
+    #      -1: 1,
+    #      -2: h'bac5b11cad8f99f9c72b05cf4b9e26d244dc189f745228255a219a86d6a09eff',
+    #      -3: h'20138bf82dc1b6d562be0fa54ab7804a3a64b6d72ccfed6b6fb6ed28bbfc117e'
+    #    }
+    #  ]
+    #}
+    it "should parse cbor A.2 example into structure" do
+      bin = CHex.parse(File.open("spec/inputs/a2.ctxt", "rb").read)
+      unpacker = CBOR::Unpacker.new(StringIO.new(bin))
+      unpacker.each { |req|
+        puts "first is: #{req}"
+        expect(req.class).to eq(Hash)
+        expect(req[3]).to eq("coap://light.example.com")
+        expect(req[8].first[1]).to eq(2)
+        expect(req[8].first[2]).to eq('11')
+        expect(req[8].first[-1]).to eq(1)
+        expect(req[8].first[-2]).to_not be_nil
+        expect(req[8].first[-3]).to_not be_nil
+      }
     end
   end
 
