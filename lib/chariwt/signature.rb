@@ -1,5 +1,5 @@
 module Chariwt
-  class Key
+  class Signature
     attr_accessor :keytype, :kid, :crv, :x, :y
 
     def initialize(cbormap)

@@ -1,5 +1,5 @@
 module Chariwt
-  class Assertion < Principal
+  class Assertion < Signatures
     attr_accessor :iss, :sub, :exp, :nbf, :iat, :cti, :aif
 
     def initialize(cbor)

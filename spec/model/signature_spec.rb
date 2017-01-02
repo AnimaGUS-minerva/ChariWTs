@@ -1,6 +1,6 @@
 require 'lib/c_hex'
-require 'lib/chariwt/key'
-require 'lib/chariwt/principal'
+require 'lib/chariwt/signature'
+require 'lib/chariwt/signatures'
 require 'lib/chariwt/assertion'
 require 'cbor'
 require 'byebug'
@@ -102,13 +102,13 @@ RSpec.describe CHex do
 
     it "should parse cbor A.2 example into key object" do
       bin = CHex.parse(File.open("spec/inputs/a2.ctxt", "rb").read)
-      principal = Chariwt::Principal.new(StringIO.new(bin))
-      expect(principal.aud).to     eq("coap://light.example.com")
-      expect(principal.keys[0].keytype).to eq("EC")
-      expect(principal.keys[0].kid).to     eq('11')
-      expect(principal.keys[0].crv).to     eq(:p384)
-      expect(principal.keys[0].x).to_not be_nil
-      expect(principal.keys[0].y).to_not be_nil
+      signatures = Chariwt::Signatures.new(StringIO.new(bin))
+      expect(signatures.aud).to     eq("coap://light.example.com")
+      expect(signatures.sigs[0].keytype).to eq("EC")
+      expect(signatures.sigs[0].kid).to     eq('11')
+      expect(signatures.sigs[0].crv).to     eq(:p384)
+      expect(signatures.sigs[0].x).to_not be_nil
+      expect(signatures.sigs[0].y).to_not be_nil
     end
 
     it "should parse cbor A.3 data into structure" do
@@ -149,11 +149,11 @@ RSpec.describe CHex do
       expect(assertion.sub).to eq("erikw")
       expect(assertion.cti).to eq(2929)
 
-      expect(assertion.keys[0].keytype).to eq("EC")
-      expect(assertion.keys[0].kid).to     eq('11')
-      expect(assertion.keys[0].crv).to     eq(:p384)
-      expect(assertion.keys[0].x).to_not be_nil
-      expect(assertion.keys[0].y).to_not be_nil
+      expect(assertion.sigs[0].keytype).to eq("EC")
+      expect(assertion.sigs[0].kid).to     eq('11')
+      expect(assertion.sigs[0].crv).to     eq(:p384)
+      expect(assertion.sigs[0].x).to_not be_nil
+      expect(assertion.sigs[0].y).to_not be_nil
 
       expect(assertion.aif[0][0]).to eq("/s/light")
       expect(assertion.aif[0][1]).to eq(1)

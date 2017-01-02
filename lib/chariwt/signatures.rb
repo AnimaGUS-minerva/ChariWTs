@@ -1,15 +1,15 @@
 module Chariwt
-  class Principal
-    attr_accessor :aud, :keys
+  class Signatures
+    attr_accessor :aud, :sigs
 
     def initialize(cbor)
       @unpacker = CBOR::Unpacker.new(cbor)
-      self.keys = []
+      self.sigs = []
       @unpacker.each { |item|
         self.aud = item[3]
         cks = item[8]
         cks.each { |key|
-          keys << Chariwt::Key.new(key)
+          sigs << Chariwt::Signature.new(key)
         }
         self.decode_item(item)
       }
