@@ -1,6 +1,7 @@
 require 'lib/c_hex'
 require 'lib/chariwt/key'
 require 'lib/chariwt/principal'
+require 'lib/chariwt/assertion'
 require 'cbor'
 require 'byebug'
 
@@ -135,6 +136,31 @@ RSpec.describe CHex do
         expect(req[9][2][0]).to eq("/dtls")
         expect(req[9][2][1]).to eq(2)
       }
+    end
+
+    it "should parse cbor A.3 data into cwt object" do
+      bin = CHex.parse(File.open("spec/inputs/a3.ctxt", "rb").read)
+      assertion = Chariwt::Assertion.new(StringIO.new(bin))
+      expect(assertion.iss).to eq("coap://as.example.com")
+      expect(assertion.aud).to eq("coap://light.example.com")
+      expect(assertion.exp).to eq(Time.new(2015,10,5,13,9,4))
+      expect(assertion.nbf).to eq(Time.new(2015,10,4,3,49,4))
+      expect(assertion.iat).to eq(Time.new(2015,10,4,3,49,4))
+      expect(assertion.sub).to eq("erikw")
+      expect(assertion.cti).to eq(2929)
+
+      expect(assertion.keys[0].keytype).to eq("EC")
+      expect(assertion.keys[0].kid).to     eq('11')
+      expect(assertion.keys[0].crv).to     eq(:p384)
+      expect(assertion.keys[0].x).to_not be_nil
+      expect(assertion.keys[0].y).to_not be_nil
+
+      expect(assertion.aif[0][0]).to eq("/s/light")
+      expect(assertion.aif[0][1]).to eq(1)
+      expect(assertion.aif[1][0]).to eq("/a/led")
+      expect(assertion.aif[1][1]).to eq(5)
+      expect(assertion.aif[2][0]).to eq("/dtls")
+      expect(assertion.aif[2][1]).to eq(2)
     end
   end
 
