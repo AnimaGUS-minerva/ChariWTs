@@ -1,4 +1,6 @@
 require 'lib/c_hex'
+require 'lib/chariwt/key'
+require 'lib/chariwt/principal'
 require 'cbor'
 require 'byebug'
 
@@ -95,6 +97,17 @@ RSpec.describe CHex do
         expect(req[8].first[-2]).to_not be_nil
         expect(req[8].first[-3]).to_not be_nil
       }
+    end
+
+    it "should parse cbor A.2 example into key object" do
+      bin = CHex.parse(File.open("spec/inputs/a2.ctxt", "rb").read)
+      principal = Chariwt::Principal.new(StringIO.new(bin))
+      expect(principal.aud).to     eq("coap://light.example.com")
+      expect(principal.keys[0].keytype).to eq("EC")
+      expect(principal.keys[0].kid).to     eq('11')
+      expect(principal.keys[0].crv).to     eq(:p384)
+      expect(principal.keys[0].x).to_not be_nil
+      expect(principal.keys[0].y).to_not be_nil
     end
 
     it "should parse cbor A.3 data into structure" do

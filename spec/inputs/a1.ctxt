@@ -1,0 +1,12 @@
+a2                                      # map(2)
+   03                                   # unsigned(3)
+   78 18                                # text(24)
+      636f61703a2f2f6c696768742e6578616d706c652e636f6d # "coap://light.example.com"
+   08                                   # unsigned(8)
+   81                                   # array(1)
+      a2                                # map(2)
+         01                             # unsigned(1)
+         04                             # unsigned(4)
+         20                             # negative(0)
+         6a                             # text(10)
+            6c6f72656d697073756d        # "loremipsum"

@@ -1,0 +1,21 @@
+# A2 example from draft-ietf-ace-cbor-web-token-01.txt
+a2                                      # map(2)
+   03                                   # unsigned(3)
+   78 18                                # text(24)
+      636f61703a2f2f6c696768742e6578616d706c652e636f6d # "coap://light.example.com"
+   08                                   # unsigned(8)
+   81                                   # array(1)
+      a5                                # map(5)
+         01                             # unsigned(1)
+         02                             # unsigned(2)
+         02                             # unsigned(2)
+         62                             # text(2)
+            3131                        # "11"
+         20                             # negative(0)
+         01                             # unsigned(1)
+         21                             # negative(1)
+         58 20                          # bytes(32)
+            bac5b11cad8f99f9c72b05cf4b9e26d244dc189f745228255a219a86d6a09eff # "\xBA\xC5\xB1\x1C\xAD\x8F\x99\xF9\xC7+\x05\xCFK\x9E&\xD2D\xDC\x18\x9FtR(%Z!\x9A\x86\xD6\xA0\x9E\xFF"
+         22                             # negative(2)
+         58 20                          # bytes(32)
+            20138bf82dc1b6d562be0fa54ab7804a3a64b6d72ccfed6b6fb6ed28bbfc117e # "\x13\x8B\xF8-\xC1\xB6\xD5b\xBE\x0F\xA5J\xB7\x80J:d\xB6\xD7,\xCF\xEDko\xB6\xED(\xBB\xFC\x11~"
