@@ -100,15 +100,32 @@ RSpec.describe CHex do
       }
     end
 
-    it "should parse cbor A.2 example into key object" do
-      bin = CHex.parse(File.open("spec/inputs/a2.ctxt", "rb").read)
-      signatures = Chariwt::Signatures.new(StringIO.new(bin))
-      expect(signatures.aud).to     eq("coap://light.example.com")
-      expect(signatures.sigs[0].keytype).to eq("EC")
-      expect(signatures.sigs[0].kid).to     eq('11')
-      expect(signatures.sigs[0].crv).to     eq(:p384)
-      expect(signatures.sigs[0].x).to_not be_nil
-      expect(signatures.sigs[0].y).to_not be_nil
+    it "should parse cose example ecdsa-sig-02 into object" do
+
+      pub_key = {
+        x: "kTJyP2KSsBBhnb4kjWmMF7WHVsY55xUPgb7k64rDcjatChoZ1nvjKmYmPh5STRKc",
+        y: "mM0weMVU2DKsYDxDJkEP9hZiRZtB8fPfXbzINZj_fF7YQRynNWedHEyzAJOX2e8s"
+      }
+
+      bin = CHex.parse(File.open("spec/inputs/cose1.ctxt", "rb").read)
+      unpacker = CBOR::Unpacker.new(StringIO.new(bin))
+      unpacker.each { |req|
+        expect(req.class).to eq(CBOR::Tagged)
+        expect(req.value.class).to eq(Array)
+        expect(req.value.length).to eq(4)
+        expect(req.value[1].class).to eq(Hash)
+
+        # here we need to validate the signature contained in req.value[3]
+        # compared to the content in req.value[2], which needs to be hashed
+        # appropriately.
+        expect(req.value[1][4]).to eq("P384")
+
+        #unpack2 = CBOR::Unpacker.new(StringIO.new(req.value[3]))
+        #unpack2.each { |req2|
+        #  byebug
+        #  expect(req2.class).to eq(Hash)
+        #}
+      }
     end
 
     it "should parse cbor A.3 data into structure" do
