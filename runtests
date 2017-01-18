@@ -1,0 +1,1 @@
+bundle exec rspec -I. spec/model/signature_spec.rb
