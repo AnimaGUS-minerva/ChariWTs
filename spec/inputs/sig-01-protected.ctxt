@@ -1,0 +1,5 @@
+a2    # map(2)
+   01 # unsigned(1)
+   26 # negative(6)
+   03 # unsigned(3)
+   00 # unsigned(0)
