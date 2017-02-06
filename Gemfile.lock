@@ -4,6 +4,10 @@ GEM
     byebug (8.2.4)
     cbor (0.5.9.1)
     diff-lcs (1.2.5)
+    ecdsa (1.2.0)
+    ffi (1.9.17)
+    rbnacl (4.0.1)
+      ffi
     rspec (3.4.0)
       rspec-core (~> 3.4.0)
       rspec-expectations (~> 3.4.0)
@@ -24,8 +28,10 @@ PLATFORMS
 DEPENDENCIES
   byebug
   cbor
+  ecdsa
+  rbnacl
   rspec
   rspec-core
 
 BUNDLED WITH
-   1.13.2
+   1.14.3

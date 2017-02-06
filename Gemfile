@@ -4,3 +4,6 @@ gem 'byebug'
 gem "rspec"
 gem "rspec-core"
 gem "cbor"
+
+gem 'ecdsa'
+gem 'rbnacl'
