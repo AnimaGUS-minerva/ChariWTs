@@ -3,6 +3,8 @@ require 'lib/chariwt/signature'
 require 'lib/chariwt/signatures'
 require 'lib/chariwt/assertion'
 require 'cbor'
+require 'base64'
+require 'ecdsa'
 require 'byebug'
 
 RSpec.describe CHex do
@@ -100,32 +102,103 @@ RSpec.describe CHex do
       }
     end
 
-    it "should parse cose example ecdsa-sig-02 into object" do
-
-      pub_key = {
+    def pub_key_base64
+      {
         x: "kTJyP2KSsBBhnb4kjWmMF7WHVsY55xUPgb7k64rDcjatChoZ1nvjKmYmPh5STRKc",
         y: "mM0weMVU2DKsYDxDJkEP9hZiRZtB8fPfXbzINZj_fF7YQRynNWedHEyzAJOX2e8s"
       }
+    end
+    def decode_pub_key
+      bx=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(pub_key_base64[:x]))
+      by=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(pub_key_base64[:y]))
+      ECDSA::Group::Secp384r1.new_point([bx, by])
+    end
+    def pub_key
+      @pub_key ||= decode_pub_key
+    end
 
-      bin = CHex.parse(File.open("spec/inputs/cose1.ctxt", "rb").read)
+    def empty_bstr
+      @empty_bstr ||= ["40"].pack("H*")
+    end
+
+    it "should parse cose example C.2.1 into object" do
+      bin = CHex.parse(File.open("spec/inputs/cose2.ctxt", "rb").read)
       unpacker = CBOR::Unpacker.new(StringIO.new(bin))
       unpacker.each { |req|
         expect(req.class).to eq(CBOR::Tagged)
         expect(req.value.class).to eq(Array)
         expect(req.value.length).to eq(4)
+
+        # protected hash
+        protected_bucket = Hash.new
+        CBOR::Unpacker.new(StringIO.new(req.value[0])).each { |thing|
+          protected_bucket = thing
+        }
+        expect(protected_bucket[1]).to eq(-7)  # ECDSA with SHA-256
+
         expect(req.value[1].class).to eq(Hash)
+        expect(req.value[1][4]).to eq("11")
 
         # here we need to validate the signature contained in req.value[3]
         # compared to the content in req.value[2], which needs to be hashed
         # appropriately.
-        expect(req.value[1][4]).to eq("P384")
 
-        #unpack2 = CBOR::Unpacker.new(StringIO.new(req.value[3]))
+        sig_struct = ["Signature1", req.value[0], empty_bstr, req.value[2]]
+        digest     = sig_struct.to_cbor
+        byebug
+        signature  = req.value[3]
+        valid = ECDSA.valid_signature?(pub_key, digest, signature)
+        byebug
         #unpack2.each { |req2|
         #  byebug
         #  expect(req2.class).to eq(Hash)
         #}
       }
+    end
+
+    it "should parse ecdsa-sig-01 into object" do
+      bin = CHex.parse(File.open("spec/inputs/sig-01.ctxt", "rb").read)
+      unpacker = CBOR::Unpacker.new(StringIO.new(bin))
+      unpacker.each { |req|
+        expect(req.class).to eq(CBOR::Tagged)
+        expect(req.value.class).to eq(Array)
+        expect(req.value.length).to eq(4)
+
+        # protected hash
+        protected_bucket = Hash.new
+        CBOR::Unpacker.new(StringIO.new(req.value[0])).each { |thing|
+          protected_bucket = thing
+        }
+        expect(protected_bucket[1]).to eq(-7)  # ECDSA with SHA-256
+        siglen = 32
+
+        expect(req.value[1].class).to eq(Hash)
+        expect(req.value[1][4]).to eq("11")
+
+        # here we need to validate the signature contained in req.value[3]
+        # compared to the content in req.value[2], which needs to be hashed
+        # appropriately.
+
+        sig_struct = ["Signature1", req.value[0], nil, req.value[2]]
+        digest     = sig_struct.to_cbor
+        signature  = ECDSA::Signature.new(ECDSA::Format::IntegerOctetString.decode(req.value[3][0..31]),
+                                          ECDSA::Format::IntegerOctetString.decode(req.value[3][32..63]))
+        byebug
+        valid = ECDSA.valid_signature?(pub_key, digest, signature)
+        byebug
+        #unpack2.each { |req2|
+        #  byebug
+        #  expect(req2.class).to eq(Hash)
+        #}
+      }
+    end
+
+    it "should verify signature from pub_key" do
+      expect(pub_key.x).to_not be_nil
+      expect(pub_key.y).to_not be_nil
+      byebug
+      signature = ECDSA::Format::SignatureDerString.decode(signature_der_string)
+      puts "kara"
     end
 
     it "should parse cbor A.3 data into structure" do
