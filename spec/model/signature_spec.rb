@@ -158,7 +158,7 @@ RSpec.describe CHex do
     end
 
     def empty_bstr
-      @empty_bstr ||= ["40"].pack("H*")
+      @empty_bstr ||= "".force_encoding('ASCII-8BIT')
     end
 
     it "should parse cose example C.2.1 into object" do
@@ -220,8 +220,9 @@ RSpec.describe CHex do
         # compared to the content in req.value[2], which needs to be hashed
         # appropriately.
 
-        sig_struct = ["Signature1", encoded_protected_bucket, nil, req.value[2]]
+        sig_struct = ["Signature1", encoded_protected_bucket, empty_bstr, req.value[2]]
         digest     = sig_struct.to_cbor
+        expect(digest.unpack("H*")).to eq(["846a5369676e61747572653145a2012603004054546869732069732074686520636f6e74656e742e"])
         r = ECDSA::Format::IntegerOctetString.decode(req.value[3][0..31])
         s = ECDSA::Format::IntegerOctetString.decode(req.value[3][32..63])
         signature  = ECDSA::Signature.new(r, s)
