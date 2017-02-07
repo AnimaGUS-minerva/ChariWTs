@@ -117,6 +117,21 @@ RSpec.describe CHex do
       @pub_key ||= decode_pub_key
     end
 
+    def sig01_pub_key_base64
+      {
+        x: "usWxHK2PmfnHKwXPS54m0kTcGJ90UiglWiGahtagnv8",
+        y: "IBOL-C3BttVivg-lSreASjpkttcsz-1rb7btKLv8EX4"
+      }
+    end
+    def sig01_decode_pub_key
+      bx=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig01_pub_key_base64[:x]))
+      by=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig01_pub_key_base64[:y]))
+      ECDSA::Group::Nistp256.new_point([bx, by])
+    end
+    def sig01_pub_key
+      @pub_key ||= sig01_decode_pub_key
+    end
+
     def empty_bstr
       @empty_bstr ||= ["40"].pack("H*")
     end
@@ -181,10 +196,12 @@ RSpec.describe CHex do
 
         sig_struct = ["Signature1", req.value[0], nil, req.value[2]]
         digest     = sig_struct.to_cbor
-        signature  = ECDSA::Signature.new(ECDSA::Format::IntegerOctetString.decode(req.value[3][0..31]),
-                                          ECDSA::Format::IntegerOctetString.decode(req.value[3][32..63]))
+        r = ECDSA::Format::IntegerOctetString.decode(req.value[3][0..31])
+        s = ECDSA::Format::IntegerOctetString.decode(req.value[3][32..63])
+        signature  = ECDSA::Signature.new(r, s)
         byebug
-        valid = ECDSA.valid_signature?(pub_key, digest, signature)
+        sha256 = Digest::SHA256.digest(digest)
+        valid = ECDSA.valid_signature?(sig01_pub_key, sha256, signature)
         byebug
         #unpack2.each { |req2|
         #  byebug
