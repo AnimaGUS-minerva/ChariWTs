@@ -250,10 +250,25 @@ RSpec.describe CHex do
       protected_bucket[1] = -7
       encoded_protected_bucket = protected_bucket.to_cbor
       sig_struct = ["Signature1", encoded_protected_bucket, nil, content]
-      digest     = sig_struct.to_cbor
+      digest     = Digest::SHA256.digest(sig_struct.to_cbor)
+      private_key = sig01_priv_key
 
-      curve = ECDSA::Group::Nistp256.new_point([bx, by])
+      group     = ECDSA::Group::Nistp256
       signature = ECDSA.sign(group, private_key, digest, temporary_key)
+      sig_r_bytes = ECDSA::Format::IntegerOctetString.encode(signature.r, 32)
+      sig_s_bytes = ECDSA::Format::IntegerOctetString.encode(signature.s, 32)
+      expect(sig_r_bytes.length).to eq(32)
+      expect(sig_s_bytes.length).to eq(32)
+      sig_bytes  = (sig_r_bytes + sig_s_bytes)
+
+      # protected, unprotected, payload, signature
+      sign1 = [ encoded_protected_bucket, {}, content, sig_bytes ]
+      signed_object = CBOR::Tagged.new(18, sign1).to_cbor
+
+      FileUtils::mkdir_p("tmp")
+      File.open("tmp/coseobject01.bin", "wb") do |f| f.write signed_object end
+      system("cbor2pretty.rb <tmp/coseobject01.bin >tmp/coseobject01.ctxt")
+      expect(system("diff tmp/coseobject01.ctxt spec/outputs/coseobject01.ctxt")).to be true
     end
 
     it "should validate public key was created from private key" do
