@@ -117,6 +117,18 @@ RSpec.describe CHex do
       @pub_key ||= decode_pub_key
     end
 
+    def decode_pub_key_from_example(example)
+      bx=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(example[:x]))
+      by=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(example[:y]))
+
+      case example[:crv]
+      when 'P-256'
+        ECDSA::Group::Nistp256.new_point([bx, by])
+      when 'P-384'
+        ECDSA::Group::Nistp384.new_point([bx, by])
+      end
+    end
+
     def sig01_key_base64
       {
         kty:"EC",
@@ -133,11 +145,6 @@ RSpec.describe CHex do
          "20DB1328B01EBB78122CE86D5B1A3A097EC44EAC603FD5F60108EDF98EA81393"
       ]
     end
-    def sig01_decode_pub_key
-      bx=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig01_key_base64[:x]))
-      by=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig01_key_base64[:y]))
-      ECDSA::Group::Nistp256.new_point([bx, by])
-    end
     def sig01_decode_private_key
       bd=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig01_key_base64[:d]))
     end
@@ -147,7 +154,7 @@ RSpec.describe CHex do
     end
 
     def sig01_pub_key
-      @pub_key ||= sig01_decode_pub_key
+      @pub_key ||= decode_pub_key_from_example(sig01_key_base64)
     end
 
     def empty_bstr
@@ -246,9 +253,46 @@ RSpec.describe CHex do
       group       = ECDSA::Group::Nistp256
       public_key  = group.generator.multiply_by_scalar(private_key)
 
+      public_key_string = ECDSA::Format::PointOctetString.encode(public_key, compression: true)
+
       byebug
       expect(public_key.x).to eq(sig01_pub_key.x)
       expect(public_key.y).to eq(sig01_pub_key.y)
+    end
+
+    def sig02_key_base64
+      {
+        kty:"EC",
+        kid:"P384",
+        crv:"P-384",
+        x:"kTJyP2KSsBBhnb4kjWmMF7WHVsY55xUPgb7k64rDcjatChoZ1nvjKmYmPh5STRKc",
+        y:"mM0weMVU2DKsYDxDJkEP9hZiRZtB8fPfXbzINZj_fF7YQRynNWedHEyzAJOX2e8s",
+        d:"ok3Nq97AXlpEusO7jIy1FZATlBP9PNReMU7DWbkLQ5dU90snHuuHVDjEPmtV0fTo"
+      }
+    end
+
+    def sig02_rng_stream
+      [
+         "20DB1328B01EBB78122CE86D5B1A3A097EC44EAC603FD5F60108EDF98EA81393"
+      ]
+    end
+    def sig02_decode_private_key
+      bd=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig02_key_base64[:d]))
+    end
+    def sig02_priv_key
+      @priv_key ||= sig02_decode_private_key
+    end
+    def sig02_pub_key
+      @pub_key ||= decode_pub_key_from_example(sig02_key_base64)
+    end
+
+    it "should validate 384-bit public key was created from private key" do
+      private_key = sig02_priv_key
+      group       = ECDSA::Group::Nistp384
+      public_key  = group.generator.multiply_by_scalar(private_key)
+
+      expect(public_key.x).to eq(sig02_pub_key.x)
+      expect(public_key.y).to eq(sig02_pub_key.y)
     end
 
     it "should verify signature from pub_key" do
