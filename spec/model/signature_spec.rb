@@ -236,6 +236,14 @@ RSpec.describe CHex do
       }
     end
 
+    def temporary_key
+      ECDSA::Format::IntegerOctetString.decode(["20DB1328B01EBB78122CE86D5B1A3A097EC44EAC603FD5F60108EDF98EA81393"].pack("H*"))
+    end
+
+    it "should have a temporary key, which is a constant for testing" do
+      expect(temporary_key.class).to be(Bignum)
+    end
+
     it "should create a signature for cose object -01" do
       content = "This is the content."
       protected_bucket = Hash.new
