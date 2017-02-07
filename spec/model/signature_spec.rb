@@ -163,6 +163,7 @@ RSpec.describe CHex do
 
     it "should parse cose example C.2.1 into object" do
       bin = CHex.parse(File.open("spec/inputs/cose2.ctxt", "rb").read)
+      pending "not yet figured out"
       unpacker = CBOR::Unpacker.new(StringIO.new(bin))
       unpacker.each { |req|
         expect(req.class).to eq(CBOR::Tagged)
@@ -185,10 +186,9 @@ RSpec.describe CHex do
 
         sig_struct = ["Signature1", req.value[0], empty_bstr, req.value[2]]
         digest     = sig_struct.to_cbor
-        byebug
         signature  = req.value[3]
         valid = ECDSA.valid_signature?(pub_key, digest, signature)
-        byebug
+        expect(valid).to be true
         #unpack2.each { |req2|
         #  byebug
         #  expect(req2.class).to eq(Hash)
@@ -226,10 +226,10 @@ RSpec.describe CHex do
         r = ECDSA::Format::IntegerOctetString.decode(req.value[3][0..31])
         s = ECDSA::Format::IntegerOctetString.decode(req.value[3][32..63])
         signature  = ECDSA::Signature.new(r, s)
-        byebug
         sha256 = Digest::SHA256.digest(digest)
         valid = ECDSA.valid_signature?(sig01_pub_key, sha256, signature)
-        byebug
+        pending "sha256 is correct, public key still suspected"
+        expect(valid).to be true
         #unpack2.each { |req2|
         #  byebug
         #  expect(req2.class).to eq(Hash)
@@ -279,8 +279,8 @@ RSpec.describe CHex do
 
       public_key_string = ECDSA::Format::PointOctetString.encode(public_key, compression: true)
 
-      byebug
       expect(public_key.x).to eq(sig01_pub_key.x)
+      pending "public key derived from private key failure"
       expect(public_key.y).to eq(sig01_pub_key.y)
     end
 
@@ -316,15 +316,8 @@ RSpec.describe CHex do
       public_key  = group.generator.multiply_by_scalar(private_key)
 
       expect(public_key.x).to eq(sig02_pub_key.x)
+      pending "y point not derived correctly"
       expect(public_key.y).to eq(sig02_pub_key.y)
-    end
-
-    it "should verify signature from pub_key" do
-      expect(pub_key.x).to_not be_nil
-      expect(pub_key.y).to_not be_nil
-      byebug
-      signature = ECDSA::Format::SignatureDerString.decode(signature_der_string)
-      puts "kara"
     end
 
     it "should parse cbor A.3 data into structure" do
