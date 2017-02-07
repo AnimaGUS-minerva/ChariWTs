@@ -117,17 +117,35 @@ RSpec.describe CHex do
       @pub_key ||= decode_pub_key
     end
 
-    def sig01_pub_key_base64
+    def sig01_key_base64
       {
-        x: "usWxHK2PmfnHKwXPS54m0kTcGJ90UiglWiGahtagnv8",
-        y: "IBOL-C3BttVivg-lSreASjpkttcsz-1rb7btKLv8EX4"
+        kty:"EC",
+        kid:"11",
+        crv:"P-256",
+        x:"usWxHK2PmfnHKwXPS54m0kTcGJ90UiglWiGahtagnv8",
+        y:"IBOL-C3BttVivg-lSreASjpkttcsz-1rb7btKLv8EX4",
+        d:"V8kgd2ZBRuh2dgyVINBUqpPDr7BOMGcF22CQMIUHtNM"
       }
     end
+
+    def sig01_rng_stream
+      [
+         "20DB1328B01EBB78122CE86D5B1A3A097EC44EAC603FD5F60108EDF98EA81393"
+      ]
+    end
     def sig01_decode_pub_key
-      bx=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig01_pub_key_base64[:x]))
-      by=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig01_pub_key_base64[:y]))
+      bx=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig01_key_base64[:x]))
+      by=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig01_key_base64[:y]))
       ECDSA::Group::Nistp256.new_point([bx, by])
     end
+    def sig01_decode_private_key
+      bd=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig01_key_base64[:d]))
+    end
+
+    def sig01_priv_key
+      @priv_key ||= sig01_decode_private_key
+    end
+
     def sig01_pub_key
       @pub_key ||= sig01_decode_pub_key
     end
@@ -181,7 +199,8 @@ RSpec.describe CHex do
 
         # protected hash
         protected_bucket = Hash.new
-        CBOR::Unpacker.new(StringIO.new(req.value[0])).each { |thing|
+        encoded_protected_bucket = req.value[0]
+        CBOR::Unpacker.new(StringIO.new(encoded_protected_bucket)).each { |thing|
           protected_bucket = thing
         }
         expect(protected_bucket[1]).to eq(-7)  # ECDSA with SHA-256
@@ -194,7 +213,7 @@ RSpec.describe CHex do
         # compared to the content in req.value[2], which needs to be hashed
         # appropriately.
 
-        sig_struct = ["Signature1", req.value[0], nil, req.value[2]]
+        sig_struct = ["Signature1", encoded_protected_bucket, nil, req.value[2]]
         digest     = sig_struct.to_cbor
         r = ECDSA::Format::IntegerOctetString.decode(req.value[3][0..31])
         s = ECDSA::Format::IntegerOctetString.decode(req.value[3][32..63])
@@ -208,6 +227,28 @@ RSpec.describe CHex do
         #  expect(req2.class).to eq(Hash)
         #}
       }
+    end
+
+    it "should create a signature for cose object -01" do
+      content = "This is the content."
+      protected_bucket = Hash.new
+      protected_bucket[1] = -7
+      encoded_protected_bucket = protected_bucket.to_cbor
+      sig_struct = ["Signature1", encoded_protected_bucket, nil, content]
+      digest     = sig_struct.to_cbor
+
+      curve = ECDSA::Group::Nistp256.new_point([bx, by])
+      signature = ECDSA.sign(group, private_key, digest, temporary_key)
+    end
+
+    it "should validate public key was created from private key" do
+      private_key = sig01_priv_key
+      group       = ECDSA::Group::Nistp256
+      public_key  = group.generator.multiply_by_scalar(private_key)
+
+      byebug
+      expect(public_key.x).to eq(sig01_pub_key.x)
+      expect(public_key.y).to eq(sig01_pub_key.y)
     end
 
     it "should verify signature from pub_key" do
