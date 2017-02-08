@@ -1,4 +1,5 @@
 require 'lib/c_hex'
+require 'lib/chariwt/cose_sign1'
 require 'lib/chariwt/signature'
 require 'lib/chariwt/signatures'
 require 'lib/chariwt/assertion'
@@ -198,43 +199,19 @@ RSpec.describe CHex do
 
     it "should parse ecdsa-sig-01 into object" do
       bin = CHex.parse(File.open("spec/inputs/sig-01.ctxt", "rb").read)
-      unpacker = CBOR::Unpacker.new(StringIO.new(bin))
-      unpacker.each { |req|
-        expect(req.class).to eq(CBOR::Tagged)
-        expect(req.value.class).to eq(Array)
-        expect(req.value.length).to eq(4)
 
-        # protected hash
-        protected_bucket = Hash.new
-        encoded_protected_bucket = req.value[0]
-        CBOR::Unpacker.new(StringIO.new(encoded_protected_bucket)).each { |thing|
-          protected_bucket = thing
-        }
-        expect(protected_bucket[1]).to eq(-7)  # ECDSA with SHA-256
-        siglen = 32
+      ccs1 = Chariwt::CoseSign1.new(bin)
+      ccs1.parse
 
-        expect(req.value[1].class).to eq(Hash)
-        expect(req.value[1][4]).to eq("11")
+      expect(ccs1.protected_bucket[1]).to eq(-7)  # ECDSA with SHA-256
+      expect(ccs1.unprotected_bucket[4]).to eq("11")
 
-        # here we need to validate the signature contained in req.value[3]
-        # compared to the content in req.value[2], which needs to be hashed
-        # appropriately.
+      validated = ccs1.validate(sig01_pub_key)
+      expect(ccs1.digest.unpack("H*")).to eq(["846a5369676e61747572653145a2012603004054546869732069732074686520636f6e74656e742e"])
 
-        sig_struct = ["Signature1", encoded_protected_bucket, empty_bstr, req.value[2]]
-        digest     = sig_struct.to_cbor
-        expect(digest.unpack("H*")).to eq(["846a5369676e61747572653145a2012603004054546869732069732074686520636f6e74656e742e"])
-        r = ECDSA::Format::IntegerOctetString.decode(req.value[3][0..31])
-        s = ECDSA::Format::IntegerOctetString.decode(req.value[3][32..63])
-        signature  = ECDSA::Signature.new(r, s)
-        sha256 = Digest::SHA256.digest(digest)
-        valid = ECDSA.valid_signature?(sig01_pub_key, sha256, signature)
-        pending "sha256 is correct, public key still suspected"
-        expect(valid).to be true
-        #unpack2.each { |req2|
-        #  byebug
-        #  expect(req2.class).to eq(Hash)
-        #}
-      }
+      pending "signature still dot check out"
+      expect(validated).to be true
+
     end
 
     def temporary_key
