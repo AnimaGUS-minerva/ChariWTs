@@ -124,9 +124,9 @@ RSpec.describe CHex do
 
       case example[:crv]
       when 'P-256'
-        ECDSA::Group::Nistp256.new_point([bx, by])
+        ECDSA::Group::Secp256r1.new_point([bx, by])
       when 'P-384'
-        ECDSA::Group::Nistp384.new_point([bx, by])
+        ECDSA::Group::Secp384r1.new_point([bx, by])
       end
     end
 
@@ -222,17 +222,33 @@ RSpec.describe CHex do
       expect(temporary_key.class).to be(Bignum)
     end
 
+    def coseobject01_digest
+      "846a5369676e61747572653143a101264074546869732069732074686520636f6e74656e742e"
+    end
+
+    def coseobject01_sha256
+      "c85fec6f6115d030389f87c76e7712dcc695a9227d2bfc371b6685caa638c7ca"
+    end
+
     it "should create a signature for cose object -01" do
       content = "This is the content."
       protected_bucket = Hash.new
       protected_bucket[1] = -7
       encoded_protected_bucket = protected_bucket.to_cbor
-      sig_struct = ["Signature1", encoded_protected_bucket, nil, content]
-      digest     = Digest::SHA256.digest(sig_struct.to_cbor)
+      sig_struct = ["Signature1", encoded_protected_bucket, Chariwt::CoseSign1.empty_bstr, content]
+      digested   = sig_struct.to_cbor
+      digest     = Digest::SHA256.digest(digested)
       private_key = sig01_priv_key
+
+      expect(digested.unpack("H*")[0]).to eq(coseobject01_digest)
+      expect(digest.unpack("H*")[0]).to   eq(coseobject01_sha256)
 
       group     = ECDSA::Group::Nistp256
       signature = ECDSA.sign(group, private_key, digest, temporary_key)
+
+      @valid = ECDSA.valid_signature?(sig01_pub_key, digest, signature)
+      expect(@valid).to be true
+
       sig_r_bytes = ECDSA::Format::IntegerOctetString.encode(signature.r, 32)
       sig_s_bytes = ECDSA::Format::IntegerOctetString.encode(signature.s, 32)
       expect(sig_r_bytes.length).to eq(32)
@@ -259,6 +275,27 @@ RSpec.describe CHex do
       expect(public_key.x).to eq(sig01_pub_key.x)
       pending "public key derived from private key failure"
       expect(public_key.y).to eq(sig01_pub_key.y)
+    end
+
+    it "should parse signed coseobject and verify contents" do
+      bin = CHex.parse(File.open("spec/inputs/coseobject01.ctxt", "rb").read)
+
+      cs1 = Chariwt::CoseSign1.new(bin)
+      cs1.parse
+      expect(cs1.parsed).to be true
+      validated = cs1.validate(sig01_pub_key)
+
+      File.open("spec/outputs/coseobject01-digest1.bin", "w") do |f|
+        f.write cs1.digest
+      end
+      File.open("spec/outputs/coseobject01-digest0.bin", "w") do |f|
+        f.write CHex.parse(coseobject01_digest)
+      end
+      expect(cs1.sha256.unpack("H*")[0]).to eq(coseobject01_sha256)
+      expect(cs1.digest.unpack("H*")[0]).to eq(coseobject01_digest)
+
+      pending "signature still not check out"
+      expect(validated).to be true
     end
 
     def sig02_key_base64
