@@ -1,0 +1,11 @@
+   {
+     "ietf-voucher:voucher": {
+       "assertion": "verified",
+       "trusted-ca-certificate": "base64-encoded X.509 DER",
+       "domain-certificate-identifier": {
+         "subject": "base64-encoded Subject DER"
+       },
+       "device-identifier": "JADA123456789",
+       "created-on": "2016-10-07T19:31:42Z"
+     }
+   }
