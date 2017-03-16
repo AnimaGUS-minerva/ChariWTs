@@ -25,7 +25,7 @@ module Chariwt
     end
 
     def parse
-      return if parsed
+      return if @parsed
       unpacker = CBOR::Unpacker.new(StringIO.new(@binary))
       unpacker.each { |req|
 
@@ -45,10 +45,13 @@ module Chariwt
         @contents        = req.value[2]
         @signature_bytes = req.value[3]
       }
-      parsed = true
+      @parsed = true
     end
 
     def empty_bstr
+      self.class.empty_bstr
+    end
+    def self.empty_bstr
       @empty_bstr ||= "".force_encoding('ASCII-8BIT')
     end
 
