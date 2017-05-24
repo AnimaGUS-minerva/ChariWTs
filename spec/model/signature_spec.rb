@@ -151,15 +151,24 @@ RSpec.describe CHex do
     end
 
     def sig01_priv_key
-      @priv_key ||= sig01_decode_private_key
+      @sig01_priv_key ||= sig01_decode_private_key
     end
 
     def sig01_pub_key
-      @pub_key ||= decode_pub_key_from_example(sig01_key_base64)
+      @sig01_pub_key ||= decode_pub_key_from_example(sig01_key_base64)
     end
 
     def empty_bstr
       @empty_bstr ||= "".force_encoding('ASCII-8BIT')
+    end
+
+    def ECDSA_decodesignature(binary, len)
+      binary = binary.dup.force_encoding('BINARY')
+      r_str = binary[0..(len-1)]
+      s_str = binary[len..(len*2)]
+      r = ECDSA::Format::IntegerOctetString.decode(r_str)
+      s = ECDSA::Format::IntegerOctetString.decode(s_str)
+      ECDSA::Signature.new(r,s)
     end
 
     it "should parse cose example C.2.1 into object" do
@@ -187,8 +196,9 @@ RSpec.describe CHex do
 
         sig_struct = ["Signature1", req.value[0], empty_bstr, req.value[2]]
         digest     = sig_struct.to_cbor
-        signature  = req.value[3]
-        valid = ECDSA.valid_signature?(pub_key, digest, signature)
+        signature  = ECDSA_decodesignature(req.value[3], 32)
+        #byebug
+        valid = ECDSA.valid_signature?(sig01_pub_key, digest, signature)
         expect(valid).to be true
         #unpack2.each { |req2|
         #  byebug
