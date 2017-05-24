@@ -110,8 +110,8 @@ RSpec.describe CHex do
       }
     end
     def decode_pub_key
-      bx=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(pub_key_base64[:x]))
-      by=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(pub_key_base64[:y]))
+      bx=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(pub_key_base64[:x]))
+      by=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(pub_key_base64[:y]))
       ECDSA::Group::Secp384r1.new_point([bx, by])
     end
     def pub_key
@@ -119,14 +119,14 @@ RSpec.describe CHex do
     end
 
     def decode_pub_key_from_example(example)
-      bx=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(example[:x]))
-      by=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(example[:y]))
+      bx=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(example[:x]))
+      by=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(example[:y]))
 
       case example[:crv]
       when 'P-256'
-        ECDSA::Group::Secp256r1.new_point([bx, by])
+        ECDSA::Group::Nistp256.new_point([bx, by])
       when 'P-384'
-        ECDSA::Group::Secp384r1.new_point([bx, by])
+        ECDSA::Group::Nistp384.new_point([bx, by])
       end
     end
 
@@ -147,7 +147,7 @@ RSpec.describe CHex do
       ]
     end
     def sig01_decode_private_key
-      bd=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig01_key_base64[:d]))
+      bd=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(sig01_key_base64[:d]))
     end
 
     def sig01_priv_key
@@ -197,7 +197,6 @@ RSpec.describe CHex do
         sig_struct = ["Signature1", req.value[0], empty_bstr, req.value[2]]
         digest     = sig_struct.to_cbor
         signature  = ECDSA_decodesignature(req.value[3], 32)
-        #byebug
         valid = ECDSA.valid_signature?(sig01_pub_key, digest, signature)
         expect(valid).to be true
         #unpack2.each { |req2|
@@ -219,7 +218,6 @@ RSpec.describe CHex do
       validated = ccs1.validate(sig01_pub_key)
       expect(ccs1.digest.unpack("H*")).to eq(["846a5369676e61747572653145a2012603004054546869732069732074686520636f6e74656e742e"])
 
-      pending "signature still dot check out"
       expect(validated).to be true
 
     end
@@ -283,7 +281,6 @@ RSpec.describe CHex do
       public_key_string = ECDSA::Format::PointOctetString.encode(public_key, compression: true)
 
       expect(public_key.x).to eq(sig01_pub_key.x)
-      pending "public key derived from private key failure"
       expect(public_key.y).to eq(sig01_pub_key.y)
     end
 
@@ -304,7 +301,6 @@ RSpec.describe CHex do
       expect(cs1.sha256.unpack("H*")[0]).to eq(coseobject01_sha256)
       expect(cs1.digest.unpack("H*")[0]).to eq(coseobject01_digest)
 
-      pending "signature still not check out"
       expect(validated).to be true
     end
 
@@ -325,7 +321,7 @@ RSpec.describe CHex do
       ]
     end
     def sig02_decode_private_key
-      bd=ECDSA::Format::IntegerOctetString.decode(Base64.decode64(sig02_key_base64[:d]))
+      bd=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(sig02_key_base64[:d]))
     end
     def sig02_priv_key
       @priv_key ||= sig02_decode_private_key
@@ -340,7 +336,6 @@ RSpec.describe CHex do
       public_key  = group.generator.multiply_by_scalar(private_key)
 
       expect(public_key.x).to eq(sig02_pub_key.x)
-      pending "y point not derived correctly"
       expect(public_key.y).to eq(sig02_pub_key.y)
     end
 
