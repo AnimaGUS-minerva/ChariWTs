@@ -1,1 +1,1 @@
-bundle exec rspec -I. spec/model/signature_spec.rb
+bundle exec rspec -I. spec/model/signature_spec.rb spec/model/voucher_spec.rb

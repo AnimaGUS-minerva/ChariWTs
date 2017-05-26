@@ -1,6 +1,8 @@
 module Chariwt
   class Voucher
-    attr_accessor :assertion, :deviceIdentifier, :created_on, :voucherType
+    attr_accessor :assertion, :deviceIdentifier, :createdOn, :voucherType
+    attr_accessor :expiredOn, :serialNumber, :idevidIssuer, :pinnedDomainCert
+    attr_accessor :nonce
 
     def initialize
       @voucherType = :unknown
@@ -10,7 +12,7 @@ module Chariwt
       thing = jhash['ietf-voucher:voucher']
       self.assertion = thing['assertion']
       self.deviceIdentifier = thing['device-identifier']
-      self.created_on = thing['created-on']
+      self.createdOn = thing['created-on']
     end
 
     def assertion=(x)
@@ -19,14 +21,18 @@ module Chariwt
       end
     end
 
-    def created_on=(x)
+    def createdOn=(x)
       if x
-        begin
-          @created_on = DateTime.parse(x)
-          @voucherType = :time_based
-        rescue ArgumentError
-          @created_on = nil
-          nil
+        if x.instance_of? DateTime
+          @createdOn = x
+        else
+          begin
+            @createdOn = DateTime.parse(x)
+            @voucherType = :time_based
+          rescue ArgumentError
+            @createdOn = nil
+            nil
+          end
         end
       end
     end
