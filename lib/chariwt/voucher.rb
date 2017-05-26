@@ -49,18 +49,26 @@ module Chariwt
       end
 
       vattr = Hash.new
-      vattr['assertion'] = nil
-      vattr['device-identifier'] = nil
-      vattr['created-on'] = nil
-      vattr['expired-on'] = nil
-      vattr['serial-umber'] = nil
-      vattr['devid-issuer'] = nil
-      vattr['pinned-domain-cert'] = nil
-      vattr['nonce'] = nil
+      add_attr_unless_nil(vattr, 'assertion',  @assertion)
+      add_attr_unless_nil(vattr, 'created-on', @createdOn)
+
+      add_attr_unless_nil(vattr, 'expires-on', @expiresOn)
+      add_attr_unless_nil(vattr, 'serial-number', @serialNumber)
+      add_attr_unless_nil(vattr, 'devid-issuer',  @devidIssuer)
+      add_attr_unless_nil(vattr, 'pinned-domain-cert', @pinnedDomainCert)
+      add_attr_unless_nil(vattr, 'nonce', @nonce)
 
       result = Hash.new
       result['ietf-voucher:voucher'] = vattr
       result
     end
+
+    private
+    def add_attr_unless_nil(hash, name, value)
+      if value
+        hash[name] = value
+      end
+    end
+
   end
 end
