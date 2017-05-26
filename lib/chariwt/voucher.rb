@@ -1,7 +1,7 @@
 module Chariwt
   class Voucher
-    attr_accessor :assertion, :deviceIdentifier, :createdOn, :voucherType
-    attr_accessor :expiredOn, :serialNumber, :idevidIssuer, :pinnedDomainCert
+    attr_accessor :assertion, :createdOn, :voucherType
+    attr_accessor :expiresOn, :serialNumber, :idevidIssuer, :pinnedDomainCert
     attr_accessor :nonce
 
     def initialize
@@ -10,9 +10,9 @@ module Chariwt
 
     def load_json(jhash)
       thing = jhash['ietf-voucher:voucher']
-      self.assertion = thing['assertion']
-      self.deviceIdentifier = thing['device-identifier']
-      self.createdOn = thing['created-on']
+      self.assertion    = thing['assertion']
+      self.serialNumber = thing['serial-number']
+      self.createdOn    = thing['created-on']
     end
 
     def assertion=(x)

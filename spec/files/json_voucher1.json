@@ -5,7 +5,7 @@
        "domain-certificate-identifier": {
          "subject": "base64-encoded Subject DER"
        },
-       "device-identifier": "JADA123456789",
+       "serial-number": "JADA123456789",
        "created-on": "2016-10-07T19:31:42Z"
      }
    }
