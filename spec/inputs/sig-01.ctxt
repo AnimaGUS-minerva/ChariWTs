@@ -1,0 +1,17 @@
+d8 62                                   # tag(98)
+   84                                   # array(4)
+      43                                # bytes(3)
+         a10300                         # "\xA1\x03\x00"
+      a0                                # map(0)
+      54                                # bytes(20)
+         546869732069732074686520636f6e74656e742e # "This is the content."
+      81                                # array(1)
+         83                             # array(3)
+            43                          # bytes(3)
+               a10126                   # "\xA1\x01&"
+            a1                          # map(1)
+               04                       # unsigned(4)
+               42                       # bytes(2)
+                  3131                  # "11"
+            58 40                       # bytes(64)
+               d71c05db52c9ce7f1bf5aac01334bbeacac1d86a2303e6eeaa89266f45c01ed602ca649eaf790d8bc99d2458457ca6a872061940e7afbe48e289dfac146ae258 # "\xD7\x1C\x05\xDBR\xC9\xCE\x7F\e\xF5\xAA\xC0\x134\xBB\xEA\xCA\xC1\xD8j#\x03\xE6\xEE\xAA\x89&oE\xC0\x1E\xD6\x02\xCAd\x9E\xAFy\r\x8B\xC9\x9D$XE|\xA6\xA8r\x06\x19@\xE7\xAF\xBEH\xE2\x89\xDF\xAC\x14j\xE2X"

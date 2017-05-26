@@ -1,0 +1,17 @@
+d8 62                                   # tag(98)
+   84                                   # array(4)
+      40                                # bytes(0)
+                                        # ""
+      a0                                # map(0)
+      54                                # bytes(20)
+         546869732069732074686520636f6e74656e742e # "This is the content."
+      81                                # array(1)
+         83                             # array(3)
+            44                          # bytes(4)
+               a1013822                 # "\xA1\x018\""
+            a1                          # map(1)
+               04                       # unsigned(4)
+               44                       # bytes(4)
+                  50333834              # "P384"
+            58 60                       # bytes(96)
+               230df24b9f31dd2d7d1b9c33ce59073fc21e02bb63dc55847626b5b7f43905d59acc186890bc1fe8b6d12e61b0373ffba131ecc6c21958cdff28ad77e0c32f9a0c6ca247135f538496228b2be5557e7dbd7280db24b46b68c0772d1baef09de5 # "#\r\xF2K\x9F1\xDD-}\e\x9C3\xCEY\a?\xC2\x1E\x02\xBBc\xDCU\x84v&\xB5\xB7\xF49\x05\xD5\x9A\xCC\x18h\x90\xBC\x1F\xE8\xB6\xD1.a\xB07?\xFB\xA11\xEC\xC6\xC2\x19X\xCD\xFF(\xADw\xE0\xC3/\x9A\fl\xA2G\x13_S\x84\x96\"\x8B+\xE5U~}\xBDr\x80\xDB$\xB4kh\xC0w-\e\xAE\xF0\x9D\xE5"

@@ -1,8 +1,5 @@
 require 'lib/c_hex'
-require 'lib/chariwt/cose_sign1'
-require 'lib/chariwt/signature'
-require 'lib/chariwt/signatures'
-require 'lib/chariwt/assertion'
+require 'lib/chariwt'
 require 'cbor'
 require 'base64'
 require 'ecdsa'
@@ -141,6 +138,17 @@ RSpec.describe CHex do
       }
     end
 
+    def sig02_key_base64
+      {
+        "kty":"EC",
+       "kid":"P384",
+       "crv":"P-384",
+       "x":"kTJyP2KSsBBhnb4kjWmMF7WHVsY55xUPgb7k64rDcjatChoZ1nvjKmYmPh5STRKc",
+       "y":"mM0weMVU2DKsYDxDJkEP9hZiRZtB8fPfXbzINZj_fF7YQRynNWedHEyzAJOX2e8s",
+       "d":"ok3Nq97AXlpEusO7jIy1FZATlBP9PNReMU7DWbkLQ5dU90snHuuHVDjEPmtV0fTo"
+      }
+    end
+
     def sig01_rng_stream
       [
          "20DB1328B01EBB78122CE86D5B1A3A097EC44EAC603FD5F60108EDF98EA81393"
@@ -171,53 +179,26 @@ RSpec.describe CHex do
       ECDSA::Signature.new(r,s)
     end
 
-    it "should parse cose example C.2.1 into object" do
-      bin = CHex.parse(File.open("spec/inputs/cose2.ctxt", "rb").read)
-      pending "not yet figured out"
-      unpacker = CBOR::Unpacker.new(StringIO.new(bin))
-      unpacker.each { |req|
-        expect(req.class).to eq(CBOR::Tagged)
-        expect(req.value.class).to eq(Array)
-        expect(req.value.length).to eq(4)
-
-        # protected hash
-        protected_bucket = Hash.new
-        CBOR::Unpacker.new(StringIO.new(req.value[0])).each { |thing|
-          protected_bucket = thing
-        }
-        expect(protected_bucket[1]).to eq(-7)  # ECDSA with SHA-256
-
-        expect(req.value[1].class).to eq(Hash)
-        expect(req.value[1][4]).to eq("11")
-
-        # here we need to validate the signature contained in req.value[3]
-        # compared to the content in req.value[2], which needs to be hashed
-        # appropriately.
-
-        sig_struct = ["Signature1", req.value[0], empty_bstr, req.value[2]]
-        digest     = sig_struct.to_cbor
-        signature  = ECDSA_decodesignature(req.value[3], 32)
-        valid = ECDSA.valid_signature?(sig01_pub_key, digest, signature)
-        expect(valid).to be true
-        #unpack2.each { |req2|
-        #  byebug
-        #  expect(req2.class).to eq(Hash)
-        #}
-      }
-    end
-
     it "should parse ecdsa-sig-01 into object" do
       bin = CHex.parse(File.open("spec/inputs/sig-01.ctxt", "rb").read)
 
-      ccs1 = Chariwt::CoseSign1.new(bin)
+      ccs1 = Chariwt::CoseSign0.create(bin)
       ccs1.parse
 
-      expect(ccs1.protected_bucket[1]).to eq(-7)  # ECDSA with SHA-256
-      expect(ccs1.unprotected_bucket[4]).to eq("11")
+      expect(ccs1.protected_bucket[3]).to eq(0)      # XXX what does this mean?
 
       validated = ccs1.validate(sig01_pub_key)
-      expect(ccs1.digest.unpack("H*")).to eq(["846a5369676e61747572653145a2012603004054546869732069732074686520636f6e74656e742e"])
+      expect(validated).to be true
 
+    end
+
+    it "should parse ecdsa-sig-02 into object" do
+      bin = CHex.parse(File.open("spec/inputs/sig-02.ctxt", "rb").read)
+
+      ccs1 = Chariwt::CoseSign0.create(bin)
+      ccs1.parse
+
+      validated = ccs1.validate(sig02_pub_key)
       expect(validated).to be true
 
     end
@@ -243,7 +224,7 @@ RSpec.describe CHex do
       protected_bucket = Hash.new
       protected_bucket[1] = -7
       encoded_protected_bucket = protected_bucket.to_cbor
-      sig_struct = ["Signature1", encoded_protected_bucket, Chariwt::CoseSign1.empty_bstr, content]
+      sig_struct = ["Signature1", encoded_protected_bucket, Chariwt::CoseSign.empty_bstr, content]
       digested   = sig_struct.to_cbor
       digest     = Digest::SHA256.digest(digested)
       private_key = sig01_priv_key
@@ -287,7 +268,7 @@ RSpec.describe CHex do
     it "should parse signed coseobject and verify contents" do
       bin = CHex.parse(File.open("spec/inputs/coseobject01.ctxt", "rb").read)
 
-      cs1 = Chariwt::CoseSign1.new(bin)
+      cs1 = Chariwt::CoseSign0.create(bin)
       cs1.parse
       expect(cs1.parsed).to be true
       validated = cs1.validate(sig01_pub_key)

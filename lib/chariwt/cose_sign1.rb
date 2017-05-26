@@ -6,8 +6,10 @@
 # Initialize with
 #
 
+require 'lib/chariwt/cose_sign0'
+
 module Chariwt
-  class CoseSign1
+  class CoseSign1 < CoseSign0
     attr_accessor :binary, :sha256, :digest
     attr_accessor :parsed, :validated, :valid, :signature, :signature_bytes
     attr_accessor :protected_bucket, :encoded_protected_bucket
@@ -18,33 +20,30 @@ module Chariwt
     # validate it until it is told to.
     #
     # @param binary (A CBOR encoded object)
-    def initialize(binary)
-      @binary = binary
+    def initialize(req)
+      @req = req
       @protected_bucket   ||= Hash.new
       @unprotected_bucket ||= Hash.new
     end
 
     def parse
       return if @parsed
-      unpacker = CBOR::Unpacker.new(StringIO.new(@binary))
-      unpacker.each { |req|
 
-        return unless req.value.length==4
+      return unless @req.value.length==4
 
-        # protected hash
-        @protected_bucket = nil
-        @encoded_protected_bucket = req.value[0]
-        CBOR::Unpacker.new(StringIO.new(@encoded_protected_bucket)).each { |thing|
-          @protected_bucket = thing
-        }
-
-        if(req.value[1].class == Hash)
-          @unprotected_bucket = req.value[1]
-        end
-
-        @contents        = req.value[2]
-        @signature_bytes = req.value[3]
+      # protected hash
+      @protected_bucket = nil
+      @encoded_protected_bucket = @req.value[0]
+      CBOR::Unpacker.new(StringIO.new(@encoded_protected_bucket)).each { |thing|
+        @protected_bucket = thing
       }
+
+      if(@req.value[1].class == Hash)
+        @unprotected_bucket = @req.value[1]
+      end
+
+      @contents        = @req.value[2]
+      @signature_bytes = @req.value[3]
       @parsed = true
     end
 
