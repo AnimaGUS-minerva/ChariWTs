@@ -36,4 +36,23 @@ RSpec.describe Chariwt::Voucher do
     end
   end
 
+  describe "jwt voucher" do
+    it "should generate a simple signed voucher in JWT format" do
+      cv = Chariwt::Voucher.new
+      cv.assertion = ''
+      cv.deviceIdentifier = 'JADA123456789'
+      cv.voucherType = :time_based
+      cv.nonce = 'abcd12345'
+      cv.createdOn = DateTime.parse('2016-10-07T19:31:42Z')
+      cv.expiredOn = DateTime.parse('2017-10-01T00:00:00Z')
+      cv.serialNumber = 23
+      cv.idevidIssuer     = "00112233445566".unpack("H*")
+      cv.pinnedDomainCert = "99001122334455".unpack("H*")
+
+      jv = cv.jwt_voucher
+      expect(jv.class).to eq(Hash)
+      expect(jv['ietf-voucher:voucher'].class).to eq(Hash)
+    end
+  end
+
 end

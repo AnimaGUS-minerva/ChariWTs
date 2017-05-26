@@ -42,5 +42,25 @@ module Chariwt
       load_json(json)
       self
     end
+
+    def jwt_voucher
+      case voucherType
+      when :time_based
+      end
+
+      vattr = Hash.new
+      vattr['assertion'] = nil
+      vattr['device-identifier'] = nil
+      vattr['created-on'] = nil
+      vattr['expired-on'] = nil
+      vattr['serial-umber'] = nil
+      vattr['devid-issuer'] = nil
+      vattr['pinned-domain-cert'] = nil
+      vattr['nonce'] = nil
+
+      result = Hash.new
+      result['ietf-voucher:voucher'] = vattr
+      result
+    end
   end
 end
