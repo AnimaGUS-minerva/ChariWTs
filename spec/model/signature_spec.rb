@@ -221,6 +221,8 @@ RSpec.describe CHex do
 
     end
 
+    # this temporary_key is a random number that is passed into the signer
+    # this should be random, but for testing must be kept static.
     def temporary_key
       ECDSA::Format::IntegerOctetString.decode(["20DB1328B01EBB78122CE86D5B1A3A097EC44EAC603FD5F60108EDF98EA81393"].pack("H*"))
     end
@@ -238,36 +240,20 @@ RSpec.describe CHex do
     end
 
     it "should create a signature for cose object -01" do
-      content = "This is the content."
-      protected_bucket = Hash.new
-      protected_bucket[1] = -7
-      encoded_protected_bucket = protected_bucket.to_cbor
-      sig_struct = ["Signature1", encoded_protected_bucket, Chariwt::CoseSign.empty_bstr, content]
-      digested   = sig_struct.to_cbor
-      digest     = Digest::SHA256.digest(digested)
-      private_key = sig01_priv_key
+      signed = Chariwt::CoseSign1.new
 
-      expect(digested.unpack("H*")[0]).to eq(coseobject01_digest)
-      expect(digest.unpack("H*")[0]).to   eq(coseobject01_sha256)
+      signed.content = "This is the content."
+      signed.protected_bucket[1] = -7
 
-      group     = ECDSA::Group::Nistp256
-      signature = ECDSA.sign(group, private_key, digest, temporary_key)
+      group       = ECDSA::Group::Nistp256
+      signed.generate_signature(group, sig01_priv_key, temporary_key)
 
-      @valid = ECDSA.valid_signature?(sig01_pub_key, digest, signature)
-      expect(@valid).to be true
-
-      sig_r_bytes = ECDSA::Format::IntegerOctetString.encode(signature.r, 32)
-      sig_s_bytes = ECDSA::Format::IntegerOctetString.encode(signature.s, 32)
-      expect(sig_r_bytes.length).to eq(32)
-      expect(sig_s_bytes.length).to eq(32)
-      sig_bytes  = (sig_r_bytes + sig_s_bytes)
-
-      # protected, unprotected, payload, signature
-      sign1 = [ encoded_protected_bucket, {}, content, sig_bytes ]
-      signed_object = CBOR::Tagged.new(18, sign1).to_cbor
+      expect(signed.digested.unpack("H*")[0]).to eq(coseobject01_digest)
+      expect(signed.digest.unpack("H*")[0]).to   eq(coseobject01_sha256)
+      expect(signed.signature_bytes.length).to eq(64)
 
       FileUtils::mkdir_p("tmp")
-      File.open("tmp/coseobject01.bin", "wb") do |f| f.write signed_object end
+      File.open("tmp/coseobject01.bin", "wb") do |f| f.write signed.binary end
       system("cbor2pretty.rb <tmp/coseobject01.bin >tmp/coseobject01.ctxt")
       expect(system("diff tmp/coseobject01.ctxt spec/outputs/coseobject01.ctxt")).to be true
     end
