@@ -4,6 +4,7 @@ require 'cbor'
 require 'base64'
 require 'ecdsa'
 require 'byebug'
+require 'json'
 
 RSpec.describe CHex do
 
@@ -116,10 +117,13 @@ RSpec.describe CHex do
     end
 
     def decode_pub_key_from_example(example)
-      bx=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(example[:x]))
-      by=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(example[:y]))
+      x = example[:x] || example["x"]
+      y = example[:y] || example["y"]
+      bx=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(x))
+      by=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(y))
 
-      case example[:crv]
+      crv = example[:crv] || example["crv"]
+      case crv
       when 'P-256'
         ECDSA::Group::Nistp256.new_point([bx, by])
       when 'P-384'
@@ -191,14 +195,28 @@ RSpec.describe CHex do
       expect(validated).to be true
 
     end
-
-    it "should parse ecdsa-sig-02 into object" do
-      bin = CHex.parse(File.open("spec/inputs/sig-02.ctxt", "rb").read)
+    it "should parse ecdsa-sig-01 into object" do
+      bin = CHex.parse(File.open("spec/inputs/sig-01.ctxt", "rb").read)
 
       ccs1 = Chariwt::CoseSign0.create(bin)
       ccs1.parse
 
-      validated = ccs1.validate(sig02_pub_key)
+      expect(ccs1.protected_bucket[3]).to eq(0)      # XXX what does this mean?
+
+      validated = ccs1.validate(sig01_pub_key)
+      expect(validated).to be true
+    end
+
+    it "should validate ecdsa-sig-02 example from json" do
+      testdesc = JSON.parse(File.open("spec/examples/ecdsa-examples/ecdsa-01.json", "rb").read)
+
+      bin  = CHex.parse(testdesc['output']['cbor'])
+      ccs1 = Chariwt::CoseSign0.create(bin)
+      ccs1.parse
+
+      key0 = testdesc['input']['sign']['signers'][0]['key']
+      pubkey = decode_pub_key_from_example(key0)
+      validated = ccs1.validate(pubkey)
       expect(validated).to be true
 
     end

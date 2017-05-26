@@ -37,6 +37,7 @@ DEPENDENCIES
   cbor (~> 0.5.9.2)
   cbor-diag
   ecdsa
+  json
   rbnacl
   rspec
   rspec-core

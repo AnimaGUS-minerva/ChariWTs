@@ -1,0 +1,3 @@
+[submodule "spec/examples"]
+	path = spec/examples
+	url = https://github.com/cose-wg/Examples
