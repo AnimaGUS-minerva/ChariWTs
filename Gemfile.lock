@@ -10,6 +10,8 @@ GEM
     ecdsa (1.2.0)
     ffi (1.9.18)
     json (1.8.6)
+    jwt (1.5.6)
+    openssl (2.0.3)
     polyglot (0.3.5)
     rbnacl (4.0.2)
       ffi
@@ -38,6 +40,8 @@ DEPENDENCIES
   cbor-diag
   ecdsa
   json
+  jwt
+  openssl
   rbnacl
   rspec
   rspec-core
