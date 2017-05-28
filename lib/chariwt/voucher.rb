@@ -43,7 +43,7 @@ module Chariwt
       self
     end
 
-    def jwt_voucher
+    def json_voucher
       case voucherType
       when :time_based
       end
