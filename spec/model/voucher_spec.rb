@@ -80,7 +80,16 @@ RSpec.describe Chariwt::Voucher do
       ecdsa_public.private_key = nil
 
       token = JWT.encode jv, ecdsa_key, 'ES256'
-      expect(token).to_not be_nil
+      File.open("tmp/jada_abcd.jwt","w") do |f|
+        f.write token
+      end
+      (part1,part2,part3) = token.split(/\./)
+      part1js = JSON.parse(Base64.urlsafe_decode64(part1))
+      part2js = JSON.parse(Base64.urlsafe_decode64(part2))
+      part3bin = Base64.urlsafe_decode64(part3)
+
+      expect(part1js['typ']).to eq('JWT')
+      expect(part2js['ietf-voucher:voucher']).to_not be_nil
     end
   end
 
