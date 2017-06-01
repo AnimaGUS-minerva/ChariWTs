@@ -2,6 +2,7 @@ require 'lib/chariwt/voucher'
 require 'date'
 require 'json'
 require 'openssl'
+require 'ecdsa'
 require 'byebug'
 require 'jwt'
 
@@ -78,10 +79,52 @@ RSpec.describe Chariwt::Voucher do
       ecdsa_public = OpenSSL::PKey::EC.new ecdsa_key
       ecdsa_public.private_key = nil
 
-
       token = JWT.encode jv, ecdsa_key, 'ES256'
       expect(token).to_not be_nil
+    end
+  end
 
+  describe "parsing an EC key" do
+    it "should read a private key from a file and sign using ECDSA" do
+      base64 = ''
+      start = false
+      File.open("spec/inputs/key1.pem", "r").each_line { |line|
+        if line =~ /-----BEGIN EC PRIVATE KEY-----/
+          start=true
+          next
+        end
+        if line =~ /-----END EC PRIVATE KEY-----/
+          break
+        end
+        if start
+          base64 += line.chomp
+        end
+      }
+      expect(base64).to_not be_nil
+      expect(base64.length).to be > 1
+      bin  = Base64.decode64(base64)
+      asn1 = OpenSSL::ASN1.decode(bin)
+
+      # described in rfc5915
+      #  ECPrivateKey ::= SEQUENCE {
+      # version        INTEGER { ecPrivkeyVer1(1) } (ecPrivkeyVer1),
+      # privateKey     OCTET STRING,
+      # parameters [0] ECParameters {{ NamedCurve }} OPTIONAL,
+      # publicKey  [1] BIT STRING OPTIONAL
+      #}
+
+      # we care about the algorithm ID and the value
+      expect(asn1.tag).to eq(16)  # a sequence
+      expect(asn1.value[0].value).to eq(1)
+      expect(asn1.value.length).to eq(4)
+
+      # should really process the array of parameters
+      expect(asn1.value[2].value[0].value).to eq("prime256v1")
+
+      # grab the private key
+      dvalue = asn1.value[1].value
+      bd=ECDSA::Format::IntegerOctetString.decode(dvalue)
+      expect(bd).to eq(62155652909192118641450531910530083020008790680669046461814889750607491156729)
     end
   end
 
