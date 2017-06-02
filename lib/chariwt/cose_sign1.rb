@@ -6,7 +6,7 @@
 # Initialize with an array from a CBOR decode, or nil if constructing.
 #
 
-require 'lib/chariwt/cose_sign0'
+require 'chariwt/cose_sign0'
 
 module Chariwt
   class CoseSign1 < CoseSign0
