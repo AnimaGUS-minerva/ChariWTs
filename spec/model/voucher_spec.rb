@@ -1,4 +1,4 @@
-require 'lib/chariwt/voucher'
+require 'chariwt/voucher'
 require 'date'
 require 'json'
 require 'openssl'
@@ -60,6 +60,11 @@ RSpec.describe Chariwt::Voucher do
     end
 
     it "should generate a simple signed voucher, using JOSE with JSON format" do
+      ecdsa_key = OpenSSL::PKey::EC.new 'prime256v1'
+      ecdsa_key.generate_key
+      ecdsa_public = OpenSSL::PKey::EC.new ecdsa_key
+      ecdsa_public.private_key = nil
+
       cv = Chariwt::Voucher.new
       cv.assertion = ''
       cv.serialNumber = 'JADA123456789'
@@ -68,16 +73,11 @@ RSpec.describe Chariwt::Voucher do
       cv.createdOn = DateTime.parse('2016-10-07T19:31:42Z')
       cv.expiresOn = DateTime.parse('2017-10-01T00:00:00Z')
       cv.idevidIssuer     = "00112233445566".unpack("H*")
-      cv.pinnedDomainCert = "99001122334455".unpack("H*")
+      cv.pinnedDomainCert = Base64.urlsafe_encode64(ecdsa_public.to_der)
 
       jv = cv.json_voucher
       expect(jv.class).to eq(Hash)
       expect(jv['ietf-voucher:voucher'].class).to eq(Hash)
-
-      ecdsa_key = OpenSSL::PKey::EC.new 'prime256v1'
-      ecdsa_key.generate_key
-      ecdsa_public = OpenSSL::PKey::EC.new ecdsa_key
-      ecdsa_public.private_key = nil
 
       token = JWT.encode jv, ecdsa_key, 'ES256'
       File.open("tmp/jada_abcd.jwt","w") do |f|

@@ -23,7 +23,7 @@ module Chariwt
 
     def createdOn=(x)
       if x
-        if x.instance_of? DateTime
+        if x.acts_like?(:time)
           @createdOn = x
         else
           begin
@@ -55,7 +55,7 @@ module Chariwt
       add_attr_unless_nil(vattr, 'expires-on', @expiresOn)
       add_attr_unless_nil(vattr, 'serial-number', @serialNumber)
       add_attr_unless_nil(vattr, 'devid-issuer',  @devidIssuer)
-      add_attr_unless_nil(vattr, 'pinned-domain-cert', @pinnedDomainCert)
+      add_base64_attr_unless_nil(vattr, 'pinned-domain-cert', @pinnedDomainCert)
       add_attr_unless_nil(vattr, 'nonce', @nonce)
 
       result = Hash.new
@@ -67,6 +67,12 @@ module Chariwt
     def add_attr_unless_nil(hash, name, value)
       if value
         hash[name] = value
+      end
+    end
+
+    def add_base64_attr_unless_nil(hash, name, value)
+      if value
+        hash[name] = Base64.urlsafe_decode64(value)
       end
     end
 
