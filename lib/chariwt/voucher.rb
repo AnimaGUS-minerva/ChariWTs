@@ -2,6 +2,7 @@ module Chariwt
   class Voucher
     attr_accessor :assertion, :createdOn, :voucherType
     attr_accessor :expiresOn, :serialNumber, :idevidIssuer, :pinnedDomainCert
+    attr_accessor :pinnedPublicKey
     attr_accessor :nonce
 
     def initialize
@@ -54,8 +55,9 @@ module Chariwt
 
       add_attr_unless_nil(vattr, 'expires-on', @expiresOn)
       add_attr_unless_nil(vattr, 'serial-number', @serialNumber)
-      add_attr_unless_nil(vattr, 'devid-issuer',  @devidIssuer)
-      add_base64_attr_unless_nil(vattr, 'pinned-domain-cert', @pinnedDomainCert)
+      add_base64_attr_unless_nil(vattr, 'idevid-issuer',  @idevidIssuer)
+      add_der_attr_unless_nil(vattr, 'pinned-domain-cert', @pinnedDomainCert)
+      add_base64_attr_unless_nil(vattr, 'pinned-public-key', @pinnedPublicKey)
       add_attr_unless_nil(vattr, 'nonce', @nonce)
 
       result = Hash.new
@@ -71,8 +73,14 @@ module Chariwt
     end
 
     def add_base64_attr_unless_nil(hash, name, value)
-      if value
-        hash[name] = Base64.urlsafe_decode64(value)
+      unless value.blank?
+        hash[name] = Base64.urlsafe_encode64(value)
+      end
+    end
+
+    def add_der_attr_unless_nil(hash, name, value)
+      unless value.blank?
+        hash[name] = Base64.urlsafe_encode64(value.to_der)
       end
     end
 
