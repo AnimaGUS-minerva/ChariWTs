@@ -1,11 +1,11 @@
 require "active_support/all"
-require 'chariwt/voucher'
 require 'date'
 require 'json'
 require 'openssl'
 require 'ecdsa'
 require 'byebug'
 require 'jwt'
+require 'chariwt'
 
 RSpec.describe Chariwt::VoucherRequest do
 
@@ -20,7 +20,8 @@ RSpec.describe Chariwt::VoucherRequest do
     it "should set the attributes when properties are set" do
       vr1 = Chariwt::VoucherRequest.new
       vr1.assertion = 'proximity'
-      expect(vr1.attributes['assertion']).to eq('proximity')
+      vr1.update_attributes
+      expect(vr1.attributes['assertion']).to eq(:proximity)
     end
 
   end

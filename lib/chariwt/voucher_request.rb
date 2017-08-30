@@ -1,6 +1,5 @@
 module Chariwt
   class VoucherRequest < Voucher
-    attr_accessor :attributes
     attr_accessor :owner_cert
 
     def self.from_json_jose(token)

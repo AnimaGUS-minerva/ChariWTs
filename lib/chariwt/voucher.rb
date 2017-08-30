@@ -6,8 +6,10 @@ module Chariwt
     attr_accessor :expiresOn, :serialNumber, :idevidIssuer, :pinnedDomainCert
     attr_accessor :pinnedPublicKey
     attr_accessor :nonce
+    attr_accessor :attributes
 
     def initialize
+      @attributes = Hash.new
       @voucherType = :unknown
     end
 
@@ -16,9 +18,16 @@ module Chariwt
       load_attributes(thing)
     end
     def load_attributes(thing)
+      byebug
       self.assertion    = thing['assertion']
       self.serialNumber = thing['serial-number']
       self.createdOn    = thing['created-on']
+    end
+
+    def update_attributes
+      @attributes['assertion']     = @assertion
+      @attributes['serial-number'] = @serialNumber
+      @attributes['createdOn']     = @createdOn
     end
 
     def assertion=(x)
