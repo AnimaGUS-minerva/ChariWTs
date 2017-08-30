@@ -11,6 +11,9 @@ module Chariwt
 
     def load_json(jhash)
       thing = jhash['ietf-voucher:voucher']
+      load_attributes(thing)
+    end
+    def load_attributes(thing)
       self.assertion    = thing['assertion']
       self.serialNumber = thing['serial-number']
       self.createdOn    = thing['created-on']
@@ -24,7 +27,7 @@ module Chariwt
 
     def createdOn=(x)
       if x
-        if x.acts_like?(:time)
+        if !x.is_a? String
           @createdOn = x
         else
           begin

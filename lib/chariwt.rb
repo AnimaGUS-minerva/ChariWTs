@@ -5,5 +5,5 @@ require 'chariwt/signature'
 require 'chariwt/signatures'
 require 'chariwt/assertion'
 require 'chariwt/voucher'
-require 'chariwt/voucherrequest'
+require 'chariwt/voucher_request'
 
