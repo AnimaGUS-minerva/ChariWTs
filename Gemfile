@@ -12,4 +12,6 @@ gem 'openssl'
 gem 'ecdsa'
 gem 'rbnacl'
 
+# for acts_like?
+gem 'activesupport'
 

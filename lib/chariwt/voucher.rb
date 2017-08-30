@@ -1,3 +1,5 @@
+require "active_support/all"
+
 module Chariwt
   class Voucher
     attr_accessor :assertion, :createdOn, :voucherType
