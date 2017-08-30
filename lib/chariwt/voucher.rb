@@ -85,7 +85,7 @@ module Chariwt
 
     def add_der_attr_unless_nil(hash, name, value)
       unless value.blank?
-        hash[name] = Base64.urlsafe_encode64(value.to_der)
+        hash[name] = Base64.encode64(value.to_der)
       end
     end
 
