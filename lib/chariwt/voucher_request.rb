@@ -101,7 +101,7 @@ module Chariwt
       @vrhash ||= { 'ietf-voucher-request:voucher' => inner_attributes }
     end
 
-    def jose_sign(privkey)
+    def pkcs_sign(privkey)
       digest = OpenSSL::Digest::SHA256.new
       smime  = OpenSSL::PKCS7.sign(@owner_cert, privkey, vrhash.to_json)
       @token = Base64.encode64(smime.to_der)
@@ -112,7 +112,7 @@ module Chariwt
       @token = vrhash.to_json
     end
 
-    def jwt_sign(privkey)
+    def jose_sign(privkey)
       @token = JWT.encode vrhash, privkey, 'ES256'
     end
 
@@ -120,9 +120,14 @@ module Chariwt
       self.owner_cert = OpenSSL::X509::Certificate.new(IO::read(file))
     end
 
-    def jwt_sign_file(file)
+    def jose_sign_file(file)
       privkey = OpenSSL::PKey.read(IO::read(file))
-      jwt_sign(privkey)
+      jose_sign(privkey)
+    end
+
+    def pkcs_sign_file(file)
+      privkey = OpenSSL::PKey.read(IO::read(file))
+      pkcs_sign(privkey)
     end
 
   end

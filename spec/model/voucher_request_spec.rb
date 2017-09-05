@@ -49,25 +49,23 @@ RSpec.describe Chariwt::VoucherRequest do
       vr1.generate_nonce
 
       vr1.owner_cert_file(File.join("spec","files","jada_prime256v1.crt"))
-      vr1.jwt_sign_file(File.join("spec","files","jada_prime256v1.key"))
+      vr1.jose_sign_file(File.join("spec","files","jada_prime256v1.key"))
 
       File.open(File.join("tmp", "pledge_jada123456789.pkix"), "w") do |f|
         f.puts vr1.token
       end
-
-
     end
   end
 
   describe "registrar signing" do
-    it "should JWT sign a voucher request and save to a file" do
+    it "should JOSE sign a voucher request and save to a file" do
       vr1 = Chariwt::VoucherRequest.new
       vr1.assertion    = 'proximity'
       vr1.serialNumber = 'JADA123456789'
       vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
 
       vr1.owner_cert_file(File.join("spec","files","jrc_prime256v1.crt"))
-      vr1.jwt_sign_file(File.join("spec","files","jrc_prime256v1.key"))
+      vr1.jose_sign_file(File.join("spec","files","jrc_prime256v1.key"))
 
       File.open(File.join("tmp", "jada123456789.jwt"), "w") do |f|
         f.puts vr1.token
@@ -80,16 +78,9 @@ RSpec.describe Chariwt::VoucherRequest do
       vr1.assertion    = 'proximity'
       vr1.serialNumber = 'JADA123456789'
       vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
+      vr1.owner_cert_file(File.join("spec","files","jrc_prime256v1.crt"))
+      vr1.pkcs_sign_file(File.join("spec","files","jrc_prime256v1.key"))
 
-      vr1.owner_cert   = File.open(File.join("spec","files","jrc_prime256v1.crt")) do |f|
-        OpenSSL::X509::Certificate.new(f)
-      end
-
-      # now find the private key to sign with.
-      jrcprivkey=File.open(File.join("spec","files","jrc_prime256v1.key")) do |f|
-        OpenSSL::PKey.read(f)
-      end
-      vr1.jose_sign(jrcprivkey)
       File.open(File.join("tmp", "jada123456789.pkix"), "w") do |f|
         f.puts vr1.token
       end
