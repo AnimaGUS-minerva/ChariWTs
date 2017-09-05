@@ -18,7 +18,6 @@ module Chariwt
       load_attributes(thing)
     end
     def load_attributes(thing)
-      byebug
       self.assertion    = thing['assertion']
       self.serialNumber = thing['serial-number']
       self.createdOn    = thing['created-on']

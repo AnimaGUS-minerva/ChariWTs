@@ -1,8 +1,56 @@
 module Chariwt
   class VoucherRequest < Voucher
     attr_accessor :owner_cert
+    attr_accessor :token
+
+    class InvalidVoucherRequest < Exception; end
+    class MissingPublicKey < Exception; end
+    class RequestFailedValidation < Exception; end
 
     def self.from_json_jose(token)
+      # first extract the public key so that it can be used to verify things.
+
+      unverified_token = OpenSSL::PKCS7.new(token)
+      sign0 = unverified_token.certificates.first
+
+      cert_store = OpenSSL::X509::Store.new
+      File::open("spec/files/ownerca_secp384r1.crt","r") do |f|
+        cert_store.add_cert(OpenSSL::X509::Certificate.new(f))
+      end
+
+      unless unverified_token.verify([sign0], cert_store)
+        raise VoucherRequest::RequestFailedValidation
+      end
+
+      json_txt = unverified_token.data
+      json0 = JSON.parse(json_txt)
+
+      pkey  = nil
+      if json0['ietf-voucher-request:voucher']
+        voucher=json0['ietf-voucher-request:voucher']
+        if voucher["pinned-domain-cert"]
+          pubkey_der = Base64.decode64(voucher["pinned-domain-cert"])
+          pubkey = OpenSSL::X509::Certificate.new(pubkey_der)
+        end
+      end
+      raise VoucherRequest::MissingPublicKey unless pubkey
+
+      verified_token = OpenSSL::PKCS7.new(token)
+      unless verified_token.verify([pubkey], cert_store)
+        raise VoucherRequest::RequestFailedValidation
+      end
+
+      json = verified_token.data
+      json0 = JSON.parse(json_txt)
+      json1 = json0['ietf-voucher-request:voucher']
+
+      vr = new
+      vr.voucherType = :request
+      vr.load_attributes(json)
+      vr
+    end
+
+    def self.from_jwt(token)
       # first extract the public key so that it can be used to verify things.
       begin
         unverified_token = JWT.decode token, nil, false
@@ -32,7 +80,11 @@ module Chariwt
     end
 
     def inner_attributes
-      attributes.merge!({ 'pinned-domain-cert' => Base64.encode64(@owner_cert.to_der) })
+      update_attributes
+      if @owner_cert
+        pinned = { 'pinned-domain-cert' => Base64.encode64(@owner_cert.to_der) }
+      end
+      attributes.merge!(pinned)
     end
 
     def vrhash
@@ -40,7 +92,12 @@ module Chariwt
     end
 
     def jose_sign(privkey)
-      byebug
+      digest = OpenSSL::Digest::SHA256.new
+      smime  = OpenSSL::PKCS7.sign(@owner_cert, privkey, vrhash.to_json)
+      @token = Base64.encode64(smime.to_der)
+    end
+
+    def jwt_sign(privkey)
       @token = JWT.encode vrhash, privkey, 'ES256'
     end
 

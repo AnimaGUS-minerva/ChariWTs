@@ -26,11 +26,64 @@ RSpec.describe Chariwt::VoucherRequest do
 
   end
 
+  describe "signing" do
+    it "should JWT sign a voucher request and save to a file" do
+      vr1 = Chariwt::VoucherRequest.new
+      vr1.assertion    = 'proximity'
+      vr1.serialNumber = 'JADA123456789'
+      vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
+
+      vr1.owner_cert   = File.open(File.join("spec","files","jrc_prime256v1.crt")) do |f|
+        OpenSSL::X509::Certificate.new(f)
+      end
+
+      # now find the private key to sign with.
+      jrcprivkey=File.open(File.join("spec","files","jrc_prime256v1.key")) do |f|
+        OpenSSL::PKey.read(f)
+      end
+      vr1.jwt_sign(jrcprivkey)
+      expect(vr1.token).to_not be_nil
+    end
+
+    it "should JSON sign a voucher request and save to a file" do
+      vr1 = Chariwt::VoucherRequest.new
+      vr1.assertion    = 'proximity'
+      vr1.serialNumber = 'JADA123456789'
+      vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
+
+      vr1.owner_cert   = File.open(File.join("spec","files","jrc_prime256v1.crt")) do |f|
+        OpenSSL::X509::Certificate.new(f)
+      end
+
+      # now find the private key to sign with.
+      jrcprivkey=File.open(File.join("spec","files","jrc_prime256v1.key")) do |f|
+        OpenSSL::PKey.read(f)
+      end
+      vr1.jose_sign(jrcprivkey)
+      File.open(File.join("tmp", "jada123456789.pkix"), "w") do |f|
+        f.puts vr1.token
+      end
+      expect(vr1.token).to_not be_nil
+    end
+  end
+
   describe "loading" do
     it "should load values from a JOSE signed JSON file string" do
+      filen = "spec/files/voucher_request1.pkix"
+      token = Base64.decode64(IO::read(filen))
+      vr1 = Chariwt::VoucherRequest.from_json_jose(token)
+      expect(voucher1).to_not be_nil
+
+      expect(voucher1.assertion).to be(:verified)
+      expect(voucher1.serialNumber).to eq('JADA123456789')
+      expect(voucher1.createdOn).to  eq(DateTime.parse('2016-10-07T19:31:42Z'))
+      expect(voucher1.voucherType).to eq(:time_based)
+    end
+
+    it "should load values from a JWT signed JSON file string" do
       filen = "spec/files/voucher_request1.jwt"
       token = IO::read(filen)
-      vr1 = Chariwt::VoucherRequest.from_json_jose(token)
+      vr1 = Chariwt::VoucherRequest.from_jwt(token)
       expect(voucher1).to_not be_nil
 
       expect(voucher1.assertion).to be(:verified)
@@ -80,8 +133,8 @@ RSpec.describe Chariwt::VoucherRequest do
       cv.nonce = 'abcd12345'
       cv.createdOn = DateTime.parse('2016-10-07T19:31:42Z')
       cv.expiresOn = DateTime.parse('2017-10-01T00:00:00Z')
-      cv.idevidIssuer     = "00112233445566".unpack("H*")
-      cv.pinnedDomainCert = Base64.urlsafe_encode64(ecdsa_public.to_der)
+      cv.idevidIssuer     = "00112233445566".unpack("H*").first
+      cv.pinnedDomainCert = ecdsa_public
 
       jv = cv.json_voucher
       expect(jv.class).to eq(Hash)
