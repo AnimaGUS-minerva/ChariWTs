@@ -24,6 +24,10 @@ module Chariwt
       self.createdOn    = thing['created-on']
     end
 
+    def generate_nonce
+      self.nonce = SecureRandom.urlsafe_base64
+    end
+
     def update_attributes
       @attributes['assertion']     = @assertion
       @attributes['serial-number'] = @serialNumber

@@ -16,7 +16,7 @@ It requires a patch to the openssl extension which is currently at:
    https://github.com/ruby/openssl/pull/141
 
 The name ChariWT is chosen to sound like "chariot", but have the
-sequence "C" "W" and "T" in it.
+letter sequence "C" "W" and "T" in it.
 
 
  
