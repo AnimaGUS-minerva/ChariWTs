@@ -42,6 +42,9 @@ RSpec.describe Chariwt::VoucherRequest do
         OpenSSL::PKey.read(f)
       end
       vr1.jwt_sign(jrcprivkey)
+      File.open(File.join("tmp", "jada123456789.jwt"), "w") do |f|
+        f.puts vr1.token
+      end
       expect(vr1.token).to_not be_nil
     end
 
@@ -71,10 +74,10 @@ RSpec.describe Chariwt::VoucherRequest do
     it "should load values from a JOSE signed JSON file string" do
       filen = "spec/files/voucher_request1.pkix"
       token = Base64.decode64(IO::read(filen))
-      vr1 = Chariwt::VoucherRequest.from_json_jose(token)
+      voucher1 = Chariwt::VoucherRequest.from_json_jose(token)
       expect(voucher1).to_not be_nil
 
-      expect(voucher1.assertion).to be(:verified)
+      expect(voucher1.assertion).to    eq(:proximity)
       expect(voucher1.serialNumber).to eq('JADA123456789')
       expect(voucher1.createdOn).to  eq(DateTime.parse('2016-10-07T19:31:42Z'))
       expect(voucher1.voucherType).to eq(:time_based)
@@ -83,10 +86,10 @@ RSpec.describe Chariwt::VoucherRequest do
     it "should load values from a JWT signed JSON file string" do
       filen = "spec/files/voucher_request1.jwt"
       token = IO::read(filen)
-      vr1 = Chariwt::VoucherRequest.from_jwt(token)
+      voucher1 = Chariwt::VoucherRequest.from_jwt(token)
       expect(voucher1).to_not be_nil
 
-      expect(voucher1.assertion).to be(:verified)
+      expect(voucher1.assertion).to    eq(:proximity)
       expect(voucher1.serialNumber).to eq('JADA123456789')
       expect(voucher1.createdOn).to  eq(DateTime.parse('2016-10-07T19:31:42Z'))
       expect(voucher1.voucherType).to eq(:time_based)

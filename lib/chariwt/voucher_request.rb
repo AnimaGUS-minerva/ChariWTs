@@ -6,6 +6,7 @@ module Chariwt
     class InvalidVoucherRequest < Exception; end
     class MissingPublicKey < Exception; end
     class RequestFailedValidation < Exception; end
+    class MalformedJSON < Exception; end
 
     def self.from_json_jose(token)
       # first extract the public key so that it can be used to verify things.
@@ -62,20 +63,29 @@ module Chariwt
       if json0['ietf-voucher-request:voucher']
         voucher=json0['ietf-voucher-request:voucher']
         if voucher["pinned-domain-cert"]
-          pkey_der = Base64.decode64(voucher["pinned-domain-cert"])
-          pkey = OpenSSL::PKey::EC.new(pkey_der)
+          pubkey_der = Base64.decode64(voucher["pinned-domain-cert"])
+          pubkey = OpenSSL::X509::Certificate.new(pubkey_der)
         end
       end
-      raise VoucherRequest::MissingPublicKey unless pkey
+      raise VoucherRequest::MissingPublicKey unless pubkey
 
       begin
-        decoded_token = JWT.decode token, pkey, true, { :algorithm => 'ES256' }
+        decoded_token = JWT.decode token, pubkey.public_key, true, { :algorithm => 'ES256' }
       rescue
         return nil
       end
-      json = decoded_token[0]
-      load_attributes(json)
-      json
+
+      json0 = unverified_token[0]
+      pkey  = nil
+      unless json0['ietf-voucher-request:voucher']
+        raise VoucherRequest::MalformedJSON
+      end
+      voucher=json0['ietf-voucher-request:voucher']
+
+      vr = new
+      vr.voucherType = :request
+      vr.load_attributes(voucher)
+      vr
     end
 
     def inner_attributes
