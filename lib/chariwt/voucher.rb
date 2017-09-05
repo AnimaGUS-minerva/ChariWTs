@@ -18,6 +18,7 @@ module Chariwt
       load_attributes(thing)
     end
     def load_attributes(thing)
+      self.attributes   = thing
       self.assertion    = thing['assertion']
       self.serialNumber = thing['serial-number']
       self.createdOn    = thing['created-on']
@@ -26,7 +27,7 @@ module Chariwt
     def update_attributes
       @attributes['assertion']     = @assertion
       @attributes['serial-number'] = @serialNumber
-      @attributes['createdOn']     = @createdOn
+      @attributes['created-on']    = @createdOn
     end
 
     def assertion=(x)

@@ -14,11 +14,10 @@ module Chariwt
       sign0 = unverified_token.certificates.first
 
       cert_store = OpenSSL::X509::Store.new
-      File::open("spec/files/ownerca_secp384r1.crt","r") do |f|
-        cert_store.add_cert(OpenSSL::X509::Certificate.new(f))
-      end
+      # leave it empty!
 
-      unless unverified_token.verify([sign0], cert_store)
+      # the data will be checked, but the certificate will not be validates.
+      unless unverified_token.verify([sign0], cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
         raise VoucherRequest::RequestFailedValidation
       end
 
@@ -36,7 +35,7 @@ module Chariwt
       raise VoucherRequest::MissingPublicKey unless pubkey
 
       verified_token = OpenSSL::PKCS7.new(token)
-      unless verified_token.verify([pubkey], cert_store)
+      unless unverified_token.verify([pubkey], cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
         raise VoucherRequest::RequestFailedValidation
       end
 
@@ -46,7 +45,7 @@ module Chariwt
 
       vr = new
       vr.voucherType = :request
-      vr.load_attributes(json)
+      vr.load_attributes(json1)
       vr
     end
 
