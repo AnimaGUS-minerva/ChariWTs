@@ -34,8 +34,10 @@ RSpec.describe Chariwt::VoucherRequest do
       vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
       vr1.generate_nonce
 
-      vr1.owner_cert   = File.open(File.join("spec","files","jrc_prime256v1.crt")) do |f|
-        OpenSSL::X509::Certificate.new(f)
+      vr1.unsigned!
+
+      File.open(File.join("tmp", "jada123456789.json_u"), "w") do |f|
+        f.puts vr1.token
       end
     end
 

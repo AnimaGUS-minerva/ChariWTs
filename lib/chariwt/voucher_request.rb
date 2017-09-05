@@ -92,8 +92,9 @@ module Chariwt
       update_attributes
       if @owner_cert
         pinned = { 'pinned-domain-cert' => Base64.encode64(@owner_cert.to_der) }
+        attributes.merge!(pinned)
       end
-      attributes.merge!(pinned)
+      attributes
     end
 
     def vrhash
@@ -104,6 +105,11 @@ module Chariwt
       digest = OpenSSL::Digest::SHA256.new
       smime  = OpenSSL::PKCS7.sign(@owner_cert, privkey, vrhash.to_json)
       @token = Base64.encode64(smime.to_der)
+    end
+
+    # mark a voucher as unsigned, generating the attributes into a hash
+    def unsigned!
+      @token = vrhash.to_json
     end
 
     def jwt_sign(privkey)

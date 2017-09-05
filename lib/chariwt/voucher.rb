@@ -32,6 +32,7 @@ module Chariwt
       @attributes['assertion']     = @assertion
       @attributes['serial-number'] = @serialNumber
       @attributes['created-on']    = @createdOn
+      @attributes['nonce']         = @nonce
     end
 
     def assertion=(x)
