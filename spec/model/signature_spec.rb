@@ -228,7 +228,8 @@ RSpec.describe CHex do
     end
 
     it "should have a temporary key, which is a constant for testing" do
-      expect(temporary_key.class).to be(Bignum)
+      # it's all Integer in 2.4+
+      expect(temporary_key.class).to be(Integer)
     end
 
     def coseobject01_digest
