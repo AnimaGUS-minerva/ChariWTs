@@ -4,88 +4,12 @@ module Chariwt
     attr_accessor :token
 
     class InvalidVoucherRequest < Exception; end
-    class MissingPublicKey < Exception; end
-    class RequestFailedValidation < Exception; end
-    class MalformedJSON < Exception; end
 
-    def self.from_json_jose(token)
-      # first extract the public key so that it can be used to verify things.
-
-      unverified_token = OpenSSL::PKCS7.new(token)
-      sign0 = unverified_token.certificates.first
-
-      cert_store = OpenSSL::X509::Store.new
-      # leave it empty!
-
-      # the data will be checked, but the certificate will not be validates.
-      unless unverified_token.verify([sign0], cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
-        raise VoucherRequest::RequestFailedValidation
-      end
-
-      json_txt = unverified_token.data
-      json0 = JSON.parse(json_txt)
-
-      pkey  = nil
-      if json0['ietf-voucher-request:voucher']
-        voucher=json0['ietf-voucher-request:voucher']
-        if voucher["pinned-domain-cert"]
-          pubkey_der = Base64.decode64(voucher["pinned-domain-cert"])
-          pubkey = OpenSSL::X509::Certificate.new(pubkey_der)
-        end
-      end
-      raise VoucherRequest::MissingPublicKey unless pubkey
-
-      verified_token = OpenSSL::PKCS7.new(token)
-      unless unverified_token.verify([pubkey], cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
-        raise VoucherRequest::RequestFailedValidation
-      end
-
-      json = verified_token.data
-      json0 = JSON.parse(json_txt)
-      json1 = json0['ietf-voucher-request:voucher']
-
-      vr = new
-      vr.voucherType = :request
-      vr.load_attributes(json1)
-      vr
+    def self.object_top_level
+      'ietf-voucher-request:voucher'
     end
-
-    def self.from_jwt(token)
-      # first extract the public key so that it can be used to verify things.
-      begin
-        unverified_token = JWT.decode token, nil, false
-      rescue JWT::DecodeError
-        # probably not a JWT object
-        return nil
-      end
-      json0 = unverified_token[0]
-      pkey  = nil
-      if json0['ietf-voucher-request:voucher']
-        voucher=json0['ietf-voucher-request:voucher']
-        if voucher["pinned-domain-cert"]
-          pubkey_der = Base64.decode64(voucher["pinned-domain-cert"])
-          pubkey = OpenSSL::X509::Certificate.new(pubkey_der)
-        end
-      end
-      raise VoucherRequest::MissingPublicKey unless pubkey
-
-      begin
-        decoded_token = JWT.decode token, pubkey.public_key, true, { :algorithm => 'ES256' }
-      rescue
-        return nil
-      end
-
-      json0 = unverified_token[0]
-      pkey  = nil
-      unless json0['ietf-voucher-request:voucher']
-        raise VoucherRequest::MalformedJSON
-      end
-      voucher=json0['ietf-voucher-request:voucher']
-
-      vr = new
-      vr.voucherType = :request
-      vr.load_attributes(voucher)
-      vr
+    def self.voucher_type
+      :request
     end
 
     def inner_attributes
