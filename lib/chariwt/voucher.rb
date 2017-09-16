@@ -12,10 +12,6 @@ module Chariwt
     class MissingPublicKey < Exception; end
     class MalformedJSON < Exception; end
 
-    def self.from_json_jose(token)
-      from_pkcs7(token)
-    end
-
     def self.object_top_level
       'ietf-voucher:voucher'
     end
@@ -77,7 +73,7 @@ module Chariwt
       object_from_verified_json(json1, pubkey)
     end
 
-    def self.from_jwt(token)
+    def self.from_jose_json(token)
       # first extract the public key so that it can be used to verify things.
       begin
         unverified_token = JWT.decode token, nil, false
