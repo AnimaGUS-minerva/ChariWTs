@@ -72,7 +72,6 @@ RSpec.describe Chariwt::Voucher do
       cv.nonce = 'abcd12345'
       cv.createdOn = DateTime.parse('2016-10-07T19:31:42Z')
       cv.expiresOn = DateTime.parse('2017-10-01T00:00:00Z')
-      cv.idevidIssuer     = "00112233445566".unpack("H*").first
       cv.pinnedDomainCert = ecdsa_public
 
       jv = cv.json_voucher

@@ -4,7 +4,7 @@ module Chariwt
   class Voucher
     attr_accessor :owner_cert
     attr_accessor :assertion, :createdOn, :voucherType
-    attr_accessor :expiresOn, :serialNumber, :idevidIssuer, :pinnedDomainCert
+    attr_accessor :expiresOn, :serialNumber, :pinnedDomainCert
     attr_accessor :pinnedPublicKey
     attr_accessor :nonce
     attr_accessor :attributes
@@ -170,7 +170,7 @@ module Chariwt
 
       add_attr_unless_nil(vattr, 'expires-on', @expiresOn)
       add_attr_unless_nil(vattr, 'serial-number', @serialNumber)
-      add_base64_attr_unless_nil(vattr, 'idevid-issuer',  @idevidIssuer)
+      #add_base64_attr_unless_nil(vattr, 'idevid-issuer',  @idevidIssuer)
       add_der_attr_unless_nil(vattr, 'pinned-domain-cert', @pinnedDomainCert)
       add_base64_attr_unless_nil(vattr, 'pinned-public-key', @pinnedPublicKey)
       add_attr_unless_nil(vattr, 'nonce', @nonce)
