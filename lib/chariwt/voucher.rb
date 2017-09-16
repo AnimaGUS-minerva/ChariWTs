@@ -112,6 +112,7 @@ module Chariwt
     end
     def load_attributes(thing)
       self.attributes   = thing
+      self.nonce        = thing['nonce']
       self.assertion    = thing['assertion']
       self.serialNumber = thing['serial-number']
       self.createdOn    = thing['created-on']
