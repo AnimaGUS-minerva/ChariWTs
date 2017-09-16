@@ -2,11 +2,13 @@ require "active_support/all"
 
 module Chariwt
   class Voucher
+    attr_accessor :owner_cert
     attr_accessor :assertion, :createdOn, :voucherType
     attr_accessor :expiresOn, :serialNumber, :idevidIssuer, :pinnedDomainCert
     attr_accessor :pinnedPublicKey
     attr_accessor :nonce
     attr_accessor :attributes
+    attr_accessor :token
 
     class RequestFailedValidation < Exception; end
     class MissingPublicKey < Exception; end
@@ -176,6 +178,25 @@ module Chariwt
       result = Hash.new
       result['ietf-voucher:voucher'] = vattr
       result
+    end
+
+    def inner_attributes
+      update_attributes
+      if owner_cert
+        pinned = { 'pinned-domain-cert' => Base64.encode64(owner_cert.to_der) }
+        attributes.merge!(pinned)
+      end
+      attributes
+    end
+
+    def vrhash
+      @vrhash ||= { 'ietf-voucher-request:voucher' => inner_attributes }
+    end
+
+    def pkcs_sign(privkey)
+      digest = OpenSSL::Digest::SHA256.new
+      smime  = OpenSSL::PKCS7.sign(owner_cert, privkey, vrhash.to_json)
+      @token = Base64.encode64(smime.to_der)
     end
 
     private

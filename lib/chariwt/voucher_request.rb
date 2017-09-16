@@ -1,8 +1,5 @@
 module Chariwt
   class VoucherRequest < Voucher
-    attr_accessor :owner_cert
-    attr_accessor :token
-
     class InvalidVoucherRequest < Exception; end
 
     def self.object_top_level
@@ -10,25 +7,6 @@ module Chariwt
     end
     def self.voucher_type
       :request
-    end
-
-    def inner_attributes
-      update_attributes
-      if @owner_cert
-        pinned = { 'pinned-domain-cert' => Base64.encode64(@owner_cert.to_der) }
-        attributes.merge!(pinned)
-      end
-      attributes
-    end
-
-    def vrhash
-      @vrhash ||= { 'ietf-voucher-request:voucher' => inner_attributes }
-    end
-
-    def pkcs_sign(privkey)
-      digest = OpenSSL::Digest::SHA256.new
-      smime  = OpenSSL::PKCS7.sign(@owner_cert, privkey, vrhash.to_json)
-      @token = Base64.encode64(smime.to_der)
     end
 
     # mark a voucher as unsigned, generating the attributes into a hash
