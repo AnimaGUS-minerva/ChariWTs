@@ -14,8 +14,12 @@ module Chariwt
     class MissingPublicKey < Exception; end
     class MalformedJSON < Exception; end
 
+    OBJECT_TOP_LEVEL = 'ietf-voucher:voucher'
     def self.object_top_level
-      'ietf-voucher:voucher'
+      OBJECT_TOP_LEVEL
+    end
+    def object_top_level
+      OBJECT_TOP_LEVEL
     end
 
     def self.voucher_type
@@ -176,7 +180,7 @@ module Chariwt
       add_attr_unless_nil(vattr, 'nonce', @nonce)
 
       result = Hash.new
-      result['ietf-voucher:voucher'] = vattr
+      result[object_top_level] = vattr
       result
     end
 
@@ -190,7 +194,7 @@ module Chariwt
     end
 
     def vrhash
-      @vrhash ||= { 'ietf-voucher-request:voucher' => inner_attributes }
+      @vrhash ||= { object_top_level => inner_attributes }
     end
 
     def pkcs_sign(privkey)

@@ -2,8 +2,12 @@ module Chariwt
   class VoucherRequest < Voucher
     class InvalidVoucherRequest < Exception; end
 
+    OBJECT_TOP_LEVEL = 'ietf-voucher-request:voucher'
+    def object_top_level
+      OBJECT_TOP_LEVEL
+    end
     def self.object_top_level
-      'ietf-voucher-request:voucher'
+      OBJECT_TOP_LEVEL
     end
     def self.voucher_type
       :request
