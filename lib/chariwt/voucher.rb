@@ -26,16 +26,17 @@ module Chariwt
       :voucher
     end
 
-    def self.cert_from_json(json0)
-      pubkey = nil
-      if json0[object_top_level]
-        voucher=json0[object_top_level]
-        if voucher["pinned-domain-cert"]
-          pubkey_der = Base64.decode64(voucher["pinned-domain-cert"])
-          pubkey = OpenSSL::X509::Certificate.new(pubkey_der)
-        end
+    def self.cert_from_json1(json1)
+      if data = json1["pinned-domain-cert"]
+        pubkey_der = Base64.decode64(data)
+        pubkey = OpenSSL::X509::Certificate.new(pubkey_der)
       end
-      return pubkey
+    end
+
+    def self.cert_from_json(json0)
+      if json0[object_top_level]
+        cert_from_json1(json0[object_top_level])
+      end
     end
 
     def self.object_from_verified_json(json1, pubkey)
