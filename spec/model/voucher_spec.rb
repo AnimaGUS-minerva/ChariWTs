@@ -58,7 +58,7 @@ RSpec.describe Chariwt::Voucher do
       cv.expiresOn    = '2099-01-01'.to_date
 
 
-      cv.owner_cert   = pubkey99
+      cv.signing_cert     = pubkey99
       cv.pinnedDomainCert = pubkey99
       smime = cv.pkcs_sign(privkey99)
 

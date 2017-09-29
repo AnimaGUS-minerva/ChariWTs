@@ -2,7 +2,7 @@ require "active_support/all"
 
 module Chariwt
   class Voucher
-    attr_accessor :owner_cert
+    attr_accessor :signing_cert
     attr_accessor :assertion, :createdOn, :voucherType
     attr_accessor :expiresOn, :serialNumber, :pinnedDomainCert
     attr_accessor :pinnedPublicKey
@@ -43,7 +43,7 @@ module Chariwt
       vr = new
       vr.voucherType = voucher_type
       vr.load_attributes(json1)
-      vr.owner_cert = pubkey
+      vr.signing_cert = pubkey
       vr
     end
 
@@ -187,8 +187,8 @@ module Chariwt
 
     def inner_attributes
       update_attributes
-      if owner_cert
-        pinned = { 'pinned-domain-cert' => Base64.encode64(owner_cert.to_der) }
+      if pinnedDomainCert
+        pinned = { 'pinned-domain-cert' => Base64.strict_encode64(pinnedDomainCert.to_der) }
         attributes.merge!(pinned)
       end
       attributes
@@ -200,7 +200,7 @@ module Chariwt
 
     def pkcs_sign(privkey)
       digest = OpenSSL::Digest::SHA256.new
-      smime  = OpenSSL::PKCS7.sign(owner_cert, privkey, vrhash.to_json)
+      smime  = OpenSSL::PKCS7.sign(signing_cert, privkey, vrhash.to_json)
       @token = Base64.strict_encode64(smime.to_der)
     end
 

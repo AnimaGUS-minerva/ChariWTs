@@ -22,8 +22,8 @@ module Chariwt
       @token = JWT.encode vrhash, privkey, 'ES256'
     end
 
-    def owner_cert_file(file)
-      self.owner_cert = OpenSSL::X509::Certificate.new(IO::read(file))
+    def signing_cert_file(file)
+      self.signing_cert = OpenSSL::X509::Certificate.new(IO::read(file))
     end
 
     def jose_sign_file(file)

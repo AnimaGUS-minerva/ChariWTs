@@ -48,7 +48,7 @@ RSpec.describe Chariwt::VoucherRequest do
       vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
       vr1.generate_nonce
 
-      vr1.owner_cert_file(File.join("spec","files","jada_prime256v1.crt"))
+      vr1.signing_cert_file(File.join("spec","files","jada_prime256v1.crt"))
       vr1.jose_sign_file(File.join("spec","files","jada_prime256v1.key"))
 
       File.open(File.join("tmp", "pledge_jada123456789.pkix"), "w") do |f|
@@ -64,7 +64,7 @@ RSpec.describe Chariwt::VoucherRequest do
       vr1.serialNumber = 'JADA123456789'
       vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
 
-      vr1.owner_cert_file(File.join("spec","files","jrc_prime256v1.crt"))
+      vr1.signing_cert_file(File.join("spec","files","jrc_prime256v1.crt"))
       vr1.jose_sign_file(File.join("spec","files","jrc_prime256v1.key"))
 
       File.open(File.join("tmp", "jada123456789.jwt"), "w") do |f|
@@ -78,7 +78,7 @@ RSpec.describe Chariwt::VoucherRequest do
       vr1.assertion    = 'proximity'
       vr1.serialNumber = 'JADA123456789'
       vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
-      vr1.owner_cert_file(File.join("spec","files","jrc_prime256v1.crt"))
+      vr1.signing_cert_file(File.join("spec","files","jrc_prime256v1.crt"))
       vr1.pkcs_sign_file(File.join("spec","files","jrc_prime256v1.key"))
 
       File.open(File.join("tmp", "jada123456789.pkix"), "w") do |f|
