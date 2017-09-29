@@ -201,7 +201,7 @@ module Chariwt
     def pkcs_sign(privkey)
       digest = OpenSSL::Digest::SHA256.new
       smime  = OpenSSL::PKCS7.sign(owner_cert, privkey, vrhash.to_json)
-      @token = Base64.encode64(smime.to_der)
+      @token = Base64.strict_encode64(smime.to_der)
     end
 
     private
