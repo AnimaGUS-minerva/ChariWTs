@@ -5,6 +5,9 @@ module Chariwt
     attr_accessor :signing_cert
     attr_accessor :assertion, :createdOn, :voucherType
     attr_accessor :expiresOn, :serialNumber, :pinnedDomainCert
+    attr_accessor :idevidIssuer, :domainCertRevocationChecks
+    attr_accessor :lastRenewalDate, :priorSignedVoucherRequest
+    attr_accessor :proximityRegistrarCert
     attr_accessor :pinnedPublicKey
     attr_accessor :nonce
     attr_accessor :attributes
@@ -118,15 +121,34 @@ module Chariwt
       load_attributes(thing)
     end
     def load_attributes(thing)
-      self.attributes   = thing
-      self.nonce        = thing['nonce']
-      self.assertion    = thing['assertion']
-      self.serialNumber = thing['serial-number']
-      self.createdOn    = thing['created-on']
+      #   +---- voucher
+      #      +---- created-on?                      yang:date-and-time
+      #      +---- expires-on?                      yang:date-and-time
+      #      +---- assertion                        enumeration
+      #      +---- serial-number                    string
+      #      +---- idevid-issuer?                   binary
+      #      +---- pinned-domain-cert?              binary
+      #      +---- domain-cert-revocation-checks?   boolean
+      #      +---- nonce?                           binary
+      #      +---- last-renewal-date?               yang:date-and-time
+      #      +---- prior-signed-voucher-request?    binary
+      #      +---- proximity-registrar-cert?        binary
+      @attributes   = thing
+      @nonce        = thing['nonce']
+      self.assertion     = thing['assertion']
+      @serialNumber = thing['serial-number']
+      self.createdOn     = thing['created-on']
+      self.expiresOn    = thing['expires-on']
+      @idevidIssuer = thing['idevid-issuer']
+      @pinnedDomainCert = thing['pinned-domain-cert']
+      @domainCertRevocationChecks = thing['domain-cert-revocation-checks']
+      @lastRenewalDate  = thing['last-renewal-date']
+      @priorSignedVoucherRequest = thing['prior-signed-voucher-request']
+      @proximityRegistrarCert    = thing['proximity-registrar-cert']
     end
 
     def generate_nonce
-      self.nonce = SecureRandom.urlsafe_base64
+      @nonce = SecureRandom.urlsafe_base64
     end
 
     def update_attributes
@@ -134,6 +156,13 @@ module Chariwt
       @attributes['serial-number'] = @serialNumber
       @attributes['created-on']    = @createdOn
       @attributes['nonce']         = @nonce
+      @attributes['expires-on']    = @expiresOn
+      @attributes['idevid-issuer'] = @idevidIssuer
+      @attributes['pinned-domain-cert'] = @pinnedDomainCert
+      @attributes['domain-cert-revocation-checks']=@domainCertRevocationChecks
+      @attributes['last-renewal-date']  = @lastRenewalDate
+      @attributes['prior-signed-voucher-request']=@priorSignedVoucherRequest
+      @attributes['proximity-registrar-cert']=@proximityRegistrarCert
     end
 
     def assertion=(x)
@@ -152,6 +181,22 @@ module Chariwt
             @voucherType = :time_based
           rescue ArgumentError
             @createdOn = nil
+            nil
+          end
+        end
+      end
+    end
+
+    def expiresOn=(x)
+      if x
+        if !x.is_a? String
+          @expiresOn = x
+        else
+          begin
+            @expiresOn = DateTime.parse(x)
+            @voucherType = :time_based
+          rescue ArgumentError
+            @expiresOn = nil
             nil
           end
         end
