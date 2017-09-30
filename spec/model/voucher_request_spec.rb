@@ -154,7 +154,7 @@ RSpec.describe Chariwt::VoucherRequest do
       cv.nonce = 'abcd12345'
       cv.createdOn = DateTime.parse('2016-10-07T19:31:42Z')
       cv.expiresOn = DateTime.parse('2017-10-01T00:00:00Z')
-      cv.pinnedDomainCert = ecdsa_public
+      cv.signing_cert = ecdsa_public
 
       jv = cv.json_voucher
       expect(jv.class).to eq(Hash)

@@ -25,6 +25,20 @@ module Chariwt
       OBJECT_TOP_LEVEL
     end
 
+    def self.decode_pem(pemstuff)
+      base64stuff = ""
+      pemstuff.lines.each { |line|
+        next if line =~ /^-----BEGIN CERTIFICATE-----/
+        next if line =~ /^-----END CERTIFICATE-----/
+        base64stuff += line
+      }
+      begin
+        pkey_der = Base64.urlsafe_decode64(base64stuff)
+      rescue ArgumentError
+        pkey_der = Base64.decode64(base64stuff)
+      end
+    end
+
     def self.voucher_type
       :voucher
     end
@@ -140,7 +154,7 @@ module Chariwt
       self.createdOn     = thing['created-on']
       self.expiresOn    = thing['expires-on']
       @idevidIssuer = thing['idevid-issuer']
-      @pinnedDomainCert = thing['pinned-domain-cert']
+      self.pinnedDomainCert = thing['pinned-domain-cert']
       @domainCertRevocationChecks = thing['domain-cert-revocation-checks']
       @lastRenewalDate  = thing['last-renewal-date']
       @priorSignedVoucherRequest = thing['prior-signed-voucher-request']
@@ -198,6 +212,23 @@ module Chariwt
           rescue ArgumentError
             @expiresOn = nil
             nil
+          end
+        end
+      end
+    end
+
+    def pinnedDomainCert=(x)
+      if x
+        if x.is_a? OpenSSL::X509::Certificate
+          @pinnedDomainCert = x
+        elsif x.is_a? OpenSSL::PKey::PKey
+          @pinnedDomainCert = x
+        else
+          begin
+            @pinnedDomainCert = OpenSSL::X509::Certificate.new(x)
+          rescue OpenSSL::X509::CertificateError
+            decoded = Chariwt::Voucher.decode_pem(x)
+            @pinnedDomainCert = OpenSSL::X509::Certificate.new(decoded)
           end
         end
       end
