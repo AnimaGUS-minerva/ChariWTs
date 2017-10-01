@@ -300,13 +300,13 @@ module Chariwt
 
     def add_base64_attr_unless_nil(hash, name, value)
       unless value.blank?
-        hash[name] = Base64.urlsafe_encode64(value)
+        hash[name] = Base64.strict_encode64(value)
       end
     end
 
     def add_der_attr_unless_nil(hash, name, value)
       unless value.blank?
-        hash[name] = Base64.encode64(value.to_der)
+        hash[name] = Base64.strict_encode64(value.to_der)
       end
     end
 
