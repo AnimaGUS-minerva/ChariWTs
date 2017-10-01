@@ -48,7 +48,26 @@ RSpec.describe Chariwt::Voucher do
       @privkey99 ||= OpenSSL::PKey.read(File.read("spec/files/jrc_prime256v1.key"))
     end
 
-    it "should sign a voucher" do
+    it "should sign a voucher with an owner public key" do
+      cv = Chariwt::Voucher.new
+      cv.assertion    = 'logged'
+      cv.serialNumber = 'JADA_f2-01-99'
+      cv.voucherType  = :time_based
+      cv.nonce        = '62a2e7693d82fcda2624de58fb6722e5'
+      cv.createdOn    = '2016-01-01'.to_date
+      cv.expiresOn    = '2099-01-01'.to_date
+
+
+      cv.signing_cert     = pubkey99
+      cv.pinnedPublicKey  = pubkey99.public_key
+      smime = cv.pkcs_sign(privkey99)
+
+      File.open(File.join("tmp", "thing_f2-01-99.pkcs"), "w") do |f|
+        f.puts smime
+      end
+    end
+
+    it "should sign a voucher with an owner certificate" do
       cv = Chariwt::Voucher.new
       cv.assertion    = 'logged'
       cv.serialNumber = 'JADA_f2-00-99'

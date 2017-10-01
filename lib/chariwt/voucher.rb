@@ -264,8 +264,10 @@ module Chariwt
     def inner_attributes
       update_attributes
       if pinnedDomainCert
-        pinned = { 'pinned-domain-cert' => Base64.strict_encode64(pinnedDomainCert.to_der) }
-        attributes.merge!(pinned)
+        attributes['pinned-domain-cert'] = Base64.strict_encode64(pinnedDomainCert.to_der)
+      end
+      if pinnedPublicKey
+        attributes['pinned-domain-subject-public-key-info'] = Base64.strict_encode64(pinnedPublicKey.to_der)
       end
       attributes
     end
