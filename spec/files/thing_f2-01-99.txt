@@ -1,0 +1,6 @@
+{"ietf-voucher:voucher":{"assertion":"logged",
+"created-on":"2016-01-01",
+"expires-on":"2099-01-01",
+"serial-number":"JADA_f2-01-99",
+"nonce":"62a2e7693d82fcda2624de58fb6722e5",
+"pinned-domain-subject-public-key-info":"MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENWQOzcNMUjP0NrtfeBc0DJLWfeMGgCFdIv6FUz4DifM1ujMBec/g6W/P6boTmyTGdFOh/8HwKUerL5bpneK8sg=="}}

@@ -62,9 +62,19 @@ RSpec.describe Chariwt::Voucher do
       cv.pinnedPublicKey  = pubkey99.public_key
       smime = cv.pkcs_sign(privkey99)
 
-      File.open(File.join("tmp", "thing_f2-01-99.pkcs"), "w") do |f|
-        f.puts smime
-      end
+      expect(cmp_pkcs_file(smime, "thing_f2-01-99")).to be true
+    end
+
+    def cmp_pkcs_file(smime, base)
+      ofile = File.join("tmp", base + ".pkcs")
+      otfile = File.join("tmp", base+ ".txt")
+
+      File.open(ofile, "w") do |f|     f.puts smime      end
+
+      system("bin/pkcs2json #{ofile} #{otfile}")
+      cmd = "diff #{otfile} spec/files/#{base}.txt"
+      puts cmd
+      system(cmd)
     end
 
     it "should sign a voucher with an owner certificate" do
@@ -81,9 +91,7 @@ RSpec.describe Chariwt::Voucher do
       cv.pinnedDomainCert = pubkey99
       smime = cv.pkcs_sign(privkey99)
 
-      File.open(File.join("tmp", "thing_f2-00-99.pkcs"), "w") do |f|
-        f.puts smime
-      end
+      expect(cmp_pkcs_file(smime, "thing_f2-00-99")).to be true
     end
   end
 

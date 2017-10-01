@@ -166,17 +166,32 @@ module Chariwt
     end
 
     def update_attributes
-      @attributes['assertion']     = @assertion
-      @attributes['serial-number'] = @serialNumber
-      @attributes['created-on']    = @createdOn
-      @attributes['nonce']         = @nonce
-      @attributes['expires-on']    = @expiresOn
-      @attributes['idevid-issuer'] = @idevidIssuer
-      @attributes['pinned-domain-cert'] = @pinnedDomainCert
-      @attributes['domain-cert-revocation-checks']=@domainCertRevocationChecks
-      @attributes['last-renewal-date']  = @lastRenewalDate
-      @attributes['prior-signed-voucher-request']=@priorSignedVoucherRequest
-      @attributes['proximity-registrar-cert']=@proximityRegistrarCert
+      add_attr_unless_nil(@attributes, 'assertion',  @assertion)
+      add_attr_unless_nil(@attributes, 'created-on', @createdOn)
+
+      add_attr_unless_nil(@attributes, 'expires-on', @expiresOn)
+      add_attr_unless_nil(@attributes, 'serial-number', @serialNumber)
+
+      add_attr_unless_nil(@attributes, 'nonce', @nonce)
+      add_attr_unless_nil(@attributes, 'idevid-issuer', @idevidIssuer)
+
+      add_der_attr_unless_nil(@attributes,
+                              'pinned-domain-cert', @pinnedDomainCert)
+      add_der_attr_unless_nil(@attributes,
+                              'pinned-domain-subject-public-key-info',
+                              @pinnedPublicKey)
+      add_attr_unless_nil(@attributes,
+                          'domain-cert-revocation-checks',
+                          @domainCertRevocationChecks)
+
+      add_attr_unless_nil(@attributes, 'last-renewal-date', @lastRenewalDate)
+      add_attr_unless_nil(@attributes,
+                          'prior-signed-voucher-request',
+                          @priorSignedVoucherRequest)
+
+      add_der_attr_unless_nil(@attributes,
+                              'proximity-registrar-cert',
+                              @proximityRegistrarCert)
     end
 
     def assertion=(x)
