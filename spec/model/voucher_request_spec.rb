@@ -218,4 +218,12 @@ RSpec.describe Chariwt::VoucherRequest do
     end
   end
 
+  describe "certificate SerialNumber" do
+    it "should be extracted from subjectAltName othername " do
+      vr = Chariwt::VoucherRequest.new
+      vr.signing_cert_file("spec/files/pledge_prime256v1.crt")
+      expect(vr.eui64_from_cert).to eq("081196FFFE0181E0")
+    end
+  end
+
 end

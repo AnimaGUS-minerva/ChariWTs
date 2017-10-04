@@ -36,5 +36,28 @@ module Chariwt
       pkcs_sign(privkey)
     end
 
+    def eui64_from_cert(cert = signing_cert)
+      eui64 = nil
+      num = 0
+      cert.extensions.each { |ext|
+        num += 1
+        # need to translate to DER, and then feed it to ASN1PARSE.
+        extparsed = OpenSSL::ASN1.decode(ext.to_der)
+        oid   = extparsed.value[0]
+        value = extparsed.value[1]
+        if oid.value == "subjectAltName"
+          sanparsed = OpenSSL::ASN1.decode(value.value)
+          sanparsed.value.each { |san|
+            case san.value[0].value
+            when "1.3.6.1.4.1.46930.1"
+              eui64 = san.value[1].value[0].value
+            end
+            #puts "#{num} #{oid} #{sanparsed}"
+          }
+        end
+      }
+      return eui64
+    end
+
   end
 end
