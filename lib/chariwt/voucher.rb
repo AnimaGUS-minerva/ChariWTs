@@ -81,7 +81,7 @@ module Chariwt
       end
 
       json_txt = unverified_token.data
-      return json_txt,unverified_token
+      return json_txt,unverified_token,sign0
     end
 
     def self.voucher_from_verified_data(json_txt, pubkey)
@@ -92,7 +92,7 @@ module Chariwt
     end
 
     def self.from_pkcs7(token)
-      json_txt,unverified_token = json0_from_pkcs7(token)
+      json_txt,unverified_token,sign0 = json0_from_pkcs7(token)
       json0 = JSON.parse(json_txt)
       pkey  = nil
       pubkey = cert_from_json(json0)
@@ -111,8 +111,8 @@ module Chariwt
     end
 
     def self.from_pkcs7_withoutkey(token)
-      json0,unverified_token = json0_from_pkcs7(token)
-      voucher_from_verified_data(json0, nil)
+      json0,unverified_token,sign0 = json0_from_pkcs7(token)
+      voucher_from_verified_data(json0, sign0)
     end
 
     def self.from_jose_json(token)
