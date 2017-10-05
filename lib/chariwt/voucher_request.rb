@@ -36,6 +36,18 @@ module Chariwt
       pkcs_sign(privkey)
     end
 
+    # this failes because ruby-openssl renders the "value" string as being
+    # "otherName:<unsupported>", which does not get us access to the value!
+    def broken_eui64_from_cert(cert = signing_cert)
+      eui64 = nil
+      certificate.extensions.each { |ext|
+        if ext.oid == "1.3.6.1.4.1.46930.1"
+          eui64 = ext.value
+        end
+      }
+      eui64
+    end
+
     def eui64_from_cert(cert = signing_cert)
       eui64 = nil
       num = 0
