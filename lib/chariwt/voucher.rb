@@ -60,11 +60,13 @@ module Chariwt
       vr = new
       vr.voucherType = voucher_type
       vr.load_attributes(json1)
-      vr.signing_cert = pubkey
+      if pubkey
+        vr.signing_cert = pubkey
+      end
       vr
     end
 
-    def self.from_pkcs7(token)
+    def self.json0_from_pkcs7(token)
       # first extract the public key so that it can be used to verify things.
 
       unverified_token = OpenSSL::PKCS7.new(token)
@@ -79,22 +81,38 @@ module Chariwt
       end
 
       json_txt = unverified_token.data
-      json0 = JSON.parse(json_txt)
+      return json_txt,unverified_token
+    end
 
+    def self.voucher_from_verified_data(json_txt, pubkey)
+      json0 = JSON.parse(json_txt)
+      json1 = json0[object_top_level]
+
+      object_from_verified_json(json1, pubkey)
+    end
+
+    def self.from_pkcs7(token)
+      json_txt,unverified_token = json0_from_pkcs7(token)
+      json0 = JSON.parse(json_txt)
       pkey  = nil
       pubkey = cert_from_json(json0)
       raise Voucher::MissingPublicKey unless pubkey
 
       verified_token = OpenSSL::PKCS7.new(token)
+
+      # leave it empty!
+      cert_store = OpenSSL::X509::Store.new
+
       unless unverified_token.verify([pubkey], cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
         raise Voucher::RequestFailedValidation
       end
+      # now univerified_token has passed second signature.
+      voucher_from_verified_data(unverified_token.data, pubkey)
+    end
 
-      json = verified_token.data
-      json0 = JSON.parse(json_txt)
-      json1 = json0[object_top_level]
-
-      object_from_verified_json(json1, pubkey)
+    def self.from_pkcs7_withoutkey(token)
+      json0,unverified_token = json0_from_pkcs7(token)
+      voucher_from_verified_data(json0, nil)
     end
 
     def self.from_jose_json(token)
