@@ -181,8 +181,8 @@ module Chariwt
       self.pinnedDomainCert = thing['pinned-domain-cert']
       @domainCertRevocationChecks = thing['domain-cert-revocation-checks']
       @lastRenewalDate  = thing['last-renewal-date']
+      self.proximityRegistrarCert = thing['proximity-registrar-cert']
       @priorSignedVoucherRequest = thing['prior-signed-voucher-request']
-      @proximityRegistrarCert    = thing['proximity-registrar-cert']
     end
 
     def generate_nonce
@@ -268,6 +268,23 @@ module Chariwt
           rescue OpenSSL::X509::CertificateError
             decoded = Chariwt::Voucher.decode_pem(x)
             @pinnedDomainCert = OpenSSL::X509::Certificate.new(decoded)
+          end
+        end
+      end
+    end
+
+    def proximityRegistrarCert=(x)
+      if x
+        if x.is_a? OpenSSL::X509::Certificate
+          @proximityRegistrarCert = x
+        elsif x.is_a? OpenSSL::PKey::PKey
+          @proximityRegistrarCert = x
+        else
+          begin
+            @proximityRegistrarCert = OpenSSL::X509::Certificate.new(x)
+          rescue OpenSSL::X509::CertificateError
+            decoded = Chariwt::Voucher.decode_pem(x)
+            @proximityRegistrarCert = OpenSSL::X509::Certificate.new(decoded)
           end
         end
       end
