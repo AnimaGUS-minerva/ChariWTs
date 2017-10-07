@@ -91,7 +91,7 @@ module Chariwt
       object_from_verified_json(json1, pubkey)
     end
 
-    def self.from_pkcs7(token)
+    def self.from_pkcs7(token, anchor = nil)
       json_txt,unverified_token,sign0 = json0_from_pkcs7(token)
       json0 = JSON.parse(json_txt)
       pkey  = nil
@@ -102,8 +102,14 @@ module Chariwt
 
       # leave it empty!
       cert_store = OpenSSL::X509::Store.new
+      if anchor
+        cert_store.add_cert(anchor)
+        flags = OpenSSL::PKCS7::NOCHAIN
+      else
+        flags = OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY
+      end
 
-      unless unverified_token.verify([pubkey], cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
+      unless unverified_token.verify([pubkey], cert_store, nil, flags)
         raise Voucher::RequestFailedValidation
       end
       # now univerified_token has passed second signature.
