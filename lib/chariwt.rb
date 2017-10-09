@@ -1,3 +1,4 @@
+require 'chariwt/testing'
 require 'chariwt/cose_sign0'
 require 'chariwt/cose_sign'
 require 'chariwt/cose_sign1'
