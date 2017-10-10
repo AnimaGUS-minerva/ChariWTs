@@ -209,9 +209,9 @@ module Chariwt
                           @domainCertRevocationChecks)
 
       add_attr_unless_nil(@attributes, 'last-renewal-date', @lastRenewalDate)
-      add_attr_unless_nil(@attributes,
-                          'prior-signed-voucher-request',
-                          @priorSignedVoucherRequest)
+      add_binary_attr_unless_nil(@attributes,
+                                 'prior-signed-voucher-request',
+                                 @priorSignedVoucherRequest)
 
       add_der_attr_unless_nil(@attributes,
                               'proximity-registrar-cert',
@@ -348,6 +348,12 @@ module Chariwt
     def add_der_attr_unless_nil(hash, name, value)
       unless value.blank?
         hash[name] = Base64.strict_encode64(value.to_der)
+      end
+    end
+
+    def add_binary_attr_unless_nil(hash, name, value)
+      unless value.blank?
+        hash[name] = Base64.strict_encode64(value)
       end
     end
 
