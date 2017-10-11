@@ -183,7 +183,8 @@ module Chariwt
       @domainCertRevocationChecks = thing['domain-cert-revocation-checks']
       @lastRenewalDate  = thing['last-renewal-date']
       self.proximityRegistrarCert = thing['proximity-registrar-cert']
-      @priorSignedVoucherRequest = thing['prior-signed-voucher-request']
+
+      self.priorSignedVoucherRequest_base64 = thing['prior-signed-voucher-request']
     end
 
     def generate_nonce
@@ -288,6 +289,12 @@ module Chariwt
             @proximityRegistrarCert = OpenSSL::X509::Certificate.new(decoded)
           end
         end
+      end
+    end
+
+    def priorSignedVoucherRequest_base64=(x)
+      if x
+        self.priorSignedVoucherRequest = Base64.decode64(x)
       end
     end
 

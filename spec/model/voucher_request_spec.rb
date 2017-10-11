@@ -24,7 +24,14 @@ RSpec.describe Chariwt::VoucherRequest do
       expect(vr1.attributes['assertion']).to eq(:proximity)
     end
 
+    it "should set the priorSignedVoucherRequest from a binary string" do
+      vr1 = Chariwt::VoucherRequest.new
+      vr1.priorSignedVoucherRequest_base64 = "aGVsbG8="
+      expect(vr1.priorSignedVoucherRequest).to eq("hello")
+    end
+
   end
+
 
   describe "pledge signing" do
     it "should create a JSON format unsigned voucher request" do
