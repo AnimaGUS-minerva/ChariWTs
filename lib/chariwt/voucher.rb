@@ -26,6 +26,7 @@ module Chariwt
     end
 
     def self.decode_pem(pemstuff)
+      return "" if pemstuff.blank?
       base64stuff = ""
       pemstuff.lines.each { |line|
         next if line =~ /^-----BEGIN CERTIFICATE-----/
