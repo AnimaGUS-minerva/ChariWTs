@@ -6,7 +6,7 @@ module Chariwt
     File.open(ofile, "w") do |f|     f.puts smime      end
 
     location = File.dirname(__FILE__) + "/../../bin"
-    puts "Location is: #{location}, wrote to #{ofile}, #{otfile}, #{base}"
+    #puts "Location is: #{location}, wrote to #{ofile}, #{otfile}, #{base}"
     system("#{location}/pkcs2json #{ofile} #{otfile}")
     cmd = "diff #{otfile} spec/files/#{base}.txt"
     puts cmd
