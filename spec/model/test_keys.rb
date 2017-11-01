@@ -26,8 +26,23 @@ module Testkeys
       "20DB1328B01EBB78122CE86D5B1A3A097EC44EAC603FD5F60108EDF98EA81393"
     ]
   end
-  def sig01_decode_private_key
-    bd=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(sig01_key_base64[:d]))
+
+  def create_point_from_example(example, px, py)
+    crv = example[:crv] || example["crv"]
+
+    case crv
+    when 'P-256'
+      ECDSA::Group::Nistp256.new_point([px, py])
+    when 'P-384'
+      ECDSA::Group::Nistp384.new_point([px, py])
+    end
+  end
+
+  def sig01_decode_private_key(example)
+    bd = ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(sig01_key_base64[:d]))
+
+    #create_point_from_example(example, bd)
+    return bd
   end
 
   def decode_pub_key_from_example(example)
@@ -36,17 +51,11 @@ module Testkeys
     bx=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(x))
     by=ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(y))
 
-    crv = example[:crv] || example["crv"]
-    case crv
-    when 'P-256'
-      ECDSA::Group::Nistp256.new_point([bx, by])
-    when 'P-384'
-      ECDSA::Group::Nistp384.new_point([bx, by])
-    end
+    create_point_from_example(example, bx, by)
   end
 
   def sig01_priv_key
-    @sig01_priv_key ||= sig01_decode_private_key
+    @sig01_priv_key ||= sig01_decode_private_key(sig01_key_base64)
   end
 
   def sig01_pub_key
