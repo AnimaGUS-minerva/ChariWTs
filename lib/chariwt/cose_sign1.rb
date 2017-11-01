@@ -95,7 +95,7 @@ module Chariwt
     def generate_signature(group, private_key, temporary_key = nil)
 
       unless temporary_key
-        temporary_key = SecureRandom.random_bytes(group.byte_length)
+        temporary_key = ECDSA::Format::IntegerOctetString.decode(SecureRandom.random_bytes(group.byte_length))
       end
 
       @encoded_protected_bucket = @protected_bucket.to_cbor
