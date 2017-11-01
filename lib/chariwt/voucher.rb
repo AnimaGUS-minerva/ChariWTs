@@ -392,6 +392,16 @@ module Chariwt
       @token = @sidhash.to_cbor
     end
 
+    def cbor_sign(privkey, temporary_key = nil)
+      @sidhash = VoucherSID.hash2yangsid(vrhash)
+      sig = Chariwt::CoseSign1.new
+      sig.protected_bucket = @sidhash.to_cbor
+
+      @token = sig.generate_signature(ECDSA::Group::Nistp256,
+                                      privkey, temporary_key)
+      @token
+    end
+
     private
     def add_attr_unless_nil(hash, name, value)
       if value
