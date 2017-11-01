@@ -1,7 +1,16 @@
 require "active_support/all"
+require "cbor"
+
+class DateTime
+  def to_cbor(n = nil)
+    to_time.to_cbor(n)
+  end
+end
 
 module Chariwt
   class Voucher
+    attr_accessor :token_format
+
     attr_accessor :signing_cert
     attr_accessor :assertion, :createdOn, :voucherType
     attr_accessor :expiresOn, :serialNumber, :pinnedDomainCert
@@ -150,7 +159,11 @@ module Chariwt
       object_from_verified_json(voucher, pubkey)
     end
 
-    def initialize
+    def initialize(options = Hash.new)
+      # setup defaults to be pkcs/cms format.
+      options = {:format => :pkcs}.merge!(options)
+
+      @token_format = options[:format]
       @attributes = Hash.new
       @voucherType = :unknown
     end
@@ -340,6 +353,17 @@ module Chariwt
       @token = Base64.strict_encode64(smime.to_der)
     end
 
+    #
+    # CBOR routines
+    #
+
+    # turns a voucher into an unsinged CBOR/YANG array based
+    # upon the SID assignments
+    def cbor_unsign
+      @sidhash = VoucherSID.hash2yangsid(vrhash)
+      @token = @sidhash.to_cbor
+    end
+
     private
     def add_attr_unless_nil(hash, name, value)
       if value
@@ -364,6 +388,7 @@ module Chariwt
         hash[name] = Base64.strict_encode64(value)
       end
     end
+
 
   end
 end

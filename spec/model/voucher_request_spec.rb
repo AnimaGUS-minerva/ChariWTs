@@ -49,7 +49,7 @@ RSpec.describe Chariwt::VoucherRequest do
     end
 
     it "should create a JSON format signed voucher request" do
-      vr1 = Chariwt::VoucherRequest.new
+      vr1 = Chariwt::VoucherRequest.new(:format => :cms)
       vr1.assertion    = 'proximity'
       vr1.serialNumber = 'JADA123456789'
       vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
@@ -59,6 +59,40 @@ RSpec.describe Chariwt::VoucherRequest do
       vr1.jose_sign_file(File.join("spec","files","jada_prime256v1.key"))
 
       File.open(File.join("tmp", "pledge_jada123456789.pkix"), "w") do |f|
+        f.puts vr1.token
+      end
+    end
+
+    it "should create a CBOR format unsigned voucher request" do
+      vr1 = Chariwt::VoucherRequest.new(:format => :cbor)
+      vr1.assertion    = 'proximity'
+      vr1.serialNumber = 'JADA123456789'
+      vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
+      vr1.generate_nonce
+
+      vr1.signing_cert_file(File.join("spec","files","jada_prime256v1.crt"))
+      vr1.cbor_unsign
+
+      File.open(File.join("tmp", "pledge_jada123456789.cbor"), "w") do |f|
+        f.write vr1.token
+      end
+      system("cbor2diag.rb tmp/pledge_jada123456789.cbor >tmp/pledge_jada123456789.diag")
+      cmd = "diff tmp/pledge_jada123456789.diag spec/files/pledge_jada123456789.diag"
+      puts cmd
+      system(cmd)
+    end
+
+    it "should create a CBOR format signed voucher request" do
+      vr1 = Chariwt::VoucherRequest.new(:format => :cwt)
+      vr1.assertion    = 'proximity'
+      vr1.serialNumber = 'JADA123456789'
+      vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
+      vr1.generate_nonce
+
+      vr1.signing_cert_file(File.join("spec","files","jada_prime256v1.crt"))
+      vr1.cwt_sign(File.join("spec","files","jada_prime256v1.key"))
+
+      File.open(File.join("tmp", "pledge_jada123456789.cwt"), "w") do |f|
         f.puts vr1.token
       end
     end
