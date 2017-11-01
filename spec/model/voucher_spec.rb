@@ -5,9 +5,11 @@ require 'openssl'
 require 'ecdsa'
 require 'byebug'
 require 'jwt'
+require 'test_keys'
 
 RSpec.describe Chariwt::Voucher do
 
+  include Testkeys
   describe "properties" do
     it "should have empty properties" do
       voucher1 = Chariwt::Voucher.new
@@ -133,6 +135,30 @@ RSpec.describe Chariwt::Voucher do
 
       expect(part1js['typ']).to eq('JWT')
       expect(part2js['ietf-voucher:voucher']).to_not be_nil
+    end
+  end
+
+  describe "cwt voucher" do
+    it "should sign a voucher in CWT format" do
+
+      cv = Chariwt::Voucher.new
+      cv.assertion = ''
+      cv.serialNumber = 'JADA123456789'
+      cv.voucherType = :time_based
+      cv.nonce = 'abcd12345'
+      cv.createdOn = DateTime.parse('2016-10-07T19:31:42Z')
+      cv.expiresOn = DateTime.parse('2017-10-01T00:00:00Z')
+      cv.pinnedDomainCert = ecdsa_public
+
+      cv.cbor_sign(sign01_priv_key)
+
+      File.open("tmp/jada_abcd.cbor","w") do |f|
+        f.write cv.token
+      end
+      system("cbor2diag.rb tmp/jada_abcd.cbor  >tmp/jada_abcd.diag")
+      cmd = "diff tmp/jada_abcd.diag spec/files/jada_abcd.diag"
+      puts cmd
+      system(cmd)
     end
   end
 
