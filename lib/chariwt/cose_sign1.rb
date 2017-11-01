@@ -103,6 +103,8 @@ module Chariwt
       @digested   = sig_struct.to_cbor
       @digest     = Digest::SHA256.digest(digested)
 
+      #puts "group: #{group} pk: #{private_key}"
+      #puts "digest: #{digest.unpack("H*")}"; puts "tk: #{temporary_key}"
       @signature= ECDSA.sign(group, private_key, digest, temporary_key)
 
       # protected, unprotected, payload, signature
