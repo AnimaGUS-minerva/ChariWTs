@@ -1,11 +1,11 @@
-require 'chariwt/voucher'
+require 'chariwt'
 require 'date'
 require 'json'
 require 'openssl'
 require 'ecdsa'
 require 'byebug'
 require 'jwt'
-require 'test_keys'
+require 'spec/model/test_keys'
 
 RSpec.describe Chariwt::Voucher do
 
@@ -148,9 +148,9 @@ RSpec.describe Chariwt::Voucher do
       cv.nonce = 'abcd12345'
       cv.createdOn = DateTime.parse('2016-10-07T19:31:42Z')
       cv.expiresOn = DateTime.parse('2017-10-01T00:00:00Z')
-      cv.pinnedDomainCert = ecdsa_public
+      cv.pinnedPublicKey = sig01_pub_key
 
-      cv.cbor_sign(sign01_priv_key)
+      cv.cbor_sign(sig01_priv_key, temporary_key)
 
       File.open("tmp/jada_abcd.cbor","w") do |f|
         f.write cv.token
