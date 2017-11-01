@@ -169,12 +169,6 @@ RSpec.describe CHex do
 
     end
 
-    # this temporary_key is a random number that is passed into the signer
-    # this should be random, but for testing must be kept static.
-    def temporary_key
-      ECDSA::Format::IntegerOctetString.decode(["20DB1328B01EBB78122CE86D5B1A3A097EC44EAC603FD5F60108EDF98EA81393"].pack("H*"))
-    end
-
     it "should have a temporary key, which is a constant for testing" do
       # it's all Integer in 2.4+
       expect(temporary_key.class).to be(Integer)

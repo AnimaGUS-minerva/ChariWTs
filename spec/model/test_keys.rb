@@ -38,6 +38,12 @@ module Testkeys
     end
   end
 
+  # this temporary_key is a random number that is passed into the signer
+  # this should be random, but for testing must be kept static.
+  def temporary_key
+    ECDSA::Format::IntegerOctetString.decode(["20DB1328B01EBB78122CE86D5B1A3A097EC44EAC603FD5F60108EDF98EA81393"].pack("H*"))
+  end
+
   def sig01_decode_private_key(example)
     bd = ECDSA::Format::IntegerOctetString.decode(Base64.urlsafe_decode64(sig01_key_base64[:d]))
 
