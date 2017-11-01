@@ -216,9 +216,19 @@ module Chariwt
 
       add_der_attr_unless_nil(@attributes,
                               'pinned-domain-cert', @pinnedDomainCert)
-      add_der_attr_unless_nil(@attributes,
-                              'pinned-domain-subject-public-key-info',
-                              @pinnedPublicKey)
+
+      case @pinnedPublicKey
+      when ECDSA::Point
+        add_attr_unless_nil(@attributes,
+                            'pinned-domain-subject-public-key-info',
+                            ECDSA::Format::PointOctetString.encode(@pinnedPublicKey, compression: true))
+
+      else
+        add_der_attr_unless_nil(@attributes,
+                                'pinned-domain-subject-public-key-info',
+                                @pinnedPublicKey)
+      end
+
       add_attr_unless_nil(@attributes,
                           'domain-cert-revocation-checks',
                           @domainCertRevocationChecks)
@@ -284,6 +294,24 @@ module Chariwt
             decoded = Chariwt::Voucher.decode_pem(x)
             @pinnedDomainCert = OpenSSL::X509::Certificate.new(decoded)
           end
+        end
+      end
+    end
+
+    def pinnedPublicKey=(x)
+      if x
+        case x
+        when OpenSSL::PKey::PKey
+          @pinnedPublicKey = x
+        when ECDSA::Point
+          # also a kind of public key
+          @pinnedPublicKey = x
+        when String
+        # try to decode it as a public key.
+          @pinnedPublicKey = OpenSSL::PKey.new(x)
+        else
+          byebug
+          puts "Not sure what othe formats belong here"
         end
       end
     end
