@@ -16,7 +16,7 @@ module Chariwt
     attr_accessor :expiresOn, :serialNumber, :pinnedDomainCert
     attr_accessor :idevidIssuer, :domainCertRevocationChecks
     attr_accessor :lastRenewalDate, :priorSignedVoucherRequest
-    attr_accessor :proximityRegistrarCert
+    attr_accessor :proximityRegistrarCert, :proximityRegistrarPublicKey
     attr_accessor :pinnedPublicKey
     attr_accessor :nonce
     attr_accessor :attributes
@@ -185,6 +185,10 @@ module Chariwt
       #      +---- last-renewal-date?               yang:date-and-time
       #      +---- prior-signed-voucher-request?    binary
       #      +---- proximity-registrar-cert?        binary
+
+      # assignments are used whenever there are actually additional processing possible
+      # for the assignment due to different formats.
+
       @attributes   = thing
       @nonce        = thing['nonce']
       self.assertion     = thing['assertion']
@@ -195,7 +199,8 @@ module Chariwt
       self.pinnedDomainCert = thing['pinned-domain-cert']
       @domainCertRevocationChecks = thing['domain-cert-revocation-checks']
       @lastRenewalDate  = thing['last-renewal-date']
-      self.proximityRegistrarCert = thing['proximity-registrar-cert']
+      self.proximityRegistrarCert     = thing['proximity-registrar-cert']
+      self.proximityRegistrarPublicKey   = thing['proximity-registrar-pubkey']
 
       self.priorSignedVoucherRequest_base64 = thing['prior-signed-voucher-request']
     end
@@ -229,6 +234,18 @@ module Chariwt
                                 @pinnedPublicKey)
       end
 
+      case @pinnedPublicKey
+      when ECDSA::Point
+        add_attr_unless_nil(@attributes,
+                            'pinned-domain-subject-public-key-info',
+                            ECDSA::Format::PointOctetString.encode(@pinnedPublicKey, compression: true))
+
+      else
+        add_der_attr_unless_nil(@attributes,
+                                'pinned-domain-subject-public-key-info',
+                                @pinnedPublicKey)
+      end
+
       add_attr_unless_nil(@attributes,
                           'domain-cert-revocation-checks',
                           @domainCertRevocationChecks)
@@ -241,6 +258,18 @@ module Chariwt
       add_der_attr_unless_nil(@attributes,
                               'proximity-registrar-cert',
                               @proximityRegistrarCert)
+
+      case @proximityRegistrarPublicKey
+      when ECDSA::Point
+        add_attr_unless_nil(@attributes,
+                            'proximity-registrar-public-key',
+                            ECDSA::Format::PointOctetString.encode(@proximityRegistrarPublicKey, compression: true))
+
+      else
+        add_der_attr_unless_nil(@attributes,
+                                'proximity-registrar-public-key',
+                                @proximityRegistrarPublicKey)
+      end
     end
 
     def assertion=(x)
@@ -328,6 +357,28 @@ module Chariwt
           rescue OpenSSL::X509::CertificateError
             decoded = Chariwt::Voucher.decode_pem(x)
             @proximityRegistrarCert = OpenSSL::X509::Certificate.new(decoded)
+          end
+        end
+      end
+    end
+
+    def proximityRegistrarPublicKey=(x)
+      if x
+        case x
+        when OpenSSL::X509::Certificate
+          byebug
+          @proximityRegistrarPublicKey = x.public_key
+        when OpenSSL::PKey::PKey
+          @proximityRegistrarPublicKey = x
+        when ECDSA::Point
+          @proximityRegistrarPublicKey = x
+        else
+          begin
+            cert = OpenSSL::X509::Certificate.new(x)
+            @proximityRegistrarPublicKey = cert.public_key
+          rescue OpenSSL::X509::CertificateError
+            decoded = Chariwt::Voucher.decode_pem(x)
+            @proximityRegistrarPublicKey = OpenSSL::X509::Certificate.new(decoded)
           end
         end
       end
