@@ -65,16 +65,6 @@ RSpec.describe Chariwt::VoucherRequest do
       end
     end
 
-    def diagdiff(token, file)
-      File.open(File.join("tmp", "#{file}.cbor"), "w") do |f|
-        f.write token
-      end
-      system("cbor2diag.rb tmp/#{file}.cbor >tmp/#{file}.diag")
-      cmd = "diff tmp/#{file}.diag spec/files/#{file}.diag"
-      puts cmd
-      system(cmd)
-    end
-
     it "should create a CBOR format unsigned voucher request" do
       vr1 = Chariwt::VoucherRequest.new(:format => :cbor)
       vr1.assertion    = 'proximity'

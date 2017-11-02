@@ -1,4 +1,14 @@
 module Testkeys
+  def diagdiff(token, file)
+    File.open(File.join("tmp", "#{file}.cbor"), "w") do |f|
+      f.write token
+    end
+    system("cbor2diag.rb tmp/#{file}.cbor >tmp/#{file}.diag")
+    cmd = "diff tmp/#{file}.diag spec/files/#{file}.diag"
+    puts cmd
+    system(cmd)
+  end
+
   def sig01_key_base64
     {
         kty:"EC",
