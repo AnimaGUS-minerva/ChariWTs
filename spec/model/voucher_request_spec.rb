@@ -83,7 +83,7 @@ RSpec.describe Chariwt::VoucherRequest do
       vr1.assertion    = 'proximity'
       vr1.serialNumber = 'JADA345768912'
       vr1.createdOn    = DateTime.parse('2016-11-07T19:31:42Z')
-      vr1.generate_nonce
+      vr1.nonce        = static_nonce
       vr1.proximityRegistrarPublicKey = sig01_pub_key
 
       vr1.cbor_sign(sig01_priv_key)
