@@ -1,5 +1,6 @@
 require "active_support/all"
 require "cbor"
+require 'ecdsa'
 
 class DateTime
   def to_cbor(n = nil)
