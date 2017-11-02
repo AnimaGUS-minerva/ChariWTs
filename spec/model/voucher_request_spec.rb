@@ -88,7 +88,7 @@ RSpec.describe Chariwt::VoucherRequest do
 
       vr1.cbor_sign(sig01_priv_key)
 
-      expect(diagdiff(vr1.token, "pledge_jada345768912")).to be true
+      expect(diagdiff_sig(vr1.token, "pledge_jada345768912")).to be true
     end
   end
 

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+file1=$1
+file2=$2
+#set -x
+cbor2diag.rb $file1 | sed -e's/,/,\n/g' | sed -e "4s/h'.*'/h'SIGNED'/" >$file2
