@@ -6,8 +6,10 @@ require 'ecdsa'
 require 'byebug'
 require 'jwt'
 require 'chariwt'
+require 'spec/model/test_keys'
 
 RSpec.describe Chariwt::VoucherRequest do
+  include Testkeys
 
   describe "properties" do
     it "should have empty properties" do
@@ -63,23 +65,27 @@ RSpec.describe Chariwt::VoucherRequest do
       end
     end
 
+    def diagdiff(token, file)
+      File.open(File.join("tmp", "#{file}.cbor"), "w") do |f|
+        f.write token
+      end
+      system("cbor2diag.rb tmp/#{file}.cbor >tmp/#{file}.diag")
+      cmd = "diff tmp/#{file}.diag spec/files/#{file}.diag"
+      puts cmd
+      system(cmd)
+    end
+
     it "should create a CBOR format unsigned voucher request" do
       vr1 = Chariwt::VoucherRequest.new(:format => :cbor)
       vr1.assertion    = 'proximity'
       vr1.serialNumber = 'JADA123456789'
       vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
-      vr1.generate_nonce
+      vr1.nonce        = static_nonce
 
-      vr1.signing_cert_file(File.join("spec","files","jada_prime256v1.crt"))
+      #vr1.signing_cert_file(File.join("spec","files","jada_prime256v1.crt"))
       vr1.cbor_unsign
 
-      File.open(File.join("tmp", "pledge_jada123456789.cbor"), "w") do |f|
-        f.write vr1.token
-      end
-      system("cbor2diag.rb tmp/pledge_jada123456789.cbor >tmp/pledge_jada123456789.diag")
-      cmd = "diff tmp/pledge_jada123456789.diag spec/files/pledge_jada123456789.diag"
-      puts cmd
-      system(cmd)
+      expect(diagdiff(vr1.token, "pledge_jada123456789")).to be true
     end
 
     it "should create a CBOR format signed voucher request" do

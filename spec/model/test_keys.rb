@@ -27,6 +27,10 @@ module Testkeys
     ]
   end
 
+  def static_nonce
+    "eGhaedeingae8hoXool4ahshi8eetaewe7eed5ah"
+  end
+
   def create_point_from_example(example, px, py)
     crv = example[:crv] || example["crv"]
 
