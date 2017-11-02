@@ -2,6 +2,15 @@ module Chariwt
   class VoucherSID
     cattr_accessor :sidkeys
 
+    class MissingSIDMapping < Exception
+      attr_reader :mapping
+
+      def initialize(msg, mapping)
+        @mapping = mapping
+        super(msg)
+      end
+    end
+
     VoucherSIDKeys = {
       60100 => ['ietf-cwt-voucher', 'ietf-voucher:voucher'],
       60101 => 'assertion',
@@ -16,7 +25,7 @@ module Chariwt
       60110 => 'prior-signed-voucher',
       60111 => 'serial-number',
       60112 => 'proximity-registrar-cert',
-      60113 => 'proximity-registrar-subject-public-key-info',
+      60113 => 'proximity-registrar-public-key',
       60200 => ['ietf-cwt-voucher-request', 'ietf-voucher-request:voucher']
     }
 
@@ -62,6 +71,7 @@ module Chariwt
       nhash = Hash.new
       hash.each { |k,v|
         kn = sid4key(k)
+        raise MissingSIDMapping.new("missing mapping", k) unless kn
         sidkey = kn - base
         case v
         when Hash
