@@ -1,5 +1,5 @@
 module Chariwt
-  def self.cmp_pkcs_file(smime, base)
+  def self.cmp_pkcs_file(smime, base, certfile=nil)
     ofile = File.join("tmp", base + ".pkcs")
     otfile = File.join("tmp", base+ ".txt")
 
@@ -7,7 +7,7 @@ module Chariwt
 
     location = File.dirname(__FILE__) + "/../../bin"
     #puts "Location is: #{location}, wrote to #{ofile}, #{otfile}, #{base}"
-    system("#{location}/pkcs2json #{ofile} #{otfile}")
+    system("#{location}/pkcs2json #{ofile} #{otfile} #{certfile}")
     cmd = "diff #{otfile} spec/files/#{base}.txt"
     puts cmd
     system(cmd)
