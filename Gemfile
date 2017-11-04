@@ -7,7 +7,7 @@ gem "cbor",  "~> 0.5.9.2"
 gem "cbor-diag"
 gem "json"
 gem 'jwt'
-gem 'openssl'
+gem 'openssl', :git => 'https://github.com/mcr/ruby-openssl.git'
 
 gem 'ecdsa'
 gem 'rbnacl'
