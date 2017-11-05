@@ -79,15 +79,20 @@ module Chariwt
 
     def self.json0_from_pkcs7(token)
       # first extract the public key so that it can be used to verify things.
-
       unverified_token = OpenSSL::PKCS7.new(token)
-      sign0 = unverified_token.certificates.first
+
+      certs = unverified_token.certificates
+      certlist = []
+      if certs
+        sign0 = certs.try(:first)
+        certlist = [sign0]
+      end
 
       cert_store = OpenSSL::X509::Store.new
       # leave it empty!
 
       # the data will be checked, but the certificate will not be validates.
-      unless unverified_token.verify([sign0], cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
+      unless unverified_token.verify(certlist, cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
         raise Voucher::RequestFailedValidation
       end
 

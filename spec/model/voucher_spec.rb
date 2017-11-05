@@ -65,7 +65,7 @@ RSpec.describe Chariwt::Voucher do
       smime = cv.pkcs_sign(privkey99)
 
       expect(Chariwt.cmp_pkcs_file(smime, "thing_f2-01-99",
-                                   "spec/files/jrc_prime256v1.crt")).to be true
+                                   "spec/files/certs.crt")).to be true
     end
 
     it "should sign a voucher with an owner certificate" do
@@ -83,7 +83,7 @@ RSpec.describe Chariwt::Voucher do
       smime = cv.pkcs_sign(privkey99)
 
       expect(Chariwt.cmp_pkcs_file(smime, "thing_f2-00-99",
-                                  "spec/files/jrc_prime256v1.crt")).to be true
+                                   "spec/files/certs.crt")).to be true
     end
   end
 

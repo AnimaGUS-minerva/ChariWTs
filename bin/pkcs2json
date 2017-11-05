@@ -8,7 +8,7 @@ der=$(echo $in | sed -e's/.pkcs$/.der/')
 certfilearg=
 if [ -n "$certfile" ];
 then
-    certfilearg="-certfile $certfile"
+    certfilearg="-CAfile $certfile"
 fi
 #extra='-nosigs -noverify'
 extra='-noverify'

@@ -10,7 +10,7 @@ gem 'jwt'
 gem 'openssl', :git => 'https://github.com/mcr/ruby-openssl.git'
 
 gem 'ecdsa'
-gem 'rbnacl'
+gem 'rbnacl', "<5.0.0"
 
 # for acts_like?
 gem 'activesupport'
