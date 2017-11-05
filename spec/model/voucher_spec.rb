@@ -42,14 +42,6 @@ RSpec.describe Chariwt::Voucher do
   end
 
   describe "pkcs voucher" do
-    def pubkey99
-      @pubkey99 ||= OpenSSL::X509::Certificate.new(File.read("spec/files/jrc_prime256v1.crt"))
-    end
-
-    def privkey99
-      @privkey99 ||= OpenSSL::PKey.read(File.read("spec/files/jrc_prime256v1.key"))
-    end
-
     it "should sign a voucher with an owner public key" do
       cv = Chariwt::Voucher.new
       cv.assertion    = 'logged'
@@ -60,9 +52,9 @@ RSpec.describe Chariwt::Voucher do
       cv.expiresOn    = '2099-01-01'.to_date
 
 
-      cv.signing_cert     = pubkey99
-      cv.pinnedPublicKey  = pubkey99.public_key
-      smime = cv.pkcs_sign(privkey99)
+      cv.signing_cert     = masapub71
+      cv.pinnedPublicKey  = pubkey99.public_key  # of the JRC!
+      smime = cv.pkcs_sign(masakey71)
 
       expect(Chariwt.cmp_pkcs_file(smime, "thing_f2-01-99",
                                    "spec/files/certs.crt")).to be true

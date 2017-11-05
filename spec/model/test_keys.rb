@@ -91,4 +91,20 @@ module Testkeys
   def sig01_pub_key
     @sig01_pub_key ||= decode_pub_key_from_example(sig01_key_base64)
   end
+
+  def pubkey99
+    @pubkey99 ||= OpenSSL::X509::Certificate.new(File.read("spec/files/jrc_prime256v1.crt"))
+  end
+
+  def privkey99
+    @privkey99 ||= OpenSSL::PKey.read(File.read("spec/files/jrc_prime256v1.key"))
+  end
+
+  def masapub71
+    @pubkey71  ||= OpenSSL::X509::Certificate.new(File.read("spec/files/masa_secp384r1.crt"))
+  end
+
+  def masakey71
+    @privkey71 ||= OpenSSL::PKey.read(File.read("spec/files/masa_secp384r1.key"))
+  end
 end

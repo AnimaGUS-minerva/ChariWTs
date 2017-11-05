@@ -14,6 +14,6 @@ fi
 extra='-noverify'
 
 base64 -d <$in >$der
-(openssl cms -verify -no-CAfile -nointern $certfilearg -inform der -in $der $extra \
+(openssl cms -verify $certfilearg -inform der -in $der $extra \
         | sed -e's/,/,\n/g'; echo) >$out
 

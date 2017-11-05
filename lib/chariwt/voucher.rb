@@ -432,9 +432,13 @@ module Chariwt
       @vrhash ||= { object_top_level => inner_attributes }
     end
 
-    def pkcs_sign(privkey)
+    def pkcs_sign(privkey, needcerts = true)
+      flags = 0
+      unless needcerts
+        flags = OpenSSL::PKCS7::NOCERTS
+      end
       digest = OpenSSL::Digest::SHA256.new
-      smime  = OpenSSL::PKCS7.sign(signing_cert, privkey, vrhash.to_json, [], OpenSSL::PKCS7::NOCERTS )
+      smime  = OpenSSL::PKCS7.sign(signing_cert, privkey, vrhash.to_json, [], flags )
       @token = Base64.strict_encode64(smime.to_der)
     end
 
