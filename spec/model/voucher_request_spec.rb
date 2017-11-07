@@ -216,7 +216,7 @@ RSpec.describe Chariwt::VoucherRequest do
       part2js = JSON.parse(Base64.urlsafe_decode64(part2))
       part3bin = Base64.urlsafe_decode64(part3)
 
-      expect(part1js['typ']).to eq('JWT')
+      expect(part1js['alg']).to eq('ES256')
       expect(part2js['ietf-voucher:voucher']).to_not be_nil
     end
   end
