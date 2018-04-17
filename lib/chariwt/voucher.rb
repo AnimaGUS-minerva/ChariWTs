@@ -467,8 +467,13 @@ module Chariwt
       sig = Chariwt::CoseSign1.new
       sig.protected_bucket = @sidhash.to_cbor
 
-      @token = sig.generate_signature(ECDSA::Group::Nistp256,
-                                      privkey, temporary_key)
+      case privkey
+      when ECDSA::Point
+        @token = sig.generate_signature(ECDSA::Group::Nistp256,
+                                        privkey, temporary_key)
+      when OpenSSL::PKey::EC
+        @token = sig.generate_openssl_signature(privkey)
+      end
       @token
     end
 
