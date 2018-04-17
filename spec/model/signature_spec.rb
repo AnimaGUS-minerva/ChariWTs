@@ -137,8 +137,7 @@ RSpec.describe CHex do
       ccs1 = Chariwt::CoseSign0.create(bin)
       ccs1.parse
 
-      expect(ccs1.protected_bucket[3]).to eq(0)      # XXX what does this mean?
-
+      expect(ccs1.protected_bucket[3]).to eq(0)  # 0 is cbor empty.
       validated = ccs1.validate(sig01_pub_key)
       expect(validated).to be true
 
@@ -149,8 +148,7 @@ RSpec.describe CHex do
       ccs1 = Chariwt::CoseSign0.create(bin)
       ccs1.parse
 
-      expect(ccs1.protected_bucket[3]).to eq(0)      # XXX what does this mean?
-
+      expect(ccs1.protected_bucket[3]).to eq(0)   # zero means cbor null.
       validated = ccs1.validate(sig01_pub_key)
       expect(validated).to be true
     end

@@ -87,9 +87,8 @@ module Chariwt
     end
 
     def ecdsa_signed_bytes
-      # 32 is hard coded for ECDSA-256!
-      sig_r_bytes = ECDSA::Format::IntegerOctetString.encode(@signature.r, 32)
-      sig_s_bytes = ECDSA::Format::IntegerOctetString.encode(@signature.s, 32)
+      sig_r_bytes = ECDSA::Format::IntegerOctetString.encode(@signature.r, @group.byte_length)
+      sig_s_bytes = ECDSA::Format::IntegerOctetString.encode(@signature.s, @group.byte_length)
       @signature_bytes  = (sig_r_bytes + sig_s_bytes)
     end
 
@@ -98,7 +97,6 @@ module Chariwt
       sig_struct = ["Signature1", encoded_protected_bucket, Chariwt::CoseSign.empty_bstr, @content]
       @digested   = sig_struct.to_cbor
       @digest     = Digest::SHA256.digest(digested)
-
     end
 
     def concat_signed_buckets(sig_bytes)
@@ -118,18 +116,19 @@ module Chariwt
     end
 
     def generate_signature(group, private_key, temporary_key = nil)
+      @group = group
 
       unless temporary_key
         temporary_key = ECDSA::Format::IntegerOctetString.decode(SecureRandom.random_bytes(group.byte_length))
       end
 
-      setup_signature_buckets(ecdsa_signed_bytes)
+      setup_signature_buckets
 
       #puts "group: #{group} pk: #{private_key}"
       #puts "digest: #{digest.unpack("H*")}"; puts "tk: #{temporary_key}"
       @signature= ECDSA.sign(group, private_key, digest, temporary_key)
 
-      concat_signed_buckets
+      concat_signed_buckets(ecdsa_signed_bytes)
     end
   end
 
