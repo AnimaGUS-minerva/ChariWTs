@@ -7,6 +7,11 @@ class DateTime
     to_time.to_cbor(n)
   end
 end
+class Date
+  def to_cbor(n = nil)
+    to_time.to_cbor(n)
+  end
+end
 
 module Chariwt
   class Voucher
