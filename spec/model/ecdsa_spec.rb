@@ -13,20 +13,19 @@ RSpec.describe CHex do
   describe "converting" do
 
     def x509pubkey
-      File.open(File.join('spec','files', 'jrc_prime256v1.crt'),'r') do |f|
+      @509pubkey ||= File.open(File.join('spec','files', 'jrc_prime256v1.crt'),'r') do |f|
         OpenSSL::X509::Certificate.new(f)
       end
     end
 
-    it "should load a PEM format ECDSA key, and convert to ECDSA library key" do
+    it "should load a PEM format ECDSA key, and convert to ECDSA library format key" do
       bx = x509pubkey.public_key.public_key.to_bn
       grp= x509pubkey.public_key.public_key.group
       point = ECDSA::Format::PointOctetString.decode_from_ssl(bx, grp)
-      byebug
-      expect(thing).to be big
-
-      pending "it shold be simple to convert, but it is not obvious"
+      expect(point.x).to eq(24149367853196172407516369164818134874115917319726245901277420101925932861939)
+      expect(point.y).to eq(24301566557813834627157509343720702610696899744154898312596647260394512104626)
     end
+
   end
 
 end
