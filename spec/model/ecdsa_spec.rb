@@ -31,10 +31,8 @@ RSpec.describe CHex do
     end
 
     it "should load a PEM format private ECDSA key, and convert to ECDSA library format key" do
-      bx = x509privkey.private_key
-      grp= x509privkey.group
-      point = ECDSA::Format::PointOctetString.decode_priv_from_ssl(bx, grp)
-      expect(point).to eq(43267311109421873114136538554130841682863264975574020465662202951949662337431)
+      privkey = ECDSA::Format::PrivateKey.decode(x509privkey)
+      expect(privkey).to eq(43267311109421873114136538554130841682863264975574020465662202951949662337431)
     end
 
   end
