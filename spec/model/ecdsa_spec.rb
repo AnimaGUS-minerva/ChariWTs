@@ -12,8 +12,14 @@ RSpec.describe CHex do
   include Testkeys
   describe "converting" do
 
+    def x509privkey
+      @x509privkey ||= File.open(File.join('spec','files', 'jrc_prime256v1.key'),'r') do |f|
+        OpenSSL::PKey.read(f)
+      end
+    end
+
     def x509pubkey
-      @509pubkey ||= File.open(File.join('spec','files', 'jrc_prime256v1.crt'),'r') do |f|
+      @x509pubkey ||= File.open(File.join('spec','files', 'jrc_prime256v1.crt'),'r') do |f|
         OpenSSL::X509::Certificate.new(f)
       end
     end
