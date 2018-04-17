@@ -31,8 +31,35 @@ RSpec.describe CHex do
     end
 
     it "should load a PEM format private ECDSA key, and convert to ECDSA library format key" do
-      privkey = ECDSA::Format::PrivateKey.decode(x509privkey)
+      (privkey,group) = ECDSA::Format::PrivateKey.decode(x509privkey)
       expect(privkey).to eq(43267311109421873114136538554130841682863264975574020465662202951949662337431)
+    end
+
+    def coseobject02_digest
+      "846a5369676e61747572653143a101264074546869732069732074686520636f6e74656e742e"
+    end
+
+    def coseobject02_sha256
+      "c85fec6f6115d030389f87c76e7712dcc695a9227d2bfc371b6685caa638c7ca"
+    end
+
+    it "should sign object with ECDSA key from PEM" do
+      signed = Chariwt::CoseSign1.new
+
+      signed.content = "This is the content."
+      signed.protected_bucket[1] = -7
+
+      (privkey,group) = ECDSA::Format::PrivateKey.decode(x509privkey)
+      signed.generate_signature(group, privkey, temporary_key)
+
+      expect(signed.digested.unpack("H*")[0]).to eq(coseobject02_digest)
+      expect(signed.digest.unpack("H*")[0]).to   eq(coseobject02_sha256)
+      expect(signed.signature_bytes.length).to eq(64)
+
+      FileUtils::mkdir_p("tmp")
+      File.open("tmp/coseobject02.bin", "wb") do |f| f.write signed.binary end
+      system("cbor2pretty.rb <tmp/coseobject02.bin >tmp/coseobject02.ctxt")
+      expect(system("diff tmp/coseobject02.ctxt spec/outputs/coseobject02.ctxt")).to be true
     end
 
   end
