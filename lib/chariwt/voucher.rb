@@ -84,7 +84,11 @@ module Chariwt
 
     def self.json0_from_pkcs7(token)
       # first extract the public key so that it can be used to verify things.
-      unverified_token = OpenSSL::PKCS7.new(token)
+      begin
+        unverified_token = OpenSSL::PKCS7.new(token)
+      rescue ArgumentError
+        raise Voucher::RequestFailedValidation
+      end
 
       certs = unverified_token.certificates
       certlist = []
