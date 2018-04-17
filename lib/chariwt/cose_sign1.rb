@@ -86,10 +86,35 @@ module Chariwt
       @valid = ECDSA.valid_signature?(pubkey, sha256, signature)
     end
 
-    def sig_bytes
+    def ecdsa_signed_bytes
+      # 32 is hard coded for ECDSA-256!
       sig_r_bytes = ECDSA::Format::IntegerOctetString.encode(@signature.r, 32)
       sig_s_bytes = ECDSA::Format::IntegerOctetString.encode(@signature.s, 32)
       @signature_bytes  = (sig_r_bytes + sig_s_bytes)
+    end
+
+    def setup_signature_buckets
+      @encoded_protected_bucket = @protected_bucket.to_cbor
+      sig_struct = ["Signature1", encoded_protected_bucket, Chariwt::CoseSign.empty_bstr, @content]
+      @digested   = sig_struct.to_cbor
+      @digest     = Digest::SHA256.digest(digested)
+
+    end
+
+    def concat_signed_buckets(sig_bytes)
+      # protected, unprotected, payload, signature
+      sign1 = [ @encoded_protected_bucket, {}, @content, sig_bytes ]
+      @binary = CBOR::Tagged.new(18, sign1).to_cbor
+    end
+
+    def generate_openssl_signature(private_key)
+      setup_signature_buckets
+
+      #puts "group: #{group} pk: #{private_key}"
+      #puts "digest: #{digest.unpack("H*")}"; puts "tk: #{temporary_key}"
+      @signature= ECDSA.sign(group, private_key, digest, temporary_key)
+
+      concat_signed_buckets(openssl_signed_bytes)
     end
 
     def generate_signature(group, private_key, temporary_key = nil)
@@ -98,18 +123,13 @@ module Chariwt
         temporary_key = ECDSA::Format::IntegerOctetString.decode(SecureRandom.random_bytes(group.byte_length))
       end
 
-      @encoded_protected_bucket = @protected_bucket.to_cbor
-      sig_struct = ["Signature1", encoded_protected_bucket, Chariwt::CoseSign.empty_bstr, @content]
-      @digested   = sig_struct.to_cbor
-      @digest     = Digest::SHA256.digest(digested)
+      setup_signature_buckets(ecdsa_signed_bytes)
 
       #puts "group: #{group} pk: #{private_key}"
       #puts "digest: #{digest.unpack("H*")}"; puts "tk: #{temporary_key}"
       @signature= ECDSA.sign(group, private_key, digest, temporary_key)
 
-      # protected, unprotected, payload, signature
-      sign1 = [ @encoded_protected_bucket, {}, @content, sig_bytes ]
-      @binary = CBOR::Tagged.new(18, sign1).to_cbor
+      concat_signed_buckets
     end
   end
 
