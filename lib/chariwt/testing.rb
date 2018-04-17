@@ -1,7 +1,20 @@
 module Chariwt
+  def self.tmpdir
+    # make sure that tmp directory is available for output.
+    @tmpdir ||=
+      begin
+        Rails.root.join("tmp")
+      rescue
+        "tmp"
+      end
+
+    FileUtils::mkdir_p(@tmpdir)
+    @tmpdir
+  end
+
   def self.cmp_pkcs_file(smime, base, certfile=nil)
-    ofile = File.join("tmp", base + ".pkcs")
-    otfile = File.join("tmp", base+ ".txt")
+    ofile = File.join(tmpdir, base + ".pkcs")
+    otfile = File.join(tmpdir, base+ ".txt")
 
     File.open(ofile, "w") do |f|     f.puts smime      end
 
