@@ -144,7 +144,7 @@ RSpec.describe Chariwt::Voucher do
       cv.expiresOn = DateTime.parse('2017-10-01T00:00:00Z')
       cv.pinnedPublicKey = sig01_pub_key
 
-      cv.cbor_sign(sig01_priv_key, temporary_key)
+      cv.cose_sign(sig01_priv_key, ECDSA::Group::Nistp256, temporary_key)
 
       File.open("tmp/jada_abcd.cbor","w") do |f|
         f.write cv.token

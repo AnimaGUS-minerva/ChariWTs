@@ -462,18 +462,22 @@ module Chariwt
       @token = @sidhash.to_cbor
     end
 
-    def cbor_sign(privkey, temporary_key = nil)
+    def cose_sign(privkey, group = ECDSA::Group::Nistp256, temporary_key = nil)
       @sidhash = VoucherSID.hash2yangsid(vrhash)
       sig = Chariwt::CoseSign1.new
       sig.protected_bucket = @sidhash.to_cbor
 
       case privkey
-      when ECDSA::Point
-        @token = sig.generate_signature(ECDSA::Group::Nistp256,
-                                        privkey, temporary_key)
       when OpenSSL::PKey::EC
-        @token = sig.generate_openssl_signature(privkey)
+        (privkey,group) = ECDSA::Format::PrivateKey.decode(privkey)
+
+      # ECDSA private keys are just integers
+      when Integer
+        # nothing else to do.
       end
+
+      @token = sig.generate_signature(group, privkey, temporary_key)
+
       @token
     end
 

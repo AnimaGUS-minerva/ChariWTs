@@ -86,7 +86,7 @@ RSpec.describe Chariwt::VoucherRequest do
       vr1.nonce        = static_nonce
       vr1.proximityRegistrarPublicKey = sig01_pub_key
 
-      vr1.cbor_sign(sig01_priv_key)
+      vr1.cose_sign(sig01_priv_key)
 
       expect(diagdiff_sig(vr1.token, "pledge_jada345768912")).to be true
     end
