@@ -1,0 +1,76 @@
+GIT
+  remote: https://github.com/AnimaGUS-minerva/ruby_ecdsa.git
+  revision: 2216043b38170b9603c05bf1d4e43e184fc6181e
+  specs:
+    ecdsa (1.2.0)
+
+GIT
+  remote: https://github.com/mcr/ruby-openssl.git
+  revision: 7c18417e2e24a9c6c407f5114c58b7f161e16d34
+  specs:
+    openssl (2.1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    activesupport (5.2.0)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      i18n (>= 0.7, < 2)
+      minitest (~> 5.1)
+      tzinfo (~> 1.1)
+    byebug (10.0.2)
+    cbor (0.5.9.2)
+    cbor-diag (0.5.3)
+      json
+      treetop (~> 1)
+    concurrent-ruby (1.0.5)
+    diff-lcs (1.3)
+    ffi (1.9.23)
+    i18n (1.0.1)
+      concurrent-ruby (~> 1.0)
+    json (2.1.0)
+    jwt (2.1.0)
+    minitest (5.11.3)
+    polyglot (0.3.5)
+    rbnacl (4.0.2)
+      ffi
+    rspec (3.7.0)
+      rspec-core (~> 3.7.0)
+      rspec-expectations (~> 3.7.0)
+      rspec-mocks (~> 3.7.0)
+    rspec-core (3.7.1)
+      rspec-support (~> 3.7.0)
+    rspec-expectations (3.7.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.7.0)
+    rspec-mocks (3.7.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.7.0)
+    rspec-support (3.7.1)
+    rspec_junit_formatter (0.3.0)
+      rspec-core (>= 2, < 4, != 2.12.0)
+    thread_safe (0.3.6)
+    treetop (1.6.10)
+      polyglot (~> 0.3)
+    tzinfo (1.2.5)
+      thread_safe (~> 0.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  activesupport
+  byebug
+  cbor (~> 0.5.9.2)
+  cbor-diag
+  ecdsa!
+  json
+  jwt
+  openssl!
+  rbnacl (< 5.0.0)
+  rspec
+  rspec-core
+  rspec_junit_formatter
+
+BUNDLED WITH
+   1.16.0
