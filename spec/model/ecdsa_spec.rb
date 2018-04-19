@@ -26,6 +26,7 @@ RSpec.describe CHex do
 
     it "should load a PEM format public ECDSA key, and convert to ECDSA library format key" do
       point = ECDSA::Format::PubKey.decode(x509pubkey)
+      expect(point.class).to eq(ECDSA::Point)
       expect(point.x).to eq(24149367853196172407516369164818134874115917319726245901277420101925932861939)
       expect(point.y).to eq(24301566557813834627157509343720702610696899744154898312596647260394512104626)
     end
@@ -60,6 +61,26 @@ RSpec.describe CHex do
       File.open("tmp/coseobject02.bin", "wb") do |f| f.write signed.binary end
       system("cbor2pretty.rb <tmp/coseobject02.bin >tmp/coseobject02.ctxt")
       expect(system("diff tmp/coseobject02.ctxt spec/outputs/coseobject02.ctxt")).to be true
+    end
+
+    it "should validate an object with ECDSA key from PEM" do
+      bin = CHex.parse(File.open("spec/inputs/coseobject02.ctxt", "rb").read)
+
+      cs1 = Chariwt::CoseSign0.create(bin)
+      cs1.parse
+      expect(cs1.parsed).to be true
+      validated = cs1.validate(x509pubkey)
+
+      File.open("spec/outputs/coseobject02-digest1.bin", "w") do |f|
+        f.write cs1.digest
+      end
+      File.open("spec/outputs/coseobject02-digest0.ctxt", "w") do |f|
+        f.write CHex.parse(coseobject02_digest)
+      end
+      expect(cs1.sha256.unpack("H*")[0]).to eq(coseobject02_sha256)
+      expect(cs1.digest.unpack("H*")[0]).to eq(coseobject02_digest)
+
+      expect(validated).to be true
     end
 
   end
