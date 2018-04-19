@@ -5,7 +5,7 @@ require 'openssl'
 require 'ecdsa'
 require 'byebug'
 require 'jwt'
-require 'spec/model/test_keys'
+require 'model/test_keys'
 
 RSpec.describe Chariwt::Voucher do
 

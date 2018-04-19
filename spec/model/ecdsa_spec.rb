@@ -1,11 +1,11 @@
-require 'lib/c_hex'
-require 'lib/chariwt'
+require 'c_hex'
+require 'chariwt'
 require 'cbor'
 require 'base64'
 require 'ecdsa'
 require 'byebug'
 require 'json'
-require 'spec/model/test_keys'
+require 'model/test_keys'
 
 RSpec.describe CHex do
 

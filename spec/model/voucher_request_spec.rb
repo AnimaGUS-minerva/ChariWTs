@@ -6,7 +6,7 @@ require 'ecdsa'
 require 'byebug'
 require 'jwt'
 require 'chariwt'
-require 'spec/model/test_keys'
+require 'model/test_keys'
 
 RSpec.describe Chariwt::VoucherRequest do
   include Testkeys
