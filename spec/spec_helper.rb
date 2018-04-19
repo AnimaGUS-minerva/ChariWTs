@@ -1,3 +1,5 @@
+$: << '../lib'
+$: << '..'
 require "active_support"
 
 RSpec.configure do |config|
