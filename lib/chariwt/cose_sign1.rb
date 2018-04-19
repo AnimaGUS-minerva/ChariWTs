@@ -15,6 +15,8 @@ module Chariwt
     attr_accessor :protected_bucket, :encoded_protected_bucket
     attr_accessor :unprotected_bucket, :content
 
+    class InvalidKeyType < Exception; end
+
     #
     # This creats a new signature object from a binary blob.  It does not
     # validate it until it is told to.
@@ -79,11 +81,20 @@ module Chariwt
     end
 
     def validate(pubkey)
+      case pubkey
+      when OpenSSL::X509::Certificate
+        pubkey_point = ECDSA::Format::PubKey.decode(pubkey)
+      when ECDSA::Point
+        pubkey_point = pubkey
+      else
+        raise InvalidKeyType
+      end
+
       sig_struct = ["Signature1", @encoded_protected_bucket, empty_bstr, @contents]
       @digest     = sig_struct.to_cbor
 
       @sha256 = Digest::SHA256.digest(@digest)
-      @valid = ECDSA.valid_signature?(pubkey, sha256, signature)
+      @valid = ECDSA.valid_signature?(pubkey_point, sha256, signature)
     end
 
     def ecdsa_signed_bytes
