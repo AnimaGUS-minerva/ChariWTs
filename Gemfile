@@ -9,7 +9,8 @@ gem "json"
 gem 'jwt'
 gem 'openssl', :git => 'https://github.com/mcr/ruby-openssl.git'
 
-gem 'ecdsa'
+gem 'ecdsa',   :git => 'https://github.com/AnimaGUS-minerva/ruby_ecdsa.git'
+#gem 'ecdsa',   :path => '../minerva/ruby_ecdsa'
 gem 'rbnacl', "<5.0.0"
 
 # for acts_like?
