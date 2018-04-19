@@ -1,6 +1,7 @@
 GIT
   remote: https://github.com/AnimaGUS-minerva/ruby_ecdsa.git
-  revision: 2216043b38170b9603c05bf1d4e43e184fc6181e
+  revision: 3f22af62902953db2ea15d598a9fa0f1fb8a2cd5
+  branch: ecdsa_interface_openssl
   specs:
     ecdsa (1.2.0)
 
