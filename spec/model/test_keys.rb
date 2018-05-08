@@ -5,7 +5,7 @@ module Testkeys
     end
     system("cbor2diag.rb tmp/#{file}.cbor >tmp/#{file}.diag")
     cmd = "diff tmp/#{file}.diag spec/files/#{file}.diag"
-    puts cmd
+    #puts cmd
     system(cmd)
   end
 
@@ -15,7 +15,7 @@ module Testkeys
     end
     system("bin/cbor2diag-sanify tmp/#{file}.cbor tmp/#{file}.diag")
     cmd = "diff tmp/#{file}.diag spec/files/#{file}.diag"
-    puts cmd
+    #puts cmd
     system(cmd)
   end
 

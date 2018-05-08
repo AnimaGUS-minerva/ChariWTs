@@ -22,7 +22,7 @@ module Chariwt
     #puts "Location is: #{location}, wrote to #{ofile}, #{otfile}, #{base}"
     system("#{location}/pkcs2json #{ofile} #{otfile} #{certfile}")
     cmd = "diff #{otfile} spec/files/#{base}.txt"
-    puts cmd
+    #puts cmd
     system(cmd)
   end
 end

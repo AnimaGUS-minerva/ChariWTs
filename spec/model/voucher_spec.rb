@@ -151,7 +151,7 @@ RSpec.describe Chariwt::Voucher do
       end
       system("cbor2diag.rb tmp/jada_abcd.cbor  >tmp/jada_abcd.diag")
       cmd = "diff tmp/jada_abcd.diag spec/files/jada_abcd.diag"
-      puts cmd
+      #puts cmd
       system(cmd)
     end
   end
