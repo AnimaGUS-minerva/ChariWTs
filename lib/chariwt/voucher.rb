@@ -492,7 +492,7 @@ module Chariwt
     def cose_sign(privkey, group = ECDSA::Group::Nistp256, temporary_key = nil)
       @sidhash = VoucherSID.hash2yangsid(vrhash)
       sig = Chariwt::CoseSign1.new
-      sig.protected_bucket = @sidhash.to_cbor
+      sig.protected_bucket = @sidhash
 
       case privkey
       when OpenSSL::PKey::EC

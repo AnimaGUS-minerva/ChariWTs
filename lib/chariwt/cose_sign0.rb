@@ -25,12 +25,14 @@ module Chariwt
       # maybe should raise an exception.
       return nil unless thing
 
-      case thing.tag
+      klass = case thing.tag
       when 18
-        CoseSign1.new(thing)
+        CoseSign1
       when 98
-        CoseSign.new(thing)
+        CoseSign
       end
+
+      return klass.new(thing)
     end
   end
 end
