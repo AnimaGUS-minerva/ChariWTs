@@ -75,10 +75,12 @@ module Chariwt
     def self.object_from_verified_cbor(cbor1, pubkey)
       vr = new
       vr.voucherType = voucher_type
-      byebug
+      vr.token_format= :cose_cbor
+      vr.load_sid_attributes(cbor1)
       if pubkey
         vr.signing_cert = pubkey
       end
+      vr
     end
 
     def self.object_from_verified_json(json1, pubkey)
@@ -189,13 +191,15 @@ module Chariwt
 
       unverified.parse
       begin
-        unverified.validate(pubkey)
+        valid = unverified.validate(pubkey)
 
       rescue Chariwt::CoseSign1::InvalidKeyType
         return nil
       end
 
-      object_from_verified_cbor(unverified, pubkey)
+      raise Chariwt::RequestFailedValidation unless valid
+
+      return object_from_verified_cbor(unverified, pubkey)
     end
 
     def initialize(options = Hash.new)
@@ -245,6 +249,28 @@ module Chariwt
       self.proximityRegistrarPublicKey   = thing['proximity-registrar-pubkey']
 
       self.priorSignedVoucherRequest_base64 = thing['prior-signed-voucher-request']
+    end
+
+    def load_sid_attributes(cose1)
+      #   +---- voucher
+      #      +---- created-on?                      yang:date-and-time
+      #      +---- expires-on?                      yang:date-and-time
+      #      +---- assertion                        enumeration
+      #      +---- serial-number                    string
+      #      +---- idevid-issuer?                   binary
+      #      +---- pinned-domain-cert?              binary
+      #      +---- domain-cert-revocation-checks?   boolean
+      #      +---- nonce?                           binary
+      #      +---- last-renewal-date?               yang:date-and-time
+      #      +---- prior-signed-voucher-request?    binary
+      #      +---- proximity-registrar-cert?        binary
+
+      # assignments are used whenever there are actually additional processing possible
+      # for the assignment due to different formats.
+
+      byebug
+      thing = VoucherSID.yangsid2hash(cose1.contents)
+      load_attributes(thing)
     end
 
     def generate_nonce
