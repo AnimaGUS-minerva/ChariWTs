@@ -13,7 +13,7 @@ module Chariwt
     attr_accessor :binary, :sha256, :digest, :digested
     attr_accessor :parsed, :validated, :valid, :signature, :signature_bytes
     attr_accessor :protected_bucket, :encoded_protected_bucket
-    attr_accessor :unprotected_bucket, :content
+    attr_accessor :unprotected_bucket, :contents
 
     class InvalidKeyType < Exception; end
 
