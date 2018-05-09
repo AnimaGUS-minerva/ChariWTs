@@ -91,5 +91,16 @@ module Chariwt
       }
       nhash
     end
+
+    def self.yangsid2hash(hash)
+      nhash = Hash.new
+      hash.each { |k,v|
+        basenum = k
+        v.each { |k,v|
+          nhash[VoucherSIDKeys[basenum+k]] = v
+        }
+      }
+      nhash
+    end
   end
 end
