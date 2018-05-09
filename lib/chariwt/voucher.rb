@@ -72,6 +72,15 @@ module Chariwt
       end
     end
 
+    def self.object_from_verified_cbor(cbor1, pubkey)
+      vr = new
+      vr.voucherType = voucher_type
+      byebug
+      if pubkey
+        vr.signing_cert = pubkey
+      end
+    end
+
     def self.object_from_verified_json(json1, pubkey)
       vr = new
       vr.voucherType = voucher_type
@@ -174,8 +183,26 @@ module Chariwt
       object_from_verified_json(voucher, pubkey)
     end
 
+    def self.from_cose_cbor(token, pubkey)
+      # first extract the public key so that it can be used to verify things.
+      unverified = Chariwt::CoseSign0.create(token)
+
+      unverified.parse
+      begin
+        unverified.validate(pubkey)
+
+      rescue Chariwt::CoseSign1::InvalidKeyType
+        return nil
+      end
+
+      object_from_verified_cbor(unverified, pubkey)
+    end
+
     def initialize(options = Hash.new)
       # setup defaults to be pkcs/cms format.
+      #  other options are:  cms_cbor
+      #                and:  cose_cbor
+      #
       options = {:format => :pkcs}.merge!(options)
 
       @token_format = options[:format]

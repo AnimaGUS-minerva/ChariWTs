@@ -160,6 +160,21 @@ RSpec.describe Chariwt::VoucherRequest do
       expect(voucher1.voucherType).to eq(:time_based)
     end
 
+    it "should validate a CWT signed file" do
+      filen = "spec/files/vr_00-D0-E5-01-00-09.cwt"
+      certn = "spec/files/010009-idevid.pem"
+      pubkey= OpenSSL::X509::Certificate.new(IO::read(certn))
+
+      token = IO::read(filen)
+      voucher1 = Chariwt::VoucherRequest.from_cose_cbor(token, pubkey)
+      expect(voucher1).to_not be_nil
+
+      expect(voucher1.assertion).to    eq(:proximity)
+      expect(voucher1.serialNumber).to eq('JADA123456789')
+      expect(voucher1.createdOn).to  eq(DateTime.parse('2016-10-07T19:31:42Z'))
+      expect(voucher1.voucherType).to eq(:time_based)
+    end
+
     it "should not barf on invalid date in JSON string" do
       voucher1 = Chariwt::Voucher.new
 
