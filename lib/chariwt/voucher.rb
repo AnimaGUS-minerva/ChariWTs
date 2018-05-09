@@ -523,13 +523,23 @@ module Chariwt
 
     def add_der_attr_unless_nil(hash, name, value)
       unless value.blank?
-        hash[name] = Base64.strict_encode64(value.to_der)
+        case @token_format
+        when :pkcs
+          hash[name] = Base64.strict_encode64(value.to_der)
+        when :cose_cbor, :cms_cbor
+          hash[name] = value.to_der
+        end
       end
     end
 
     def add_binary_attr_unless_nil(hash, name, value)
       unless value.blank?
-        hash[name] = Base64.strict_encode64(value)
+        case @token_format
+        when :pkcs
+          hash[name] = Base64.strict_encode64(value)
+        when :cose_cbor, :cms_cbor
+          hash[name] = value
+        end
       end
     end
 
