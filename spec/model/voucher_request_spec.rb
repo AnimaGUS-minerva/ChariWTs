@@ -86,7 +86,7 @@ RSpec.describe Chariwt::VoucherRequest do
       vr1.nonce        = static_nonce
       vr1.proximityRegistrarPublicKey = sig01_pub_key
 
-      vr1.cose_sign(sig01_priv_key)
+      vr1.cose_sign(sig01_priv_key, ECDSA::Group::Nistp256, temporary_key)
 
       expect(diagdiff_sig(vr1.token, "pledge_jada345768912")).to be true
     end
@@ -170,9 +170,9 @@ RSpec.describe Chariwt::VoucherRequest do
       expect(voucher1).to_not be_nil
 
       expect(voucher1.assertion).to    eq(:proximity)
-      expect(voucher1.serialNumber).to eq('JADA123456789')
-      expect(voucher1.createdOn).to  eq(DateTime.parse('2016-10-07T19:31:42Z'))
-      expect(voucher1.voucherType).to eq(:time_based)
+      expect(voucher1.serialNumber).to eq('00-D0-E5-01-00-09')
+      expect(voucher1.createdOn.utc).to eq(DateTime.parse('2018-05-09T21:04:26Z'))
+      expect(voucher1.voucherType).to eq(:request)
     end
 
     it "should not barf on invalid date in JSON string" do

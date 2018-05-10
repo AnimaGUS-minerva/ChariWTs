@@ -245,7 +245,7 @@ module Chariwt
       self.pinnedDomainCert = thing['pinned-domain-cert']
       @domainCertRevocationChecks = thing['domain-cert-revocation-checks']
       @lastRenewalDate  = thing['last-renewal-date']
-      self.proximityRegistrarCert     = thing['proximity-registrar-cert']
+      self.proximityRegistrarCert        = thing['proximity-registrar-cert']
       self.proximityRegistrarPublicKey   = thing['proximity-registrar-pubkey']
 
       self.priorSignedVoucherRequest_base64 = thing['prior-signed-voucher-request']
@@ -268,7 +268,6 @@ module Chariwt
       # assignments are used whenever there are actually additional processing possible
       # for the assignment due to different formats.
 
-      byebug
       thing = VoucherSID.yangsid2hash(cose1.contents)
       load_attributes(thing)
     end
