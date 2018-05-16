@@ -132,11 +132,22 @@ RSpec.describe Chariwt::Voucher do
     end
   end
 
+  def cmp_vch_voucher(basename)
+    diffcmd = sprintf("cbor2diag.rb tmp/%s.vch >tmp/%s.diag",
+                      basename, basename)
+    system(diffcmd)
+
+    cmd = sprintf("diff tmp/%s.diag spec/files/%s.diag",
+                  basename, basename)
+    #puts cmd
+    system(cmd)
+  end
+
   describe "cwt voucher" do
     it "should sign a voucher in CWT format" do
 
       cv = Chariwt::Voucher.new
-      cv.assertion = ''
+      cv.assertion = 'proximity'
       cv.serialNumber = 'JADA123456789'
       cv.voucherType = :time_based
       cv.nonce = 'abcd12345'
@@ -146,13 +157,11 @@ RSpec.describe Chariwt::Voucher do
 
       cv.cose_sign(sig01_priv_key, ECDSA::Group::Nistp256, temporary_key)
 
-      File.open("tmp/jada_abcd.cbor","w") do |f|
+      name="voucher_jada123456789"
+      File.open("tmp/#{name}.vch","w") do |f|
         f.write cv.token
       end
-      system("cbor2diag.rb tmp/jada_abcd.cbor  >tmp/jada_abcd.diag")
-      cmd = "diff tmp/jada_abcd.diag spec/files/jada_abcd.diag"
-      #puts cmd
-      system(cmd)
+      cmp_vch_voucher(name)
     end
   end
 
