@@ -69,6 +69,8 @@ module Chariwt
     def self.cert_from_json(json0)
       if json0[object_top_level]
         cert_from_json1(json0[object_top_level])
+      else
+        nil
       end
     end
 
@@ -185,7 +187,7 @@ module Chariwt
       object_from_verified_json(voucher, pubkey)
     end
 
-    def self.from_cose_cbor(token, pubkey)
+    def self.from_cose_cbor(token, pubkey = nil)
       # first extract the public key so that it can be used to verify things.
       unverified = Chariwt::CoseSign0.create(token)
 
@@ -394,60 +396,42 @@ module Chariwt
       end
     end
 
+    def decode_unknown_public_key(x)
+      case x
+      when OpenSSL::PKey::PKey
+        x
+      when ECDSA::Point
+        # also a kind of public key
+        x
+      when String
+        # try to decode it as a public key.
+        begin
+          OpenSSL::X509::Certificate.new(x)
+        rescue OpenSSL::X509::CertificateError
+          decoded = Chariwt::Voucher.decode_pem(x)
+          OpenSSL::X509::Certificate.new(decoded)
+        end
+      else
+        byebug
+        puts "Not sure what othe formats belong here"
+      end
+    end
+
     def pinnedPublicKey=(x)
       if x
-        case x
-        when OpenSSL::PKey::PKey
-          @pinnedPublicKey = x
-        when ECDSA::Point
-          # also a kind of public key
-          @pinnedPublicKey = x
-        when String
-        # try to decode it as a public key.
-          @pinnedPublicKey = OpenSSL::PKey.new(x)
-        else
-          byebug
-          puts "Not sure what othe formats belong here"
-        end
+        @pinnedPublicKey = decode_unknown_public_key(x)
       end
     end
 
     def proximityRegistrarCert=(x)
       if x
-        if x.is_a? OpenSSL::X509::Certificate
-          @proximityRegistrarCert = x
-        elsif x.is_a? OpenSSL::PKey::PKey
-          @proximityRegistrarCert = x
-        else
-          begin
-            @proximityRegistrarCert = OpenSSL::X509::Certificate.new(x)
-          rescue OpenSSL::X509::CertificateError
-            decoded = Chariwt::Voucher.decode_pem(x)
-            @proximityRegistrarCert = OpenSSL::X509::Certificate.new(decoded)
-          end
-        end
+        @proximityRegistrarCert = decode_unknown_public_key(x)
       end
     end
 
     def proximityRegistrarPublicKey=(x)
       if x
-        case x
-        when OpenSSL::X509::Certificate
-          byebug
-          @proximityRegistrarPublicKey = x.public_key
-        when OpenSSL::PKey::PKey
-          @proximityRegistrarPublicKey = x
-        when ECDSA::Point
-          @proximityRegistrarPublicKey = x
-        else
-          begin
-            cert = OpenSSL::X509::Certificate.new(x)
-            @proximityRegistrarPublicKey = cert.public_key
-          rescue OpenSSL::X509::CertificateError
-            decoded = Chariwt::Voucher.decode_pem(x)
-            @proximityRegistrarPublicKey = OpenSSL::X509::Certificate.new(decoded)
-          end
-        end
+        @proximityRegistrarPublicKey = decode_unknown_public_key(x).public_key
       end
     end
 
