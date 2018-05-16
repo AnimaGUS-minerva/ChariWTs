@@ -15,6 +15,7 @@ end
 
 module Chariwt
   class Voucher
+    cattr_accessor :debug
     attr_accessor :token_format
 
     attr_accessor :signing_cert
@@ -412,7 +413,8 @@ module Chariwt
           OpenSSL::X509::Certificate.new(decoded)
         end
       else
-        byebug
+        byebug if @@debug
+        raise MissingPublicKey
         puts "Not sure what othe formats belong here"
       end
     end
