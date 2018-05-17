@@ -77,6 +77,7 @@ RSpec.describe Chariwt::Voucher do
       expect(Chariwt.cmp_pkcs_file(smime, "thing_f2-00-99",
                                    "spec/files/certs.crt")).to be true
     end
+
   end
 
   describe "json voucher" do
@@ -143,8 +144,8 @@ RSpec.describe Chariwt::Voucher do
     system(cmd)
   end
 
-  describe "cwt voucher" do
-    it "should sign a voucher in CWT format" do
+  describe "vch voucher" do
+    it "should sign a voucher in COSE format" do
 
       cv = Chariwt::Voucher.new
       cv.assertion = 'proximity'
@@ -153,7 +154,11 @@ RSpec.describe Chariwt::Voucher do
       cv.nonce = 'abcd12345'
       cv.createdOn = DateTime.parse('2016-10-07T19:31:42Z')
       cv.expiresOn = DateTime.parse('2017-10-01T00:00:00Z')
-      cv.pinnedPublicKey = sig01_pub_key
+
+      cv.pubkey          = sig01_pub_key
+
+      # this is the registrar's public key, not the MASA's public key
+      cv.pinnedPublicKey = pubkey99.public_key
 
       cv.cose_sign(sig01_priv_key, ECDSA::Group::Nistp256, temporary_key)
 

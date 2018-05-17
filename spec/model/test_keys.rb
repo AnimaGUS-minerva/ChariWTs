@@ -92,6 +92,7 @@ module Testkeys
     @sig01_pub_key ||= decode_pub_key_from_example(sig01_key_base64)
   end
 
+  # used as JRC keys.
   def pubkey99
     @pubkey99 ||= OpenSSL::X509::Certificate.new(File.read("spec/files/jrc_prime256v1.crt"))
   end
