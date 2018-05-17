@@ -2,6 +2,8 @@ require "active_support/all"
 require "cbor"
 require 'ecdsa'
 
+require 'cose/msg'
+
 class DateTime
   def to_cbor(n = nil)
     to_time.to_cbor(n)
@@ -435,7 +437,7 @@ module Chariwt
 
     def proximityRegistrarPublicKey=(x)
       if x
-        @proximityRegistrarPublicKey = decode_unknown_public_key(x).public_key
+        @proximityRegistrarPublicKey = decode_unknown_public_key(x).try(:public_key)
       end
     end
 
