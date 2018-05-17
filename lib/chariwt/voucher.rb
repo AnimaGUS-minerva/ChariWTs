@@ -85,6 +85,7 @@ module Chariwt
       vr.token_format= :cose_cbor
       vr.load_sid_attributes(cbor1)
       if pubkey
+        vr.pubkey       = pubkey
         vr.signing_cert = pubkey
       end
       vr
@@ -198,7 +199,7 @@ module Chariwt
 
       unverified.parse
       begin
-        valid = unverified.validate(pubkey)
+        valid = unverified.validate(unverified.pubkey)
 
       rescue Chariwt::CoseSign1::InvalidKeyType
         raise InvalidKeyType
@@ -206,7 +207,7 @@ module Chariwt
 
       raise Chariwt::RequestFailedValidation unless valid
 
-      return object_from_verified_cbor(unverified, pubkey)
+      return object_from_verified_cbor(unverified, unverified.pubkey)
     end
 
     def initialize(options = Hash.new)

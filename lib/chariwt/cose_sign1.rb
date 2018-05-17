@@ -34,11 +34,14 @@ module Chariwt
     end
 
     def kid
-      @unprotected[Cose::Msg::KID]
+      @unprotected_bucket[Cose::Msg::KID]
     end
 
-    def pubkey
-      @unprotected[Cose::Msg::VOUCHER_PUBKEY]
+    # the group should be taken from another attribute
+    def pubkey(group = ECDSA::Group::Nistp256)
+      if @unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY]
+        @pubkey ||= ECDSA::Format::PointOctetString.decode(@unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY], group)
+      end
     end
 
     #
