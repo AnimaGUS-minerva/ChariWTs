@@ -166,7 +166,7 @@ RSpec.describe Chariwt::Voucher do
       File.open("tmp/#{name}.vch","w") do |f|
         f.write cv.token
       end
-      cmp_vch_voucher(name)
+      expect(cmp_vch_voucher(name)).to be_truthy
     end
   end
 
