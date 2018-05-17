@@ -508,7 +508,9 @@ module Chariwt
       @sidhash = VoucherSID.hash2yangsid(vrhash)
       sig = Chariwt::CoseSign1.new
       sig.content = @sidhash
-      sig.unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY] = pubkey
+      if pubkey
+        sig.unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY] = pubkey.to_wireformat
+      end
 
       case privkey
       when OpenSSL::PKey::EC

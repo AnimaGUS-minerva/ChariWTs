@@ -116,7 +116,7 @@ module Chariwt
 
     def concat_signed_buckets(sig_bytes)
       # protected, unprotected, payload, signature
-      sign1 = [ @encoded_protected_bucket, {}, @content, sig_bytes ]
+      sign1 = [ @encoded_protected_bucket, @unprotected_bucket, @content, sig_bytes ]
       @binary = CBOR::Tagged.new(18, sign1).to_cbor
     end
 
