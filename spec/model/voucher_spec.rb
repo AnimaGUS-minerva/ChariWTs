@@ -168,6 +168,13 @@ RSpec.describe Chariwt::Voucher do
       end
       expect(cmp_vch_voucher(name)).to be_truthy
     end
+
+    it "should raise an exception, due to lack of public key" do
+      voucher_binary=IO::read(File.join("spec","files","voucher_jada123456789_bad.vch"))
+      expect {
+        Chariwt::Voucher.from_cose_cbor(voucher_binary)
+      }.to raise_error(Chariwt::Voucher::InvalidKeyType)
+    end
   end
 
   describe "parsing an EC key" do
