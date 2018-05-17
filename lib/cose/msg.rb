@@ -10,6 +10,7 @@ module Cose
     IV   = 5
     PARTIAL_IV = 6
     COUNTER_SIGNATURE = 7
+    VOUCHER_PUBKEY    = 60299
 
     # from table 5, ECDSA Algorithm Values
     ES256 = -7

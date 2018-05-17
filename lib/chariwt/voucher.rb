@@ -28,6 +28,7 @@ module Chariwt
     attr_accessor :nonce
     attr_accessor :attributes
     attr_accessor :token
+    attr_accessor :pubkey
 
     class RequestFailedValidation < Exception; end
     class MissingPublicKey < Exception; end
@@ -505,6 +506,7 @@ module Chariwt
       @sidhash = VoucherSID.hash2yangsid(vrhash)
       sig = Chariwt::CoseSign1.new
       sig.content = @sidhash
+      sig.unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY] = pubkey
 
       case privkey
       when OpenSSL::PKey::EC

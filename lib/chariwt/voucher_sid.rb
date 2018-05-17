@@ -29,6 +29,9 @@ module Chariwt
       60200 => ['ietf-cwt-voucher-request', 'ietf-voucher-request:voucher']
     }
 
+    # also Cose::Msg::VoucherPubkey
+    VoucherPubkey = 60299
+
     def self.calc_sidkeys
       rev = Hash.new
       VoucherSIDKeys.each {|k,v|

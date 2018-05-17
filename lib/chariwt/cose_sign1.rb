@@ -37,6 +37,10 @@ module Chariwt
       @unprotected[Cose::Msg::KID]
     end
 
+    def pubkey
+      @unprotected[Cose::Msg::VOUCHER_PUBKEY]
+    end
+
     #
     # PARSING AND VALIDATION ROUTINES
     #
