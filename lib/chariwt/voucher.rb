@@ -32,6 +32,7 @@ module Chariwt
     class RequestFailedValidation < Exception; end
     class MissingPublicKey < Exception; end
     class MalformedJSON < Exception; end
+    class InvalidKeyType < Exception; end
 
     OBJECT_TOP_LEVEL = 'ietf-voucher:voucher'
     def self.object_top_level
@@ -197,7 +198,7 @@ module Chariwt
         valid = unverified.validate(pubkey)
 
       rescue Chariwt::CoseSign1::InvalidKeyType
-        return nil
+        raise InvalidKeyType
       end
 
       raise Chariwt::RequestFailedValidation unless valid
