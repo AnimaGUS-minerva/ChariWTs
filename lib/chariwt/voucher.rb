@@ -198,8 +198,11 @@ module Chariwt
       unverified = Chariwt::CoseSign0.create(token)
 
       unverified.parse
+      pubkey ||= unverified.pubkey
+
+      # XXX something here if there is no key.
       begin
-        valid = unverified.validate(unverified.pubkey)
+        valid = unverified.validate(pubkey)
 
       rescue Chariwt::CoseSign1::InvalidKeyType
         raise InvalidKeyType
@@ -207,7 +210,7 @@ module Chariwt
 
       raise Chariwt::RequestFailedValidation unless valid
 
-      return object_from_verified_cbor(unverified, unverified.pubkey)
+      return object_from_verified_cbor(unverified, pubkey)
     end
 
     def initialize(options = Hash.new)

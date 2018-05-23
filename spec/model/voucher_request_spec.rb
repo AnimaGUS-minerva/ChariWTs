@@ -160,8 +160,8 @@ RSpec.describe Chariwt::VoucherRequest do
       expect(voucher1.voucherType).to eq(:time_based)
     end
 
-    it "should validate a CWT signed file" do
-      filen = "spec/files/vr_00-D0-E5-01-00-09.cwt"
+    it "should validate a COSE signed file" do
+      filen = "spec/files/vr_00-D0-E5-01-00-09.vch"
       certn = "spec/files/010009-idevid.pem"
       pubkey= OpenSSL::X509::Certificate.new(IO::read(certn))
 
