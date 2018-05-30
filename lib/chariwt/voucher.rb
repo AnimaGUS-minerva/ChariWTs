@@ -33,7 +33,12 @@ module Chariwt
     attr_accessor :pubkey
 
     class RequestFailedValidation < Exception; end
-    class MissingPublicKey < Exception; end
+    class MissingPublicKey < Exception
+      def initialize(msg, keyvalue = nil)
+        @keyvalue = keyvalue
+        super(msg)
+      end
+    end
     class MalformedJSON < Exception; end
     class InvalidKeyType < Exception; end
 
@@ -424,10 +429,11 @@ module Chariwt
           decoded = Chariwt::Voucher.decode_pem(x)
           OpenSSL::X509::Certificate.new(decoded)
         end
+      when OpenSSL::X509::Certificate
+        x
       else
         byebug if @@debug
-        raise MissingPublicKey
-        puts "Not sure what othe formats belong here"
+        raise MissingPublicKey.new("unknown public key of class #{x.class}", x)
       end
     end
 
