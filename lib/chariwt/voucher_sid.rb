@@ -1,7 +1,5 @@
 module Chariwt
   class VoucherSIDClass
-    cattr_accessor :sidkeys
-
     class MissingSIDMapping < Exception
       attr_reader :mapping
 
@@ -46,6 +44,7 @@ module Chariwt
     #   { NUM1 => { (NUM2-NUM1) => 'stuff' }}
     #
     def self.mapkeys(base, hash)
+      raise MissingSIDMapping.new("bad base id", base) unless base
       nhash = Hash.new
       hash.each { |k,v|
         kn = sid4key(k)
@@ -66,6 +65,7 @@ module Chariwt
       nhash = Hash.new
       hash.each { |k,v|
         sidkey = sid4key(k)
+        raise MissingSIDMapping.new("missing base object", k) unless sidkey
         nhash[sidkey] = mapkeys(sidkey,v)
       }
       nhash
@@ -112,7 +112,7 @@ module Chariwt
     end
 
     def self.sidkeys
-      @@sidkeys ||= calc_sidkeys(SIDKeys)
+      @sidkeys_voucher ||= calc_sidkeys(SIDKeys)
     end
   end
 
@@ -142,7 +142,7 @@ module Chariwt
     end
 
     def self.sidkeys
-      @@sidkeys ||= calc_sidkeys(SIDKeys)
+      @sidkeys_voucher_request ||= calc_sidkeys(SIDKeys)
     end
   end
 end

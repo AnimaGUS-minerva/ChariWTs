@@ -168,6 +168,8 @@ RSpec.describe Chariwt::VoucherRequest do
       token = IO::read(filen)
       voucher1 = Chariwt::VoucherRequest.from_cose_cbor(token, pubkey)
       expect(voucher1).to_not be_nil
+      pending "update of reference file"
+      expect(voucher1.attributes['unknown']).to be nil
 
       expect(voucher1.assertion).to    eq(:proximity)
       expect(voucher1.serialNumber).to eq('00-D0-E5-01-00-09')
