@@ -257,9 +257,13 @@ module Chariwt
       @domainCertRevocationChecks = thing['domain-cert-revocation-checks']
       @lastRenewalDate  = thing['last-renewal-date']
       self.proximityRegistrarCert        = thing['proximity-registrar-cert']
-      self.proximityRegistrarPublicKey   = thing['proximity-registrar-pubkey']
+      self.proximityRegistrarPublicKey   = thing['proximity-registrar-subject-public-key-info']
 
       self.priorSignedVoucherRequest_base64 = thing['prior-signed-voucher-request']
+    end
+
+    def yangsid2hash(contents)
+      VoucherSID.yangsid2hash(contents)
     end
 
     def load_sid_attributes(cose1)
@@ -279,7 +283,7 @@ module Chariwt
       # assignments are used whenever there are actually additional processing possible
       # for the assignment due to different formats.
 
-      thing = VoucherSID.yangsid2hash(cose1.contents)
+      thing = yangsid2hash(cose1.contents)
       load_attributes(thing)
     end
 
@@ -340,12 +344,12 @@ module Chariwt
       case @proximityRegistrarPublicKey
       when ECDSA::Point
         add_attr_unless_nil(@attributes,
-                            'proximity-registrar-public-key',
+                            'proximity-registrar-subject-public-key-info',
                             ECDSA::Format::PointOctetString.encode(@proximityRegistrarPublicKey, compression: true))
 
       else
         add_der_attr_unless_nil(@attributes,
-                                'proximity-registrar-public-key',
+                                'proximity-registrar-subject-public-key-info',
                                 @proximityRegistrarPublicKey)
       end
     end
@@ -501,15 +505,19 @@ module Chariwt
     # CBOR routines
     #
 
+    def hash2yangsid(vrhash)
+      VoucherSID.hash2yangsid(vrhash)
+    end
+
     # turns a voucher into an unsinged CBOR/YANG array based
     # upon the SID assignments
     def cbor_unsign
-      @sidhash = VoucherSID.hash2yangsid(vrhash)
+      @sidhash = hash2yangsid(vrhash)
       @token = @sidhash.to_cbor
     end
 
     def cose_sign(privkey, group = ECDSA::Group::Nistp256, temporary_key = nil)
-      @sidhash = VoucherSID.hash2yangsid(vrhash)
+      @sidhash = hash2yangsid(vrhash)
       sig = Chariwt::CoseSign1.new
       sig.content = @sidhash
       if pubkey

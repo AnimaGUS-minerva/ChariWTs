@@ -49,6 +49,7 @@ module Chariwt
       nhash = Hash.new
       hash.each { |k,v|
         kn = sid4key(k)
+        #byebug unless kn
         raise MissingSIDMapping.new("missing mapping", k) unless kn
         sidkey = kn - base
         case v
@@ -75,7 +76,13 @@ module Chariwt
       hash.each { |k,v|
         basenum = k
         v.each { |k,v|
-          nhash[hashkeys[basenum+k]] = v
+          val = hashkeys[basenum+k]
+          if val
+            nhash[val] = v
+          else
+            nhash['unknown'] ||= []
+            nhash['unknown'] << [basenum+k,v]
+          end
         }
       }
       nhash

@@ -13,6 +13,14 @@ module Chariwt
       :request
     end
 
+    def yangsid2hash(contents)
+      VoucherRequestSID.yangsid2hash(contents)
+    end
+
+    def hash2yangsid(vrhash)
+      VoucherRequestSID.hash2yangsid(vrhash)
+    end
+
     # mark a voucher as unsigned, generating the attributes into a hash
     def unsigned!
       @token = vrhash.to_json
