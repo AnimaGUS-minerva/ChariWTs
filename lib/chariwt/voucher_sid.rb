@@ -132,6 +132,7 @@ module Chariwt
       1001163 => 'proximity-registrar-subject-public-key-info',
       1001164 => 'serial-number',
       1001165 => 'prior-signed-voucher-request',
+      1001166 => 'proximity-registrar-cert'
     }
 
     # also Cose::Msg::VoucherPubkey
