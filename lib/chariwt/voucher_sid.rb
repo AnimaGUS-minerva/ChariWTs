@@ -1,5 +1,5 @@
 module Chariwt
-  class VoucherSID
+  class VoucherSIDClass
     cattr_accessor :sidkeys
 
     class MissingSIDMapping < Exception
@@ -11,30 +11,9 @@ module Chariwt
       end
     end
 
-    VoucherSIDKeys = {
-      60100 => ['ietf-cwt-voucher', 'ietf-voucher:voucher'],
-      60101 => 'assertion',
-      60102 => 'created-on',
-      60103 => 'domain-cert-revocation-checks',
-      60104 => 'expires-on',
-      60105 => 'idevid-issuer',
-      60106 => 'last-renewal-date',
-      60107 => 'nonce',
-      60108 => 'pinned-domain-cert',
-      60109 => 'pinned-domain-subject-public-key-info',
-      60110 => 'prior-signed-voucher',
-      60111 => 'serial-number',
-      60112 => 'proximity-registrar-cert',
-      60113 => 'proximity-registrar-public-key',
-      60200 => ['ietf-cwt-voucher-request', 'ietf-voucher-request:voucher']
-    }
-
-    # also Cose::Msg::VoucherPubkey
-    VoucherPubkey = 60299
-
-    def self.calc_sidkeys
+    def self.calc_sidkeys(sidkeys)
       rev = Hash.new
-      VoucherSIDKeys.each {|k,v|
+      sidkeys.each {|k,v|
         case v
         when Array
           v.each {|str|
@@ -45,10 +24,6 @@ module Chariwt
         end
       }
       rev
-    end
-
-    def self.sidkeys
-      @@sidkeys ||= calc_sidkeys
     end
 
     def self.sid4key(key)
@@ -100,10 +75,67 @@ module Chariwt
       hash.each { |k,v|
         basenum = k
         v.each { |k,v|
-          nhash[VoucherSIDKeys[basenum+k]] = v
+          nhash[hashkeys[basenum+k]] = v
         }
       }
       nhash
+    end
+  end
+
+  class VoucherSID < VoucherSIDClass
+    SIDKeys = {
+      1001100 => ['ietf-cwt-voucher', 'ietf-voucher:voucher'],
+      1001105 => 'assertion',
+      1001106 => 'created-on',
+      1001107 => 'domain-cert-revocation-checks',
+      1001108 => 'expires-on',
+      1001109 => 'idevid-issuer',
+      1001110 => 'last-renewal-date',
+      1001111 => 'nonce',
+      1001112 => 'pinned-domain-cert',
+      1001113 => 'pinned-domain-subject-public-key-info',
+      1001114 => 'serial-number',
+    }
+
+    # also Cose::Msg::VoucherPubkey
+    VoucherPubkey = 60299
+
+    def self.hashkeys
+      SIDKeys
+    end
+
+    def self.sidkeys
+      @@sidkeys ||= calc_sidkeys(SIDKeys)
+    end
+  end
+
+  class VoucherRequestSID < VoucherSIDClass
+    SIDKeys = {
+      1001154 => ['ietf-cwt-voucher-request',
+                  'ietf-cwt-voucher-request:voucher',
+                  'ietf-voucher-request:voucher'],
+      1001155 => 'assertion',
+      1001156 => 'created-on',
+      1001157 => 'domain-cert-revocation-checks',
+      1001158 => 'expires-on',
+      1001159 => 'idevid-issuer',
+      1001160 => 'last-renewal-date',
+      1001161 => 'nonce',
+      1001162 => 'pinned-domain-cert',
+      1001163 => 'proximity-registrar-subject-public-key-info',
+      1001164 => 'serial-number',
+      1001165 => 'prior-signed-voucher-request',
+    }
+
+    # also Cose::Msg::VoucherPubkey
+    VoucherPubkey = 60299
+
+    def self.hashkeys
+      SIDKeys
+    end
+
+    def self.sidkeys
+      @@sidkeys ||= calc_sidkeys(SIDKeys)
     end
   end
 end
