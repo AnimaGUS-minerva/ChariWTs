@@ -37,6 +37,12 @@ module Chariwt
     system(cmd)
   end
 
+  def cmp_vch_file(token, basename)
+    ofile = File.join(tmpdir, basename + ".vch")
+    File.open(ofile, "w") do |f|     f.write token      end
+    return cmp_vch_voucher(basename)
+  end
+
 
 end
 
