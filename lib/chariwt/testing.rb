@@ -16,7 +16,7 @@ module Chariwt
     ofile = File.join(tmpdir, base + ".pkcs")
     otfile = File.join(tmpdir, base+ ".txt")
 
-    File.open(ofile, "w") do |f|     f.puts smime      end
+    File.open(ofile, "w") do |f|     f.write smime      end
 
     location = File.dirname(__FILE__) + "/../../bin"
     #puts "Location is: #{location}, wrote to #{ofile}, #{otfile}, #{base}"
@@ -25,6 +25,19 @@ module Chariwt
     #puts cmd
     system(cmd)
   end
+
+  def cmp_vch_voucher(basename)
+    diffcmd = sprintf("cbor2diag.rb tmp/%s.vch >tmp/%s.diag",
+                      basename, basename)
+    system(diffcmd)
+
+    cmd = sprintf("diff tmp/%s.diag spec/files/%s.diag",
+                  basename, basename)
+    #puts cmd
+    system(cmd)
+  end
+
+
 end
 
 

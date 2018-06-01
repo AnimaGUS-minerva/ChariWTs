@@ -133,17 +133,6 @@ RSpec.describe Chariwt::Voucher do
     end
   end
 
-  def cmp_vch_voucher(basename)
-    diffcmd = sprintf("cbor2diag.rb tmp/%s.vch >tmp/%s.diag",
-                      basename, basename)
-    system(diffcmd)
-
-    cmd = sprintf("diff tmp/%s.diag spec/files/%s.diag",
-                  basename, basename)
-    #puts cmd
-    system(cmd)
-  end
-
   describe "vch voucher" do
     it "should sign a voucher in COSE format" do
 
@@ -166,7 +155,7 @@ RSpec.describe Chariwt::Voucher do
       File.open("tmp/#{name}.vch","w") do |f|
         f.write cv.token
       end
-      expect(cmp_vch_voucher(name)).to be_truthy
+      expect(Chariwt.cmp_vch_voucher(name)).to be_truthy
     end
 
     it "should parse a public key out of the unprotected bucket" do
