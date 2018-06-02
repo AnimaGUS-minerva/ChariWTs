@@ -199,6 +199,10 @@ module Chariwt
     end
 
     def self.from_cose_cbor(token, pubkey = nil)
+      return from_cbor_cose(token, pubkey)
+    end
+
+    def self.from_cbor_cose(token, pubkey = nil)
       # first extract the public key so that it can be used to verify things.
       unverified = Chariwt::CoseSign0.create(token)
 
