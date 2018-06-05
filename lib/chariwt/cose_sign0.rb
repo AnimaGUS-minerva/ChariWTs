@@ -12,9 +12,13 @@ module Chariwt
     attr_accessor :protected_bucket, :encoded_protected_bucket
     attr_accessor :unprotected_bucket, :content
 
-    def self.create(binary)
+    def self.create(string)
+      create_io(StringIO.new(string))
+    end
+
+    def self.create_io(binary)
       thing = nil
-      unpacker = CBOR::Unpacker.new(StringIO.new(binary))
+      unpacker = CBOR::Unpacker.new(binary)
       # takes the first item, there should be only one...
       # unpacker does not take "first"
       unpacker.each { |req|
