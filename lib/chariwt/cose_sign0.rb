@@ -27,6 +27,7 @@ module Chariwt
 
       # could be there was no data at all!
       # maybe should raise an exception.
+      byebug unless thing
       return nil unless thing
 
       klass = case thing.tag
