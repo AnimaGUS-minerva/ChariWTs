@@ -246,10 +246,6 @@ module Chariwt
       @voucherType = :unknown
     end
 
-    def load_json(jhash)
-      thing = jhash['ietf-voucher:voucher']
-      load_attributes(thing)
-    end
     def load_attributes(thing)
       #   +---- voucher
       #      +---- created-on?                      yang:date-and-time
