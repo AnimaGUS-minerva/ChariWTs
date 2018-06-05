@@ -99,7 +99,8 @@ module Chariwt
     def self.object_from_verified_json(json1, pubkey)
       vr = new
       vr.voucherType = voucher_type
-      vr.load_attributes(json1)
+      vr.load_json_attributes(json1)
+
       if pubkey
         vr.signing_cert = pubkey
       end
@@ -145,7 +146,7 @@ module Chariwt
       json0 = JSON.parse(json_txt)
       pkey  = nil
       pubkey = cert_from_json(json0)
-      raise Voucher::MissingPublicKey unless pubkey
+      raise MissingPublicKey.new("pkcs7 did not find a key") unless pubkey
 
       verified_token = OpenSSL::PKCS7.new(token)
 
@@ -170,6 +171,12 @@ module Chariwt
       voucher_from_verified_data(json0, sign0)
     end
 
+    def self.from_cose_withoutkey(token)
+      unverified                   = Chariwt::CoseSign0.create(token)
+      unverified.parse
+      object_from_verified_cbor(unverified, nil)
+    end
+
     def self.from_jose_json(token)
       # first extract the public key so that it can be used to verify things.
       begin
@@ -181,7 +188,7 @@ module Chariwt
       json0 = unverified_token[0]
       pkey  = nil
       pubkey = cert_from_json(json0)
-      raise Voucher::MissingPublicKey unless pubkey
+      raise MissingPublicKey.new("json did not find a key") unless pubkey
 
       begin
         decoded_token = JWT.decode token, pubkey.public_key, true, { :algorithm => 'ES256' }
@@ -203,13 +210,18 @@ module Chariwt
     end
 
     def self.from_cbor_cose(token, pubkey = nil)
+      from_cbor_cose(StringIO.new(token), pubkey)
+    end
+
+    def self.from_cbor_cose_io(tokenio, pubkey = nil)
       # first extract the public key so that it can be used to verify things.
-      unverified = Chariwt::CoseSign0.create(token)
+      unverified = Chariwt::CoseSign0.create_io(tokenio)
 
       unverified.parse
       pubkey ||= unverified.pubkey
 
-      # XXX something here if there is no key.
+      raise MissingPublicKey.new("cose unprotected did include a key") unless pubkey
+
       begin
         valid = unverified.validate(pubkey)
 
@@ -294,7 +306,19 @@ module Chariwt
 
       thing = yangsid2hash(cose1.contents)
       load_attributes(thing)
+      self.priorSignedVoucherRequest = thing['prior-signed-voucher-request']
     end
+
+    def load_json_attributes(jhash)
+      load_attributes(jhash)
+      self.priorSignedVoucherRequest_base64 = jhash['prior-signed-voucher-request']
+    end
+
+    def load_json(jhash)
+      thing = jhash['ietf-voucher:voucher']
+      load_json_attributes(thing)
+    end
+
 
     def generate_nonce
       @nonce = SecureRandom.urlsafe_base64
