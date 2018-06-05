@@ -10,7 +10,7 @@ require 'chariwt/cose_sign0'
 
 module Chariwt
   class CoseSign1 < CoseSign0
-    attr_accessor :binary, :sha256, :digest, :digested
+    attr_accessor :binary, :sha256, :digest, :digested, :raw_cbor
     attr_accessor :parsed, :validated, :valid, :signature, :signature_bytes
     attr_accessor :protected_bucket, :encoded_protected_bucket
     attr_accessor :unprotected_bucket, :contents
@@ -23,7 +23,7 @@ module Chariwt
     #
     # @param binary (A CBOR encoded object)
     def initialize(req = nil)
-      @req = req
+      @raw_cbor = req
       @protected_bucket   ||= Hash.new
       @unprotected_bucket ||= Hash.new
     end
@@ -50,23 +50,23 @@ module Chariwt
     #
     def parse
       return if @parsed
-      return unless @req
+      return unless @raw_cbor
 
-      return unless @req.value.length==4
+      return unless @raw_cbor.value.length==4
 
       # protected hash
       @protected_bucket = nil
-      @encoded_protected_bucket = @req.value[0]
+      @encoded_protected_bucket = @raw_cbor.value[0]
       CBOR::Unpacker.new(StringIO.new(@encoded_protected_bucket)).each { |thing|
         @protected_bucket = thing
       }
 
-      if(@req.value[1].class == Hash)
-        @unprotected_bucket = @req.value[1]
+      if(@raw_cbor.value[1].class == Hash)
+        @unprotected_bucket = @raw_cbor.value[1]
       end
 
-      @contents        = @req.value[2]
-      @signature_bytes = @req.value[3]
+      @contents        = @raw_cbor.value[2]
+      @signature_bytes = @raw_cbor.value[3]
       @parsed = true
     end
 
