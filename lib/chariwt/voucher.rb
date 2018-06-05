@@ -276,13 +276,13 @@ module Chariwt
       self.proximityRegistrarCert        = thing['proximity-registrar-cert']
       self.proximityRegistrarPublicKey   = thing['proximity-registrar-subject-public-key-info']
 
-      self.priorSignedVoucherRequest_base64 = thing['prior-signed-voucher-request']
     end
 
     def yangsid2hash(contents)
       VoucherSID.yangsid2hash(contents)
     end
 
+    # this takes a CoseSign1 object
     def load_sid_attributes(cose1)
       #   +---- voucher
       #      +---- created-on?                      yang:date-and-time
@@ -519,6 +519,26 @@ module Chariwt
 
     def vrhash
       @vrhash ||= { object_top_level => inner_attributes }
+    end
+
+    CBOR_BINARY_FIELDS = {
+      'prior-signed-voucher-request' => true
+    }
+
+    def calc_sanitized_hash
+      n = Hash.new
+      inner_attributes.each {|k,v|
+        if CBOR_BINARY_FIELDS[k]
+          n[k]= Base64.encode64(v)
+        else
+          n[k]=v
+        end
+      }
+      n
+    end
+
+    def sanitized_hash
+      @sanitized_hash ||= calc_sanitized_hash
     end
 
     def pkcs_sign(privkey, needcerts = true)
