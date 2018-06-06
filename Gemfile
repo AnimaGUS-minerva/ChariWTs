@@ -10,6 +10,7 @@ gem 'ecdsa',   :git => 'https://github.com/AnimaGUS-minerva/ruby_ecdsa.git', :br
 #gem 'ecdsa',   :path => '../minerva/ruby_ecdsa'
 #gem 'ecdsa', "~> 1.3.0"
 gem 'rbnacl', "<5.0.0"
+gem 'rake'
 
 # for acts_like?
 gem 'activesupport'
