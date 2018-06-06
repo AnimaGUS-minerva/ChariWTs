@@ -159,17 +159,17 @@ RSpec.describe Chariwt::Voucher do
     end
 
     it "should parse a public key out of the unprotected bucket" do
-      voucher_binary=IO::read(File.join("spec","files","voucher_jada123456789.vch"))
+      voucher_binary=open(File.join("spec","files","voucher_jada123456789.vch"))
 
-      @cvoucher = Chariwt::Voucher.from_cose_cbor(voucher_binary)
+      @cvoucher = Chariwt::Voucher.from_cbor_cose_io(voucher_binary)
       expect(@cvoucher.pubkey).to_not be_nil
     end
 
     it "should raise an exception, due to lack of public key" do
-      voucher_binary=IO::read(File.join("spec","files","voucher_jada123456789_bad.vch"))
+      voucher_binary=open(File.join("spec","files","voucher_jada123456789_bad.vch"))
       expect {
-        Chariwt::Voucher.from_cose_cbor(voucher_binary)
-      }.to raise_error(Chariwt::Voucher::InvalidKeyType)
+        Chariwt::Voucher.from_cbor_cose_io(voucher_binary)
+      }.to raise_error(Chariwt::Voucher::MissingPublicKey)
     end
   end
 

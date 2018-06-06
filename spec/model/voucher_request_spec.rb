@@ -178,14 +178,13 @@ RSpec.describe Chariwt::VoucherRequest do
     end
 
     it "should load values from a COSE signed CBOR pledge request, without key" do
-      filen = "spec/files/vr_00-D0-E5-F2-00-02.vch"
-      token = IO::read(filen)
-      voucher1 = Chariwt::VoucherRequest.from_cose_withoutkey(token)
+      token_io = open("spec/files/vr_00-D0-E5-F2-10-02.vch")
+      voucher1 = Chariwt::VoucherRequest.from_cose_withoutkey_io(token_io)
 
       expect(voucher1).to_not be_nil
       expect(voucher1.assertion).to    eq(:proximity)
-      expect(voucher1.serialNumber).to eq('00-D0-E5-01-00-09')
-      expect(voucher1.createdOn.utc).to eq(DateTime.parse('2018-05-09T21:04:26Z'))
+      expect(voucher1.serialNumber).to eq('00-D0-E5-F2-10-02')
+      expect(voucher1.createdOn.utc).to eq(DateTime.parse('2018-05-31T01:18:39Z'))
       expect(voucher1.voucherType).to eq(:request)
     end
 

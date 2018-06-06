@@ -171,10 +171,14 @@ module Chariwt
       voucher_from_verified_data(json0, sign0)
     end
 
-    def self.from_cose_withoutkey(token)
-      unverified                   = Chariwt::CoseSign0.create(token)
+    def self.from_cose_withoutkey_io(tokenio)
+      unverified                   = Chariwt::CoseSign0.create_io(tokenio)
       unverified.parse
       object_from_verified_cbor(unverified, nil)
+    end
+
+    def self.from_cose_withoutkey(token)
+      from_cose_withoutkey_io(StringIO.new(token))
     end
 
     def self.from_jose_json(token)
@@ -210,7 +214,7 @@ module Chariwt
     end
 
     def self.from_cbor_cose(token, pubkey = nil)
-      from_cbor_cose(StringIO.new(token), pubkey)
+      from_cbor_cose_io(StringIO.new(token), pubkey)
     end
 
     def self.from_cbor_cose_io(tokenio, pubkey = nil)
