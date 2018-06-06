@@ -1,8 +1,13 @@
-anguage: ruby
+language: ruby
+sudo: false
 rvm:
   - 2.4.1
 
 cache: bundler
 script:
   - ./runtests
-  
+
+addons:
+  apt:
+    packages:
+      - libsodium-dev
