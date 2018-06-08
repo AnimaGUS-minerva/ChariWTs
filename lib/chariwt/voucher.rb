@@ -217,26 +217,32 @@ module Chariwt
       from_cbor_cose_io(StringIO.new(token), pubkey)
     end
 
-    def self.from_cbor_cose_io(tokenio, pubkey = nil)
+    def self.from_cbor_cose_io_unverified(tokenio)
       # first extract the public key so that it can be used to verify things.
       unverified = Chariwt::CoseSign0.create_io(tokenio)
 
       unverified.parse
-      pubkey ||= unverified.pubkey
+      return unverified
+    end
 
-      raise MissingPublicKey.new("cose unprotected did include a key") unless pubkey
-
+    def self.validate_from_chariwt(unverified, pubkey)
       begin
         valid = unverified.validate(pubkey)
-
       rescue Chariwt::CoseSign1::InvalidKeyType
         raise InvalidKeyType
       end
-
       raise Chariwt::RequestFailedValidation unless valid
-
       return object_from_verified_cbor(unverified, pubkey)
     end
+
+    def self.from_cbor_cose_io(tokenio, pubkey = nil)
+      unverified = from_cbor_cose_io_unverified(tokenio)
+      pubkey ||= unverified.pubkey
+
+      raise MissingPublicKey.new("cose unprotected did include a key") unless pubkey
+      return validate_from_chariwt(unverified, pubkey)
+    end
+
 
     def initialize(options = Hash.new)
       # setup defaults to be pkcs/cms format.
