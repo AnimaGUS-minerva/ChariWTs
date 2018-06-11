@@ -21,6 +21,7 @@ module Chariwt
     attr_accessor :token_format
 
     attr_accessor :signing_cert
+    attr_accessor :signed_object
     attr_accessor :assertion, :createdOn, :voucherType
     attr_accessor :expiresOn, :serialNumber, :pinnedDomainCert
     attr_accessor :idevidIssuer, :domainCertRevocationChecks
@@ -84,11 +85,12 @@ module Chariwt
       end
     end
 
-    def self.object_from_verified_cbor(cbor1, pubkey)
+    def self.object_from_verified_cbor(signedobject, pubkey)
       vr = new
       vr.voucherType = voucher_type
       vr.token_format= :cose_cbor
-      vr.load_sid_attributes(cbor1)
+      vr.load_sid_attributes(signedobject)
+      vr.signed_object = signedobject
       if pubkey
         vr.pubkey       = pubkey
         vr.signing_cert = pubkey
@@ -96,13 +98,16 @@ module Chariwt
       vr
     end
 
-    def self.object_from_verified_json(json1, pubkey)
+    def self.object_from_verified_json(json1, pubkey, signed_object = nil)
       vr = new
       vr.voucherType = voucher_type
       vr.load_json_attributes(json1)
 
       if pubkey
         vr.signing_cert = pubkey
+      end
+      if signed_object
+        vr.signed_object = signed_object
       end
       vr
     end
@@ -125,7 +130,7 @@ module Chariwt
       cert_store = OpenSSL::X509::Store.new
       # leave it empty!
 
-      # the data will be checked, but the certificate will not be validates.
+      # the data will be checked, but the certificate will be trusted, and not be validated.
       unless unverified_token.verify(certlist, cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
         raise Voucher::RequestFailedValidation
       end
@@ -134,11 +139,11 @@ module Chariwt
       return json_txt,unverified_token,sign0
     end
 
-    def self.voucher_from_verified_data(json_txt, pubkey)
+    def self.voucher_from_verified_data(json_txt, pubkey, pkcs7object)
       json0 = JSON.parse(json_txt)
       json1 = json0[object_top_level]
 
-      object_from_verified_json(json1, pubkey)
+      object_from_verified_json(json1, pubkey, pkcs7object)
     end
 
     def self.from_pkcs7(token, anchor = nil)
@@ -149,7 +154,6 @@ module Chariwt
       raise MissingPublicKey.new("pkcs7 did not find a key") unless pubkey
 
       verified_token = OpenSSL::PKCS7.new(token)
-
       # leave it empty!
       cert_store = OpenSSL::X509::Store.new
       if anchor
@@ -163,12 +167,12 @@ module Chariwt
         raise Voucher::RequestFailedValidation
       end
       # now univerified_token has passed second signature.
-      voucher_from_verified_data(unverified_token.data, pubkey)
+      voucher_from_verified_data(unverified_token.data, pubkey, verified_token)
     end
 
     def self.from_pkcs7_withoutkey(token)
       json0,unverified_token,sign0 = json0_from_pkcs7(token)
-      voucher_from_verified_data(json0, sign0)
+      voucher_from_verified_data(json0, sign0, unverified_token)
     end
 
     def self.from_cose_withoutkey_io(tokenio)
@@ -241,6 +245,21 @@ module Chariwt
 
       raise MissingPublicKey.new("cose unprotected did include a key") unless pubkey
       return validate_from_chariwt(unverified, pubkey)
+    end
+
+    def verify_with_key(pubkey)
+      case @token_format
+      when :pkcs
+        certlist = [pubkey]
+        # leave it empty!
+        cert_store = OpenSSL::X509::Store.new
+
+        # the data will be checked, but the certificate will be trusted, and not be validated.
+        return @signed_object.verify(certlist, cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
+
+      when :cose_cbor, :cms_cbor
+        return @signed_object.validate(pubkey)
+      end
     end
 
 
