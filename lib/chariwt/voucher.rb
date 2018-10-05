@@ -117,7 +117,7 @@ module Chariwt
       begin
         unverified_token = OpenSSL::PKCS7.new(token)
       rescue ArgumentError
-        raise Voucher::RequestFailedValidation
+        raise RequestFailedValidation
       end
 
       certs = unverified_token.certificates
@@ -132,7 +132,7 @@ module Chariwt
 
       # the data will be checked, but the certificate will be trusted, and not be validated.
       unless unverified_token.verify(certlist, cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
-        raise Voucher::RequestFailedValidation
+        raise RequestFailedValidation
       end
 
       json_txt = unverified_token.data
@@ -164,7 +164,7 @@ module Chariwt
       end
 
       unless unverified_token.verify([pubkey], cert_store, nil, flags)
-        raise Voucher::RequestFailedValidation
+        raise RequestFailedValidation
       end
       # now univerified_token has passed second signature.
       voucher_from_verified_data(unverified_token.data, pubkey, verified_token)
@@ -235,7 +235,7 @@ module Chariwt
       rescue Chariwt::CoseSign1::InvalidKeyType
         raise InvalidKeyType
       end
-      raise Chariwt::RequestFailedValidation unless valid
+      raise RequestFailedValidation.new("with key #{pubkey}") unless valid
       return object_from_verified_cbor(unverified, pubkey)
     end
 
