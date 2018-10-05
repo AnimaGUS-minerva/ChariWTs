@@ -89,6 +89,9 @@ module Chariwt
 
     def validate(pubkey)
       case pubkey
+      when String    # key is not decoded yet.
+        cert        = OpenSSL::X509::Certificate.new(pubkey)
+        pubkey_point= ECDSA::Format::PubKey.decode(cert)
       when OpenSSL::X509::Certificate
         pubkey_point = ECDSA::Format::PubKey.decode(pubkey)
       when ECDSA::Point
