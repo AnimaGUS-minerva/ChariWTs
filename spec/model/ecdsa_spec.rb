@@ -63,6 +63,25 @@ RSpec.describe CHex do
       expect(system("diff tmp/coseobject02.ctxt spec/outputs/coseobject02.ctxt")).to be true
     end
 
+    it "should validate a signed object when ECDSA was carried in PEM" do
+      signed = Chariwt::CoseSign1.new
+
+      signed.content = "This is the content."
+      signed.protected_bucket[1] = -7
+
+      (privkey,group) = ECDSA::Format::PrivateKey.decode(x509privkey)
+      signed.generate_signature(group, privkey, temporary_key)
+
+      expect(signed.digested.unpack("H*")[0]).to eq(coseobject02_digest)
+      expect(signed.digest.unpack("H*")[0]).to   eq(coseobject02_sha256)
+      expect(signed.signature_bytes.length).to eq(64)
+
+      cs1 = Chariwt.CoseSign0.create(signed.binary)
+      cs1.parse
+      expect(cs1.parse).to be true
+      validated = cs1.validate(x509pubkey)
+    end
+
     it "should validate an object with ECDSA key from PEM" do
       bin = CHex.parse(File.open("spec/inputs/coseobject02.ctxt", "rb").read)
 
