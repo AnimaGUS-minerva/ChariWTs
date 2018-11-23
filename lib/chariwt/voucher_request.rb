@@ -23,7 +23,10 @@ module Chariwt
 
     # mark a voucher as unsigned, generating the attributes into a hash
     def unsigned!
-      @token = vrhash.to_json
+      @token = vrhash
+    end
+    def token_json
+      token.to_json
     end
 
     def jose_sign(privkey)

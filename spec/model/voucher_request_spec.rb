@@ -8,6 +8,17 @@ require 'jwt'
 require 'chariwt'
 require 'model/test_keys'
 
+$NonceNumber = 1
+
+# monkey patch generate_nonce to return deterministic nonces for testing
+class Chariwt::Voucher
+  def generate_nonce
+    $NonceNumber += 1
+    @nonce = sprintf("fakeNonce%05x", $NonceNumber)
+  end
+end
+
+
 RSpec.describe Chariwt::VoucherRequest do
   include Testkeys
 
@@ -45,9 +56,13 @@ RSpec.describe Chariwt::VoucherRequest do
 
       vr1.unsigned!
 
-      File.open(File.join("tmp", "jada123456789.json_u"), "w") do |f|
-        f.puts vr1.token
+      unsigned_pledge_file="jada123456789.json_u"
+
+      File.open(File.join("tmp", unsigned_pledge_file), "w") do |f|
+        f.puts vr1.token_json
       end
+      cmd = "diff tmp/#{unsigned_pledge_file} spec/files/#{unsigned_pledge_file}"
+      expect(system cmd).to be true
     end
 
     it "should create a JSON format signed voucher request" do
@@ -93,6 +108,30 @@ RSpec.describe Chariwt::VoucherRequest do
   end
 
   describe "registrar signing" do
+    it "should create a JSON format CMS-signed voucher request, with unsigned pledge request" do
+      vr0 = Chariwt::VoucherRequest.new
+      vr0.assertion    = 'proximity'
+      vr0.serialNumber = 'JADA123456789'
+      vr0.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
+      vr0.proximityRegistrarCert = pubkey99
+      vr0.generate_nonce
+      vr0.unsigned!
+
+      expect(JSON.parse(vr0.token_json)).to_not be_nil
+
+      # now make a voucher request with unsigned pledge request
+      vr1 = Chariwt::VoucherRequest.new
+      vr1.assertion    = 'proximity'
+      vr1.serialNumber = 'JADA123456789'
+      vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
+      vr1.priorSignedVoucherRequest = vr0.token
+
+      vr1.signing_cert_file(File.join("spec","files","jrc_prime256v1.crt"))
+      vr1.pkcs_sign_file(File.join("spec","files","jrc_prime256v1.key"))
+
+      expect(Chariwt.cmp_pkcs_file(vr1.token, "parboiled_jada56789012")).to be true
+    end
+
     it "should JOSE sign a voucher request and save to a file" do
       vr1 = Chariwt::VoucherRequest.new
       vr1.assertion    = 'proximity'
