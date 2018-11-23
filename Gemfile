@@ -9,6 +9,7 @@ gem 'openssl', :git => 'https://github.com/mcr/ruby-openssl.git'
 gem 'ecdsa',   :git => 'https://github.com/AnimaGUS-minerva/ruby_ecdsa.git', :branch => 'ecdsa_interface_openssl'
 #gem 'ecdsa',   :path => '../minerva/ruby_ecdsa'
 #gem 'ecdsa', "~> 1.3.0"
+gem 'rbnacl-libsodium'
 gem 'rbnacl', "<5.0.0"
 gem 'rake'
 
