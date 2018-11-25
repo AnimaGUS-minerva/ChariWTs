@@ -19,10 +19,18 @@ module Chariwt
     def self.create_io(binary)
       thing = nil
       unpacker = CBOR::Unpacker.new(binary)
+
       # takes the first item, there should be only one...
-      # unpacker does not take "first"
+      # but unpacker does not take "first"
       unpacker.each { |req|
-        thing = req   unless thing
+        byebug
+        case req
+        when Integer
+          true
+        else
+          byebug
+          thing = req   unless thing
+        end
       }
 
       # could be there was no data at all!
