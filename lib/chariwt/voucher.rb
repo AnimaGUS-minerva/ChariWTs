@@ -101,7 +101,9 @@ module Chariwt
     def self.object_from_verified_json(json1, pubkey, signed_object = nil)
       vr = new
       vr.voucherType = voucher_type
-      vr.load_json_attributes(json1)
+      if json1
+        vr.load_json_attributes(json1)
+      end
 
       if pubkey
         vr.signing_cert = pubkey
@@ -110,6 +112,11 @@ module Chariwt
         vr.signed_object = signed_object
       end
       vr
+    end
+    def self.object_from_unsigned_json(json0)
+      if json0 and json0[object_top_level]
+        object_from_verified_json(json0[object_top_level], nil, nil)
+      end
     end
 
     def self.json0_from_pkcs7(token)
@@ -336,7 +343,7 @@ module Chariwt
 
     def load_json_attributes(jhash)
       load_attributes(jhash)
-      self.priorSignedVoucherRequest_base64 = jhash['prior-signed-voucher-request']
+      self.priorSignedVoucherRequest = jhash['prior-signed-voucher-request']
     end
 
     def load_json(jhash)
@@ -514,9 +521,12 @@ module Chariwt
       end
     end
 
-    def priorSignedVoucherRequest_base64=(x)
-      if x
-        self.priorSignedVoucherRequest = Base64.decode64(x)
+    def priorSignedVoucherRequest=(x)
+      case x
+      when String
+        @priorSignedVoucherRequest = Base64.decode64(x)
+      when Hash
+        @priorSignedVoucherRequest = x
       end
     end
 
