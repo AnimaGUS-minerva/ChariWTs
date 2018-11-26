@@ -377,7 +377,7 @@ module Chariwt
     end
 
     def load_json(jhash)
-      thing = jhash['ietf-voucher:voucher']
+      thing = jhash[object_top_level]
       load_json_attributes(thing)
     end
 

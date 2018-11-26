@@ -13,6 +13,12 @@ module Chariwt
       :request
     end
 
+    def self.from_json(json0)
+      vr = new
+      vr.load_json(json0)
+      return vr
+    end
+
     def yangsid2hash(contents)
       VoucherRequestSID.yangsid2hash(contents)
     end
