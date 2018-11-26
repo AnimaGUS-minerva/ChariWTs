@@ -16,6 +16,8 @@ class Date
 end
 
 module Chariwt
+  class MalformedCBOR < Exception; end
+
   class Voucher
     cattr_accessor :debug
     attr_accessor :token_format
@@ -183,6 +185,7 @@ module Chariwt
     end
 
     def self.from_cose_withoutkey_io(tokenio)
+      # raises MalformedCBOR if processing fails
       unverified                   = Chariwt::CoseSign0.create_io(tokenio)
       unverified.parse
       object_from_verified_cbor(unverified, nil)

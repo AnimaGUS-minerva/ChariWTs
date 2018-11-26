@@ -23,10 +23,13 @@ module Chariwt
       # takes the first item, there should be only one...
       # but unpacker does not take "first"
       unpacker.each { |req|
-        byebug
         case req
         when Integer
           true
+
+        when CBOR::Tagged
+          thing = req   unless thing
+
         else
           byebug
           thing = req   unless thing
@@ -34,8 +37,9 @@ module Chariwt
       }
 
       # could be there was no data at all!
-      # maybe should raise an exception.
-      byebug unless thing
+      # raise an exception for this case.
+      raise Chariwt::MalformedCBOR unless thing
+      # yes, redundant.
       return nil unless thing
 
       klass = case thing.tag
@@ -43,6 +47,8 @@ module Chariwt
         CoseSign1
       when 98
         CoseSign
+      else
+        raise Chariwt::MalformedCBOR
       end
 
       return klass.new(thing)
