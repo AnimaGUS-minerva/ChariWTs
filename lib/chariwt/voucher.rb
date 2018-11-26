@@ -346,7 +346,7 @@ module Chariwt
 
     def load_json_attributes(jhash)
       load_attributes(jhash)
-      self.priorSignedVoucherRequest = jhash['prior-signed-voucher-request']
+      self.priorSignedVoucherRequest_base64 = jhash['prior-signed-voucher-request']
     end
 
     def load_json(jhash)
@@ -524,13 +524,16 @@ module Chariwt
       end
     end
 
-    def priorSignedVoucherRequest=(x)
-      case x
-      when String
+    def priorSignedVoucherRequest_base64=(x)
+      if x
         @priorSignedVoucherRequest = Base64.decode64(x)
-      when Hash
-        @priorSignedVoucherRequest = x
+      else
+        @priorSignedVoucherRequest = nil
       end
+    end
+
+    def priorSignedVoucherRequest_hash=(x)
+      @priorSignedVoucherRequest = x
     end
 
     def load_file(io)
