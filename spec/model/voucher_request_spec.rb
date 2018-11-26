@@ -124,6 +124,7 @@ RSpec.describe Chariwt::VoucherRequest do
       vr1.assertion    = 'proximity'
       vr1.serialNumber = 'JADA123456789'
       vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
+      vr1.cmsSignedPriorVoucherRequest!
       vr1.priorSignedVoucherRequest = vr0.token
 
       vr1.signing_cert_file(File.join("spec","files","jrc_prime256v1.crt"))

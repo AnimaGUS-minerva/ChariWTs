@@ -17,6 +17,7 @@ end
 
 module Chariwt
   class MalformedCBOR < Exception; end
+  class InvalidVoucherPriorType < Exception; end
 
   class Voucher
     cattr_accessor :debug
@@ -29,6 +30,7 @@ module Chariwt
     attr_accessor :idevidIssuer, :domainCertRevocationChecks
     attr_accessor :lastRenewalDate, :priorSignedVoucherRequest
     attr_accessor :proximityRegistrarCert, :proximityRegistrarPublicKey
+    attr_accessor :priorSignedType
     attr_accessor :pinnedPublicKey
     attr_accessor :nonce
     attr_accessor :attributes
@@ -89,6 +91,7 @@ module Chariwt
 
     def self.object_from_verified_cbor(signedobject, pubkey)
       vr = new
+      vr.coseSignedPriorVoucherRequest!
       vr.voucherType = voucher_type
       vr.token_format= :cose_cbor
       vr.load_sid_attributes(signedobject)
@@ -246,7 +249,9 @@ module Chariwt
         raise InvalidKeyType
       end
       raise RequestFailedValidation.new("with key #{pubkey}") unless valid
-      return object_from_verified_cbor(unverified, pubkey)
+      object = object_from_verified_cbor(unverified, pubkey)
+      object.coseSignedPriorVoucherRequest!
+      return object
     end
 
     def self.from_cbor_cose_io(tokenio, pubkey = nil)
@@ -255,6 +260,27 @@ module Chariwt
 
       raise MissingPublicKey.new("cose unprotected did include a key") unless pubkey
       return validate_from_chariwt(unverified, pubkey)
+    end
+
+    def unsignedPriorVoucherRequest!
+      @priorSignedType = :unsigned
+    end
+    def unsignedPriorVoucherRequest?
+      @priorSignedType == :unsigned
+    end
+
+    def cmsSignedPriorVoucherRequest!
+      @priorSignedType = :cmsSigned
+    end
+    def cmsSignedPriorVoucherRequest?
+      @priorSignedType == :cmsSigned
+    end
+
+    def coseSignedPriorVoucherRequest!
+      @priorSignedType = :coseSigned
+    end
+    def coseSignedPriorVoucherRequest?
+      @priorSignedType == :coseSigned
     end
 
     def verify_with_key(pubkey)
@@ -521,6 +547,22 @@ module Chariwt
     def proximityRegistrarPublicKey=(x)
       if x
         @proximityRegistrarPublicKey = decode_unknown_public_key(x).try(:public_key)
+      end
+    end
+
+    def priorSignedVoucherRequest=(x)
+      case
+      when unsignedPriorVoucherRequest?
+        @priorSignedVoucherRequest = x
+
+      when cmsSignedPriorVoucherRequest?
+        @priorSignedVoucherRequest = x
+
+      when coseSignedPriorVoucherRequest?
+        @priorSignedVoucherRequest = x
+      else
+        #byebug
+        raise InvalidVoucherPriorType if x
       end
     end
 
