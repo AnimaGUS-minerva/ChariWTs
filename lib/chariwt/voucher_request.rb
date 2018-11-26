@@ -82,5 +82,19 @@ module Chariwt
       return eui64
     end
 
+    def load_json_attributes(jhash)
+      load_attributes(jhash)
+
+      priorSigned = jhash['prior-signed-voucher-request']
+      case priorSigned
+      when String
+        cmsSignedPriorVoucherRequest!
+        self.priorSignedVoucherRequest_base64 = jhash['prior-signed-voucher-request']
+      when Hash
+        unsignedPriorVoucherRequest!
+        self.priorSignedVoucherRequest = jhash['prior-signed-voucher-request']
+      end
+    end
+
   end
 end

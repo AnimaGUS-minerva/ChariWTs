@@ -370,9 +370,10 @@ module Chariwt
       self.priorSignedVoucherRequest = thing['prior-signed-voucher-request']
     end
 
+    # note, that *voucher* does not have a priorSignedVoucherRequest, so none is set.
+    # the subclass VoucherRequest overrides this method.
     def load_json_attributes(jhash)
       load_attributes(jhash)
-      self.priorSignedVoucherRequest_base64 = jhash['prior-signed-voucher-request']
     end
 
     def load_json(jhash)
@@ -561,7 +562,7 @@ module Chariwt
       when coseSignedPriorVoucherRequest?
         @priorSignedVoucherRequest = x
       else
-        #byebug
+        byebug if @@debug
         raise InvalidVoucherPriorType if x
       end
     end
