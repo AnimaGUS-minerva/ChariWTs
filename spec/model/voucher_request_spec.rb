@@ -39,7 +39,7 @@ RSpec.describe Chariwt::VoucherRequest do
 
     it "should set the priorSignedVoucherRequest from a binary string" do
       vr1 = Chariwt::VoucherRequest.new
-      vr1.priorSignedVoucherRequest_base64 = "aGVsbG8="
+      vr1.priorSignedVoucherRequest = "aGVsbG8="
       expect(vr1.priorSignedVoucherRequest).to eq("hello")
     end
 
