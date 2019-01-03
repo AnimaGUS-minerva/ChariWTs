@@ -127,9 +127,9 @@ module Chariwt
     def self.json0_from_pkcs7(token)
       # first extract the public key so that it can be used to verify things.
       begin
-        unverified_token = OpenSSL::PKCS7.new(token)
+        unverified_token = OpenSSL::CMS::ContentInfo.new(token)
       rescue ArgumentError
-        raise RequestFailedValidation
+        raise RequestFailedValidation.new("request did not decode properly")
       end
 
       certs = unverified_token.certificates
@@ -143,8 +143,8 @@ module Chariwt
       # leave it empty!
 
       # the data will be checked, but the certificate will be trusted, and not be validated.
-      unless unverified_token.verify(certlist, cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
-        raise RequestFailedValidation
+      unless unverified_token.verify(certlist, cert_store, nil, OpenSSL::CMS::NOINTERN|OpenSSL::CMS::NO_SIGNER_CERT_VERIFY)
+        raise RequestFailedValidation.new(unverified_token.error_string)
       end
 
       json_txt = unverified_token.data
