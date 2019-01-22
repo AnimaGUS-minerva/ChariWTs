@@ -4,7 +4,8 @@ gem "cbor",  "~> 0.5.9.2"
 gem "cbor-diag"
 gem "json"
 gem 'jwt'
-gem 'openssl', :git => 'https://github.com/mcr/ruby-openssl.git'
+#gem 'openssl', :git => 'https://github.com/mcr/ruby-openssl.git'
+gem 'openssl', :path => '../minerva/ruby-openssl'
 
 gem 'ecdsa',   :git => 'https://github.com/AnimaGUS-minerva/ruby_ecdsa.git', :branch => 'ecdsa_interface_openssl'
 #gem 'ecdsa',   :path => '../minerva/ruby_ecdsa'
