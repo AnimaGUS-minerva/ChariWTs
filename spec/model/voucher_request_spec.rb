@@ -206,7 +206,7 @@ RSpec.describe Chariwt::VoucherRequest do
       pubkey= OpenSSL::X509::Certificate.new(IO::read(certn))
 
       token = IO::read(filen)
-      voucher1 = Chariwt::VoucherRequest.from_cose_cbor(token, pubkey)
+      voucher1 = Chariwt::VoucherRequest.from_cbor_cose(token, pubkey)
       expect(voucher1).to_not be_nil
       pending "update of reference file"
       expect(voucher1.attributes['unknown']).to be nil

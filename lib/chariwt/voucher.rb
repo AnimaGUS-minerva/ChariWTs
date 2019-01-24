@@ -165,14 +165,14 @@ module Chariwt
       pubkey = cert_from_json(json0)
       raise MissingPublicKey.new("pkcs7 did not find a key") unless pubkey
 
-      verified_token = OpenSSL::PKCS7.new(token)
+      verified_token = OpenSSL::CMS::ContentInfo.new(token)
       # leave it empty!
       cert_store = OpenSSL::X509::Store.new
       if anchor
         cert_store.add_cert(anchor)
-        flags = OpenSSL::PKCS7::NOCHAIN
+        flags = OpenSSL::CMS::NOINTERN
       else
-        flags = OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY
+        flags = OpenSSL::CMS::NOINTERN|OpenSSL::CMS::NO_SIGNER_CERT_VERIFY
       end
 
       unless unverified_token.verify([pubkey], cert_store, nil, flags)
@@ -291,7 +291,7 @@ module Chariwt
         cert_store = OpenSSL::X509::Store.new
 
         # the data will be checked, but the certificate will be trusted, and not be validated.
-        return @signed_object.verify(certlist, cert_store, nil, OpenSSL::PKCS7::NOCHAIN|OpenSSL::PKCS7::NOVERIFY)
+        return @signed_object.verify(certlist, cert_store, nil, OpenSSL::CMS::NOINTERN|OpenSSL::CMS::NO_SIGNER_CERT_VERIFY)
 
       when :cose_cbor, :cms_cbor
         return @signed_object.validate(pubkey)
@@ -638,10 +638,10 @@ module Chariwt
     def pkcs_sign(privkey, needcerts = true)
       flags = 0
       unless needcerts
-        flags = OpenSSL::PKCS7::NOCERTS
+        flags = OpenSSL::CMS::NOCERTS
       end
       digest = OpenSSL::Digest::SHA256.new
-      smime  = OpenSSL::PKCS7.sign(signing_cert, privkey, vrhash.to_json, [], flags )
+      smime  = OpenSSL::CMS.sign(signing_cert, privkey, vrhash.to_json, [], flags )
       @token = Base64.strict_encode64(smime.to_der)
     end
 
