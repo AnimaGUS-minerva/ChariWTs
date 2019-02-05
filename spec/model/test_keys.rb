@@ -9,6 +9,10 @@ module Testkeys
     system(cmd)
   end
 
+  def cert_from(file)
+    OpenSSL::X509::Certificate.new(IO::read(File::join("spec","files",file + ".crt")))
+  end
+
   def diagdiff_sig(token, file)
     File.open(File.join("tmp", "#{file}.cbor"), "w") do |f|
       f.write token
