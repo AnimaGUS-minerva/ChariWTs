@@ -163,7 +163,7 @@ module Chariwt
       json0 = JSON.parse(json_txt)
       pkey  = nil
       pubkey = cert_from_json(json0)
-      raise MissingPublicKey.new("pkcs7 did not find a key") unless pubkey
+      raise MissingPublicKey.new("from_pkcs7 did not find a pinned-domain-cert") unless pubkey
 
       verified_token = OpenSSL::CMS::ContentInfo.new(token)
       # leave it empty!
