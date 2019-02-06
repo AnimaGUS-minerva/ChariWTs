@@ -636,7 +636,7 @@ module Chariwt
     end
 
     def pkcs_sign(privkey, needcerts = true)
-      flags = 0
+      flags = OpenSSL::CMS::NOSMIMECAP
       unless needcerts
         flags = OpenSSL::CMS::NOCERTS
       end
