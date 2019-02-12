@@ -158,24 +158,35 @@ module Chariwt
       object_from_verified_json(json1, pubkey, pkcs7object)
     end
 
-    def self.from_pkcs7(token, anchor = nil)
+    def self.from_pkcs7(token, signinganchor)
       json_txt,unverified_token,sign0 = json0_from_pkcs7(token)
       json0 = JSON.parse(json_txt)
       pkey  = nil
       pubkey = cert_from_json(json0)
-      raise MissingPublicKey.new("from_pkcs7 did not find a pinned-domain-cert") unless pubkey
+      #raise MissingPublicKey.new("from_pkcs7 did not find a pinned-domain-cert") unless pubkey
 
-      verified_token = OpenSSL::CMS::ContentInfo.new(token)
-      # leave it empty!
+      byebug
+      certs=unverified_token.certificates
       cert_store = OpenSSL::X509::Store.new
-      if anchor
-        cert_store.add_cert(anchor)
-        flags = OpenSSL::CMS::NOINTERN
-      else
-        flags = OpenSSL::CMS::NOINTERN|OpenSSL::CMS::NO_SIGNER_CERT_VERIFY
+
+      # go through the provided certificates, and if the signinganchor
+      # verifies any of them, then include them.
+      if certs
+        certs.each { |cert|
+          #byebug
+          puts "verify #{cert.subject.to_s} with #{signinganchor.subject.to_s} "
+          if cert.verify(signinganchor.public_key)
+            cert_store.add_cert(cert)
+          end
+        }
       end
 
-      unless unverified_token.verify([pubkey], cert_store, nil, flags)
+      verified_token = OpenSSL::CMS::ContentInfo.new(token)
+
+      flags = OpenSSL::CMS::NOINTERN
+      #flags = OpenSSL::CMS::NOINTERN|OpenSSL::CMS::NO_SIGNER_CERT_VERIFY
+
+      unless unverified_token.verify([signinganchor], cert_store, nil, flags)
         raise RequestFailedValidation
       end
       # now univerified_token has passed second signature.

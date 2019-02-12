@@ -112,4 +112,13 @@ module Testkeys
   def masakey71
     @privkey71 ||= OpenSSL::PKey.read(File.read("spec/files/masa_secp384r1.key"))
   end
+
+  def tbt_pubkey
+    @tbt_pubkey||= OpenSSL::X509::Certificate.new(File.read("spec/files/siemens-bt-registrar.pem"))
+  end
+
+  def vr1_pubkey
+    @vr1_pubkey||= OpenSSL::X509::Certificate.new(File.read("spec/files/voucher_request1-anchor.pem"))
+  end
+
 end

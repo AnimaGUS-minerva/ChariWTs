@@ -168,7 +168,7 @@ RSpec.describe Chariwt::VoucherRequest do
     it "should load values from a JOSE signed JSON file string" do
       filen = "spec/files/voucher_request1.pkix"
       token = Base64.decode64(IO::read(filen))
-      voucher1 = Chariwt::VoucherRequest.from_pkcs7(token)
+      voucher1 = Chariwt::VoucherRequest.from_pkcs7(token, vr1_pubkey)
       expect(voucher1).to_not be_nil
 
       expect(voucher1.assertion).to    eq(:proximity)
@@ -211,7 +211,7 @@ RSpec.describe Chariwt::VoucherRequest do
     it "should process CMS-signed (pledge) voucher request from Thomas" do
       filen = "spec/files/voucher_request-00-D0-E5-03-00-03.pkcs"
       token = Base64.decode64(IO::read(filen))
-      voucher1 = Chariwt::VoucherRequest.from_pkcs7(token)
+      voucher1 = Chariwt::VoucherRequest.from_pkcs7(token, tbt_pubkey)
       expect(voucher1).to_not be_nil
 
       expect(voucher1.assertion).to    eq(:proximity)

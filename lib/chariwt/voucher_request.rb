@@ -19,6 +19,15 @@ module Chariwt
       return vr
     end
 
+    # override cert_from_json1, as pinned-domain-cert is never in
+    # voucher-requests.
+    def self.cert_from_json1(json1)
+      if data = json1["registrar-proximity-cert"]
+        pubkey_der = Base64.decode64(data)
+        pubkey = OpenSSL::X509::Certificate.new(pubkey_der)
+      end
+    end
+
     def yangsid2hash(contents)
       VoucherRequestSID.yangsid2hash(contents)
     end
@@ -29,7 +38,7 @@ module Chariwt
 
     # mark a voucher as unsigned, generating the attributes into a hash
     def unsigned!
-      @token = vrhash
+      @token = vrhash.to_s
     end
     def token_json
       token.to_json
