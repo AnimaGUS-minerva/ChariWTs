@@ -31,7 +31,6 @@ module Chariwt
           thing = req   unless thing
 
         else
-          byebug
           thing = req   unless thing
         end
       }
