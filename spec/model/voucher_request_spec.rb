@@ -189,6 +189,12 @@ RSpec.describe Chariwt::VoucherRequest do
       expect(voucher1.voucherType).to eq(:time_based)
     end
 
+    it "should process CMS-signed (parbolied) voucher request via Thomas/BT registrar" do
+      token = IO::read("spec/files/siemens-bt-reg29.pkcs")
+      voucher1 = Chariwt::VoucherRequest.from_pkcs7(token)
+      expect(voucher1).to_not be_nil
+    end
+
     it "should process CMS-signed (pledge) voucher request from Thomas" do
       filen = "spec/files/voucher_request-bt01.pkcs"
       token = Base64.decode64(IO::read(filen))
