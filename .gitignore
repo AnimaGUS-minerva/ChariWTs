@@ -51,3 +51,4 @@ build-iPhoneSimulator/
 *~
 spec/outputs/coseobject01-digest0.bin
 spec/outputs/coseobject01-digest1.bin
+.byebug_history
