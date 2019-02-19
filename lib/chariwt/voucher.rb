@@ -36,6 +36,7 @@ module Chariwt
     attr_accessor :attributes
     attr_accessor :token
     attr_accessor :pubkey
+    attr_accessor :cert_chain
 
     class RequestFailedValidation < Exception; end
     class MissingPublicKey < Exception
@@ -103,13 +104,17 @@ module Chariwt
       vr
     end
 
-    def self.object_from_verified_json(json1, pubkey, signed_object = nil)
+    def self.object_from_verified_json(json1, store0, signed_object = nil)
       vr = new
       vr.voucherType = voucher_type
+      if store0
+        vr.cert_chain = store0
+      end
       if json1
         vr.load_json_attributes(json1)
       end
 
+      pubkey = (store0 && store0.chain.try(:last))
       if pubkey
         vr.signing_cert = pubkey
       end
@@ -118,84 +123,65 @@ module Chariwt
       end
       vr
     end
+
     def self.object_from_unsigned_json(json0)
       if json0 and json0[object_top_level]
         object_from_verified_json(json0[object_top_level], nil, nil)
       end
     end
 
-    def self.json0_from_pkcs7(token)
-      # first extract the public key so that it can be used to verify things.
+    def self.json0_from_pkcs7(token, extracert = nil)
+      # set things up and then see if there a certificate that can verify the signature
       begin
         unverified_token = OpenSSL::CMS::ContentInfo.new(token)
       rescue ArgumentError
         raise RequestFailedValidation.new("request did not decode properly")
       end
 
+      # the cert_store is the list of trusted anchors
+      cert_store = OpenSSL::X509::Store.new
+
+      # walk through the certificate list and look for any self-signed certificates
+      # and put them into the cert_store.
       certs = unverified_token.certificates
       certlist = []
-      if certs
-        sign0 = certs.try(:first)
-        certlist = [sign0]
+      if extracert
+        certlist << extracert
       end
+      certs.each { |cert|
+        if cert.issuer == cert.subject
+          cert_store.add_cert(cert)
+        else
+          certlist << cert
+        end
+      }
 
-      cert_store = OpenSSL::X509::Store.new
-      # leave it empty!
-
-      # the data will be checked, but the certificate will be trusted, and not be validated.
+      # the data will be checked. The certificates are allowed to be trusted at this point, as
+      # we are essentially just calculating a checksum on the contents in order to be able to
+      # take look inside.  However, the certificate is not checked at this point.
       unless unverified_token.verify(certlist, cert_store, nil, OpenSSL::CMS::NOINTERN|OpenSSL::CMS::NO_SIGNER_CERT_VERIFY)
         raise RequestFailedValidation.new(unverified_token.error_string)
       end
 
       json_txt = unverified_token.data
-      return json_txt,unverified_token,sign0
+      return json_txt,unverified_token,cert_store
     end
 
-    def self.voucher_from_verified_data(json_txt, pubkey, pkcs7object)
+    def self.voucher_from_verified_data(json_txt, store0, pkcs7object)
       json0 = JSON.parse(json_txt)
       json1 = json0[object_top_level]
 
-      object_from_verified_json(json1, pubkey, pkcs7object)
+      object_from_verified_json(json1, store0, pkcs7object)
     end
 
-    def self.from_pkcs7(token, signinganchor)
-      json_txt,unverified_token,sign0 = json0_from_pkcs7(token)
-      json0 = JSON.parse(json_txt)
-      pkey  = nil
-      pubkey = cert_from_json(json0)
-      #raise MissingPublicKey.new("from_pkcs7 did not find a pinned-domain-cert") unless pubkey
-
-      byebug
-      certs=unverified_token.certificates
-      cert_store = OpenSSL::X509::Store.new
-
-      # go through the provided certificates, and if the signinganchor
-      # verifies any of them, then include them.
-      if certs
-        certs.each { |cert|
-          #byebug
-          puts "verify #{cert.subject.to_s} with #{signinganchor.subject.to_s} "
-          if cert.verify(signinganchor.public_key)
-            cert_store.add_cert(cert)
-          end
-        }
-      end
-
-      verified_token = OpenSSL::CMS::ContentInfo.new(token)
-
-      flags = OpenSSL::CMS::NOINTERN
-      #flags = OpenSSL::CMS::NOINTERN|OpenSSL::CMS::NO_SIGNER_CERT_VERIFY
-
-      unless unverified_token.verify([signinganchor], cert_store, nil, flags)
-        raise RequestFailedValidation
-      end
-      # now univerified_token has passed second signature.
-      voucher_from_verified_data(unverified_token.data, pubkey, verified_token)
+    def self.from_pkcs7(token, extracert)
+      json_txt,unverified_token,store0 = json0_from_pkcs7(token, extracert)
+      voucher_from_verified_data(unverified_token.data, store0, token)
     end
 
     def self.from_pkcs7_withoutkey(token)
-      json0,unverified_token,sign0 = json0_from_pkcs7(token)
-      voucher_from_verified_data(json0, sign0, unverified_token)
+      json0,unverified_token,store0 = json0_from_pkcs7(token)
+      voucher_from_verified_data(json0, store0, token)
     end
 
     def self.from_cose_withoutkey_io(tokenio)

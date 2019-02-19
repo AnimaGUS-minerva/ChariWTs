@@ -177,15 +177,15 @@ RSpec.describe Chariwt::VoucherRequest do
       expect(voucher1.voucherType).to eq(:time_based)
     end
 
-    it "should process CMS-signed (parboiled) voucher request from Thomas" do
+    it "should process CMS-signed (parboiled), assertion-less voucher request from Thomas" do
       filen = "spec/files/parboiled_vr-9730-siemens-bt.pkcs"
       token = Base64.decode64(IO::read(filen))
-      voucher1 = Chariwt::VoucherRequest.from_pkcs7(token)
+      voucher1 = Chariwt::VoucherRequest.from_pkcs7(token, vr1_pubkey)
       expect(voucher1).to_not be_nil
 
-      expect(voucher1.assertion).to    eq(:proximity)
-      expect(voucher1.serialNumber).to eq('JADA123456789')
-      expect(voucher1.createdOn).to  eq(DateTime.parse('2016-10-07T19:31:42Z'))
+      expect(voucher1.assertion).to    be_nil
+      expect(voucher1.serialNumber).to eq('0123456789')
+      expect(voucher1.createdOn).to  eq(DateTime.parse('2018-12-14T05:59:09.256Z'))
       expect(voucher1.voucherType).to eq(:time_based)
     end
 
