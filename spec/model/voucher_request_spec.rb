@@ -47,7 +47,7 @@ RSpec.describe Chariwt::VoucherRequest do
 
 
   describe "pledge signing" do
-    it "should create a JSON format unsigned voucher request" do
+    it "should create a JSON format unsigned pledge voucher request" do
       vr1 = Chariwt::VoucherRequest.new
       vr1.assertion    = 'proximity'
       vr1.serialNumber = 'JADA123456789'
@@ -57,7 +57,6 @@ RSpec.describe Chariwt::VoucherRequest do
       vr1.unsigned!
 
       unsigned_pledge_file="jada123456789.json_u"
-
       File.open(File.join("tmp", unsigned_pledge_file), "w") do |f|
         f.puts vr1.token_json
       end

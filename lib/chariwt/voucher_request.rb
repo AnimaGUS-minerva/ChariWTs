@@ -36,9 +36,10 @@ module Chariwt
       VoucherRequestSID.hash2yangsid(vrhash)
     end
 
-    # mark a voucher as unsigned, generating the attributes into a hash
+    # mark a voucher as unsigned, generating the attributes into a hash, which will
+    # get rendered as JSON.
     def unsigned!
-      @token = vrhash.to_s
+      @token = vrhash
     end
     def token_json
       token.to_json
