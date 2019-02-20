@@ -426,9 +426,11 @@ module Chariwt
 
       add_attr_unless_nil(@attributes, 'last-renewal-date', @lastRenewalDate)
 
-      add_binary_attr_unless_nil(@attributes,
-                                 'prior-signed-voucher-request',
-                                 @priorSignedVoucherRequest)
+      unless @priorSignedVoucherRequest.is_a? Hash
+        add_binary_attr_unless_nil(@attributes,
+                                   'prior-signed-voucher-request',
+                                   @priorSignedVoucherRequest)
+      end
 
       add_der_attr_unless_nil(@attributes,
                               'proximity-registrar-cert',
