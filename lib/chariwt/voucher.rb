@@ -1,15 +1,17 @@
-require "active_support/all"
+require "active_support"
+require 'active_support/core_ext/class/attribute_accessors'
 require "cbor"
 require 'ecdsa'
 
 require 'cose/msg'
+require 'date'
 
-class DateTime
+DateTime.class_eval do
   def to_cbor(n = nil)
     to_time.to_cbor(n)
   end
 end
-class Date
+Date.class_eval do
   def to_cbor(n = nil)
     to_time.to_cbor(n)
   end

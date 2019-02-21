@@ -1,3 +1,4 @@
+require 'active_support/core_ext/class/attribute_accessors'
 require 'chariwt/testing'
 require 'chariwt/cose_sign0'
 require 'chariwt/cose_sign'

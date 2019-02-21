@@ -1,3 +1,6 @@
+require "active_support"
+require 'active_support/core_ext/class/attribute_accessors'
+
 module Chariwt
   class VoucherRequest < Voucher
     class InvalidVoucherRequest < Exception; end
