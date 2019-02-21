@@ -66,7 +66,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activesupport
+  activesupport (~> 5.2.0)
   byebug
   cbor (~> 0.5.9.2)
   cbor-diag
@@ -80,6 +80,7 @@ DEPENDENCIES
   rspec
   rspec-core
   rspec_junit_formatter
+  tzinfo (~> 1.2.5)
 
 BUNDLED WITH
    1.17.2
