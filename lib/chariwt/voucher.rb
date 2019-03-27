@@ -176,7 +176,7 @@ module Chariwt
       object_from_verified_json(json1, store0, pkcs7object)
     end
 
-    def self.from_pkcs7(token, extracert)
+    def self.from_pkcs7(token, extracert = nil)
       json_txt,unverified_token,store0 = json0_from_pkcs7(token, extracert)
       voucher_from_verified_data(unverified_token.data, store0, token)
     end
