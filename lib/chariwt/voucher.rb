@@ -148,6 +148,7 @@ module Chariwt
       certs = unverified_token.certificates
       certlist = []
       if extracert
+        cert_store.add_cert(extracert)
         certlist << extracert
       end
       certs.each { |cert|
