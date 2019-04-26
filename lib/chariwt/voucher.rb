@@ -179,12 +179,12 @@ module Chariwt
 
     def self.from_pkcs7(token, extracert = nil)
       json_txt,unverified_token,store0 = json0_from_pkcs7(token, extracert)
-      voucher_from_verified_data(unverified_token.data, store0, token)
+      voucher_from_verified_data(unverified_token.data, store0, unverified_token)
     end
 
     def self.from_pkcs7_withoutkey(token)
       json0,unverified_token,store0 = json0_from_pkcs7(token)
-      voucher_from_verified_data(json0, store0, token)
+      voucher_from_verified_data(json0, store0, unverified_token)
     end
 
     def self.from_cose_withoutkey_io(tokenio)
