@@ -106,7 +106,7 @@ module Chariwt
       @sha256 = Digest::SHA256.digest(@digest)
       @valid = ECDSA.valid_signature?(pubkey_point, sha256, signature)
 
-      if @valid
+      if @valid and @signed_contents.kind_of? String
         CBOR::Unpacker.new(StringIO.new(@signed_contents)).each { |thing|
           @contents = thing
         }

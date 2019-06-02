@@ -73,6 +73,7 @@ module Chariwt
 
     def self.yangsid2hash(hash)
       nhash = Hash.new
+      return nil unless hash.kind_of? Hash
       hash.each { |k,v|
         basenum = k
         v.each { |k,v|
