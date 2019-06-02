@@ -206,7 +206,9 @@ RSpec.describe CHex do
       cs1 = Chariwt::CoseSign0.create(bin)
       cs1.parse
       expect(cs1.parsed).to be true
+
       validated = cs1.validate(sig01_pub_key)
+      expect(validated).to be true
 
       File.open("spec/outputs/coseobject01-digest1.bin", "w") do |f|
         f.write cs1.digest

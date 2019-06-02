@@ -13,7 +13,7 @@ module Chariwt
     attr_accessor :binary, :sha256, :digest, :digested, :raw_cbor
     attr_accessor :parsed, :validated, :valid, :signature, :signature_bytes
     attr_accessor :protected_bucket, :encoded_protected_bucket
-    attr_accessor :unprotected_bucket, :contents
+    attr_accessor :unprotected_bucket, :contents, :signed_contents
 
     class InvalidKeyType < Exception; end
 
@@ -65,7 +65,7 @@ module Chariwt
         @unprotected_bucket = @raw_cbor.value[1]
       end
 
-      @contents        = @raw_cbor.value[2]
+      @signed_contents = @raw_cbor.value[2]
       @signature_bytes = @raw_cbor.value[3]
       @parsed = true
     end
@@ -100,11 +100,18 @@ module Chariwt
         raise InvalidKeyType
       end
 
-      sig_struct = ["Signature1", @encoded_protected_bucket, empty_bstr, @contents]
+      sig_struct = ["Signature1", @encoded_protected_bucket, empty_bstr, @signed_contents]
       @digest     = sig_struct.to_cbor
 
       @sha256 = Digest::SHA256.digest(@digest)
       @valid = ECDSA.valid_signature?(pubkey_point, sha256, signature)
+
+      if @valid
+        CBOR::Unpacker.new(StringIO.new(@signed_contents)).each { |thing|
+          @contents = thing
+        }
+      end
+      @valid
     end
 
     def ecdsa_signed_bytes
