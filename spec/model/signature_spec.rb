@@ -142,16 +142,6 @@ RSpec.describe CHex do
       expect(validated).to be true
 
     end
-    it "should parse ecdsa-sig-01 into object" do
-      bin = CHex.parse(File.open("spec/inputs/sig-01.ctxt", "rb").read)
-
-      ccs1 = Chariwt::CoseSign0.create(bin)
-      ccs1.parse
-
-      expect(ccs1.protected_bucket[3]).to eq(0)   # zero means cbor null.
-      validated = ccs1.validate(sig01_pub_key)
-      expect(validated).to be true
-    end
 
     it "should validate ecdsa-sig-02 example from json" do
       testdesc = JSON.parse(File.open("spec/examples/ecdsa-examples/ecdsa-01.json", "rb").read)
