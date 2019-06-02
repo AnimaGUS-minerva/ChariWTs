@@ -660,7 +660,7 @@ module Chariwt
     def cose_sign(privkey, group = ECDSA::Group::Nistp256, temporary_key = nil)
       @sidhash = hash2yangsid(vrhash)
       sig = Chariwt::CoseSign1.new
-      sig.content = @sidhash
+      sig.content = @sidhash.to_cbor
       if pubkey
         sig.unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY] = pubkey.to_wireformat
       end
