@@ -163,6 +163,7 @@ RSpec.describe Chariwt::Voucher do
 
       @cvoucher = Chariwt::Voucher.from_cbor_cose_io(voucher_binary)
       expect(@cvoucher.pubkey).to_not be_nil
+      expect(@cvoucher.nonce).to eq("abcd12345")
     end
 
     it "should raise an exception, due to lack of public key" do
