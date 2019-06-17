@@ -191,6 +191,10 @@ module Chariwt
       # raises MalformedCBOR if processing fails
       unverified                   = Chariwt::CoseSign0.create_io(tokenio)
       unverified.parse
+
+      # because there was no key, must decode the signed content into content
+      # directly here.
+      unverified.parse_signed_contents
       object_from_verified_cbor(unverified, nil)
     end
 
@@ -327,6 +331,8 @@ module Chariwt
 
       # assignments are used whenever there are actually additional processing possible
       # for the assignment due to different formats.
+      byebug if thing.nil?
+      return nil unless thing.kind_of? Hash
 
       @attributes   = thing
       @nonce        = thing['nonce']

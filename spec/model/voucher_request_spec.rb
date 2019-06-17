@@ -231,6 +231,7 @@ RSpec.describe Chariwt::VoucherRequest do
     end
 
     it "should validate a COSE signed file" do
+      pending "THIS TEST DATA IS OLD"
       filen = "spec/files/vr_00-D0-E5-01-00-09.vch"
       certn = "spec/files/010009-idevid.pem"
       pubkey= OpenSSL::X509::Certificate.new(IO::read(certn))
@@ -248,13 +249,13 @@ RSpec.describe Chariwt::VoucherRequest do
     end
 
     it "should load values from a COSE signed CBOR pledge request, without key" do
-      token_io = open("spec/files/vr_00-D0-E5-F2-10-02.vch")
+      token_io = open("spec/files/vr_00-D0-E5-F2-00-02.vrq")
       voucher1 = Chariwt::VoucherRequest.from_cose_withoutkey_io(token_io)
 
       expect(voucher1).to_not be_nil
       expect(voucher1.assertion).to    eq(:proximity)
-      expect(voucher1.serialNumber).to eq('00-D0-E5-F2-10-02')
-      expect(voucher1.createdOn.utc).to eq(DateTime.parse('2018-05-31T01:18:39Z'))
+      expect(voucher1.serialNumber).to eq('00-D0-E5-F2-00-02')
+      expect(voucher1.createdOn.utc).to eq(DateTime.parse('2019-06-17T18:14:09Z'))
       expect(voucher1.voucherType).to eq(:request)
     end
 

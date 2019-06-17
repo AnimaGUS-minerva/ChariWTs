@@ -87,6 +87,14 @@ module Chariwt
       @signature ||= extract_signature
     end
 
+    def parse_signed_contents
+      if @signed_contents.kind_of? String
+        CBOR::Unpacker.new(StringIO.new(@signed_contents)).each { |thing|
+          @contents = thing
+        }
+      end
+    end
+
     def validate(pubkey)
       case pubkey
       when String    # key is not decoded yet.
@@ -106,10 +114,8 @@ module Chariwt
       @sha256 = Digest::SHA256.digest(@digest)
       @valid = ECDSA.valid_signature?(pubkey_point, sha256, signature)
 
-      if @valid and @signed_contents.kind_of? String
-        CBOR::Unpacker.new(StringIO.new(@signed_contents)).each { |thing|
-          @contents = thing
-        }
+      if @valid
+        unverified.parse_signed_contents
       end
       @valid
     end
