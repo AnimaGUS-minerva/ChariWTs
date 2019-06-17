@@ -331,7 +331,7 @@ module Chariwt
 
       # assignments are used whenever there are actually additional processing possible
       # for the assignment due to different formats.
-      byebug if thing.nil?
+      #byebug if thing.nil?
       return nil unless thing.kind_of? Hash
 
       @attributes   = thing
