@@ -373,7 +373,9 @@ module Chariwt
 
       thing = yangsid2hash(cose1.contents)
       load_attributes(thing)
-      self.priorSignedVoucherRequest = thing['prior-signed-voucher-request']
+      if thing
+        self.priorSignedVoucherRequest = thing['prior-signed-voucher-request']
+      end
     end
 
     # note, that *voucher* does not have a priorSignedVoucherRequest, so none is set.
