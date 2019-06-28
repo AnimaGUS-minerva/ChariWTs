@@ -115,7 +115,7 @@ module Chariwt
       @valid = ECDSA.valid_signature?(pubkey_point, sha256, signature)
 
       if @valid
-        unverified.parse_signed_contents
+        parse_signed_contents
       end
       @valid
     end
