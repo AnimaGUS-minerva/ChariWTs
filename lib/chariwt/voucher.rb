@@ -640,14 +640,14 @@ module Chariwt
       @sanitized_hash ||= calc_sanitized_hash
     end
 
-    def pkcs_sign(privkey, needcerts = true, extracerts = [])
+    def pkcs_sign_bin(privkey, needcerts = true, extracerts = [])
       flags = OpenSSL::CMS::NOSMIMECAP
       unless needcerts
         flags = OpenSSL::CMS::NOCERTS
       end
       digest = OpenSSL::Digest::SHA256.new
       smime  = OpenSSL::CMS.sign(signing_cert, privkey, vrhash.to_json, extracerts, flags )
-      @token = Base64.strict_encode64(smime.to_der)
+      @token = smime.to_der
     end
 
     #
