@@ -3,7 +3,7 @@
 in=$1
 out=$2
 certfile=$3
-der=$(echo $in | sed -e's/.pkcs$/.der/')
+#der=$(echo $in | sed -e's/.pkcs$/.der/')
 
 certfilearg=
 if [ -n "$certfile" ];
@@ -13,7 +13,6 @@ fi
 #extra='-nosigs -noverify'
 extra='-noverify'
 
-base64 -d <$in >$der
-(openssl cms -verify $certfilearg -inform der -in $der $extra 2>/dev/null \
+(openssl cms -verify $certfilearg -inform der -in $in $extra 2>/dev/null \
         | sed -e's/,/,\n/g'; echo) >$out
 
