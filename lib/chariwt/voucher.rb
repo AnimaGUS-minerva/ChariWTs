@@ -371,7 +371,7 @@ module Chariwt
       # assignments are used whenever there are actually additional processing possible
       # for the assignment due to different formats.
 
-      thing = yangsid2hash(cose1.contents)
+      thing = yangsid2hash(cose1.signed_contents)
       load_attributes(thing)
       if thing
         self.priorSignedVoucherRequest = thing['prior-signed-voucher-request']
