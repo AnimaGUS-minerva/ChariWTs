@@ -54,7 +54,7 @@ RSpec.describe Chariwt::Voucher do
 
       cv.signing_cert     = masapub71
       cv.pinnedPublicKey  = pubkey99.public_key  # of the JRC!
-      smime = cv.pkcs_sign(masakey71)
+      smime = cv.pkcs_sign_bin(masakey71)
 
       expect(Chariwt.cmp_pkcs_file(smime, "thing_f2-01-99",
                                    "spec/files/certs.crt")).to be true
@@ -72,7 +72,7 @@ RSpec.describe Chariwt::Voucher do
 
       cv.signing_cert     = pubkey99
       cv.pinnedDomainCert = pubkey99
-      smime = cv.pkcs_sign(privkey99)
+      smime = cv.pkcs_sign_bin(privkey99)
 
       expect(Chariwt.cmp_pkcs_file(smime, "thing_f2-00-99",
                                    "spec/files/certs.crt")).to be true

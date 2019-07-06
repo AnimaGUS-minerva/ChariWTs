@@ -63,7 +63,7 @@ module Chariwt
 
     def pkcs_sign_file(file)
       privkey = OpenSSL::PKey.read(IO::read(file))
-      pkcs_sign(privkey)
+      pkcs_sign_bin(privkey)
     end
 
     # this failes because ruby-openssl renders the "value" string as being
