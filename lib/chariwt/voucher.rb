@@ -20,6 +20,7 @@ end
 module Chariwt
   class MalformedCBOR < Exception; end
   class InvalidVoucherPriorType < Exception; end
+  class UnsupportedCOSEAlgorithm <Exception; end
 
   class Voucher
     cattr_accessor :debug
