@@ -33,6 +33,10 @@ module Chariwt
       @protected_bucket[Cose::Msg::ALG] == Cose::Msg::ES256
     end
 
+    def set_msg_alg_es256!
+      @protected_bucket[Cose::Msg::ALG] = Cose::Msg::ES256
+    end
+
     def kid
       @unprotected_bucket[Cose::Msg::KID]
     end

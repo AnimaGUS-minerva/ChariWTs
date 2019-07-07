@@ -673,6 +673,14 @@ module Chariwt
       @sidhash = hash2yangsid(vrhash)
       sig = Chariwt::CoseSign1.new
       sig.content = @sidhash.to_cbor
+
+      case group
+      when ECDSA::Group::Nistp256
+        sig.set_msg_alg_es256!
+      else
+        raise UnsupportedCOSEAlgorithm
+      end
+
       if pubkey
         sig.unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY] = pubkey.to_wireformat
       end
