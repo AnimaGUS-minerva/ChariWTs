@@ -39,6 +39,7 @@ module Chariwt
     attr_accessor :token
     attr_accessor :pubkey
     attr_accessor :cert_chain
+    attr_accessor :unprotected_bucket
 
     class RequestFailedValidation < Exception; end
     class MissingPublicKey < Exception
@@ -389,6 +390,9 @@ module Chariwt
       load_json_attributes(thing)
     end
 
+    def unprotected_bucket
+      @unprotected_bucket ||= Hash.new
+    end
 
     def generate_nonce
       @nonce = SecureRandom.urlsafe_base64
