@@ -34,7 +34,10 @@ module Chariwt
     cmd = sprintf("diff tmp/%s.diag spec/files/%s.diag",
                   basename, basename)
     #puts cmd
-    system(cmd)
+    exitcode = system(cmd)
+    unless exitcode==0
+      puts cmd
+    end
   end
 
   def self.cmp_vch_pretty_voucher(basename)
@@ -44,8 +47,10 @@ module Chariwt
 
     cmd = sprintf("diff tmp/%s.pretty spec/files/%s.pretty",
                   basename, basename)
-    #puts cmd
-    system(cmd)
+    exitcode = system(cmd)
+    unless exitcode==0
+      puts cmd
+    end
   end
 
   def self.cmp_vch_detailed_voucher(basename)
@@ -55,8 +60,11 @@ module Chariwt
     system(cvtcmd)
     diffcmd = sprintf("diff %s spec/files/%s.pretty",
                       pretty, basename)
-    #puts cmd
-    system(diffcmd)
+    exitcode = system(cmd)
+    unless exitcode==0
+      puts cmd
+      return exitcode
+    end
 
     # grab the tenth line, and convert it back to cbor, for decoding.
     n=0
@@ -74,7 +82,11 @@ module Chariwt
     system(bagdcode)
     diff2cmd= sprintf("diff %s spec/files/%s.bag.pretty",
                       bag2pretty, basename)
-    system(diff2cmd)
+    exitcode = system(diff2cmd)
+    unless exitcode==0
+      puts diff2cmd
+      return exitcode
+    end
   end
 
   def self.cmp_vch_file(token, basename)
