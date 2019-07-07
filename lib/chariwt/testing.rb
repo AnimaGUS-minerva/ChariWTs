@@ -37,6 +37,46 @@ module Chariwt
     system(cmd)
   end
 
+  def self.cmp_vch_pretty_voucher(basename)
+    diffcmd = sprintf("cbor2pretty.rb tmp/%s.vch >tmp/%s.pretty",
+                      basename, basename)
+    system(diffcmd)
+
+    cmd = sprintf("diff tmp/%s.pretty spec/files/%s.pretty",
+                  basename, basename)
+    #puts cmd
+    system(cmd)
+  end
+
+  def self.cmp_vch_detailed_voucher(basename)
+    pretty = sprintf("tmp/%s.pretty", basename)
+    cvtcmd = sprintf("cbor2pretty.rb tmp/%s.vch >%s",
+                      basename, pretty)
+    system(cvtcmd)
+    diffcmd = sprintf("diff %s spec/files/%s.pretty",
+                      pretty, basename)
+    #puts cmd
+    system(diffcmd)
+
+    # grab the tenth line, and convert it back to cbor, for decoding.
+    n=0
+    signedcbor=nil
+    IO.readlines(pretty).each { |line|
+      n += 1
+      next unless n==10
+      signedcbor = line.sub(/#.*/, '').scan(/[0-9a-fA-F][0-9a-fA-F]/).map {|b| b.to_i(16).chr(Encoding::BINARY)}.join
+      break
+    }
+    outfile=sprintf("tmp/%s.bag", basename)
+    bag2pretty=sprintf("tmp/%s.bag.pretty", basename)
+    open(outfile, "wb") {|f| f.syswrite signedcbor }
+    bagdcode = sprintf("cbor2pretty.rb %s >%s", outfile, bag2pretty)
+    system(bagdcode)
+    diff2cmd= sprintf("diff %s spec/files/%s.bag.pretty",
+                      bag2pretty, basename)
+    system(diff2cmd)
+  end
+
   def self.cmp_vch_file(token, basename)
     ofile = File.join(tmpdir, basename + ".vch")
     File.open(ofile, "wb") do |f|     f.write token      end

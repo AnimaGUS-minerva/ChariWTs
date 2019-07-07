@@ -1,0 +1,21 @@
+a1                                      # map(1)
+   1a 000f468c                          # unsigned(1001100)
+   a6                                   # map(6)
+      05                                # unsigned(5)
+      69                                # text(9)
+         70726f78696d697479             # "proximity"
+      06                                # unsigned(6)
+      c1                                # tag(1)
+         1a 57f7f81e                    # unsigned(1475868702)
+      08                                # unsigned(8)
+      c1                                # tag(1)
+         1a 59d03000                    # unsigned(1506816000)
+      0e                                # unsigned(14)
+      6d                                # text(13)
+         4a414441313233343536373839     # "JADA123456789"
+      0b                                # unsigned(11)
+      69                                # text(9)
+         616263643132333435             # "abcd12345"
+      0d                                # unsigned(13)
+      78 7c                             # text(124)
+         4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a304441516344516741454e57514f7a634e4d556a50304e72746665426330444a4c5766654d476743466449763646557a344469664d31756a4d4265632f6736572f5036626f546d79544764464f682f3848774b5565724c3562706e654b3873673d3d # "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAENWQOzcNMUjP0NrtfeBc0DJLWfeMGgCFdIv6FUz4DifM1ujMBec/g6W/P6boTmyTGdFOh/8HwKUerL5bpneK8sg=="
