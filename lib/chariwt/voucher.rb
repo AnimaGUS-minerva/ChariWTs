@@ -695,13 +695,13 @@ module Chariwt
     end
 
     def add_base64_attr_unless_nil(hash, name, value)
-      unless value.blank?
+      if value
         hash[name] = Base64.strict_encode64(value)
       end
     end
 
     def add_der_attr_unless_nil(hash, name, value)
-      unless value.blank?
+      if value
         case @token_format
         when :pkcs
           hash[name] = Base64.strict_encode64(value.to_der)
@@ -712,7 +712,7 @@ module Chariwt
     end
 
     def add_binary_attr_unless_nil(hash, name, value)
-      unless value.blank?
+      if value
         case @token_format
         when :pkcs
           hash[name] = Base64.strict_encode64(value)
