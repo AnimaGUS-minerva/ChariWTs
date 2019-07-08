@@ -167,7 +167,7 @@ RSpec.describe Chariwt::Voucher do
 
       cv = Chariwt::Voucher.new
       cv.assertion = 'proximity'
-      cv.serialNumber = 'JADA123456789'
+      cv.serialNumber = 'NICE23465789'
       cv.voucherType = :time_based
       cv.nonce = 'abcd12345'
       cv.createdOn = DateTime.parse('2016-10-07T19:31:42Z')
@@ -180,16 +180,22 @@ RSpec.describe Chariwt::Voucher do
 
       cv.cose_sign(sig01_priv_key, ECDSA::Group::Nistp256, temporary_key)
 
-      name="voucher_jada123456789"
-      File.open("tmp/#{name}.vch","w") do |f|
+      name="voucher_nice23465789"
+      File.open("tmp/#{name}.vch","wb") do |f|
         f.write cv.token
       end
       expect(Chariwt.cmp_vch_detailed_voucher(name)).to be_truthy
+
+      cv.signing_object.signature_record.title="COSE Voucher case with signing key"
+      File.open("tmp/#{name}.cose.json","w") do |f|
+        f.write cv.signing_object.signature_record.to_s
+      end
     end
 
     it "should parse a public key out of the unprotected bucket" do
       voucher_binary=open(File.join("spec","files","voucher_jada123456789.vch"))
 
+      pending "test data needs to be built again with proper SIGN1"
       @cvoucher = Chariwt::Voucher.from_cbor_cose_io(voucher_binary)
       expect(@cvoucher.pubkey).to_not be_nil
       expect(@cvoucher.nonce).to eq("abcd12345")
