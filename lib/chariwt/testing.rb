@@ -38,19 +38,21 @@ module Chariwt
     unless exitcode==0
       puts cmd
     end
+    return exitcode
   end
 
   def self.cmp_vch_pretty_voucher(basename)
-    diffcmd = sprintf("cbor2pretty.rb tmp/%s.vch >tmp/%s.pretty",
+    cvtcmd = sprintf("cbor2pretty.rb tmp/%s.vch >tmp/%s.pretty",
                       basename, basename)
-    system(diffcmd)
+    system(cvtcmd)
 
-    cmd = sprintf("diff tmp/%s.pretty spec/files/%s.pretty",
+    diffcmd = sprintf("diff tmp/%s.pretty spec/files/%s.pretty",
                   basename, basename)
-    exitcode = system(cmd)
+    exitcode = system(diffcmd)
     unless exitcode==0
-      puts cmd
+      puts diffcmd
     end
+    return exitcode
   end
 
   def self.cmp_vch_detailed_voucher(basename)
@@ -60,9 +62,9 @@ module Chariwt
     system(cvtcmd)
     diffcmd = sprintf("diff %s spec/files/%s.pretty",
                       pretty, basename)
-    exitcode = system(cmd)
+    exitcode = system(diffcmd)
     unless exitcode==0
-      puts cmd
+      puts diffcmd
       return exitcode
     end
 
@@ -85,8 +87,8 @@ module Chariwt
     exitcode = system(diff2cmd)
     unless exitcode==0
       puts diff2cmd
-      return exitcode
     end
+    return exitcode
   end
 
   def self.cmp_vch_file(token, basename)
