@@ -165,6 +165,10 @@ module Chariwt
     def generate_signature(group, private_key, temporary_key = nil)
       @group = group
 
+      if @pubkey
+        @unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY] = @pubkey.to_wireformat
+      end
+
       unless temporary_key
         temporary_key = ECDSA::Format::IntegerOctetString.decode(SecureRandom.random_bytes(group.byte_length))
       end
