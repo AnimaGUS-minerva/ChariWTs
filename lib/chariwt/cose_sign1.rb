@@ -154,6 +154,7 @@ module Chariwt
     def generate_openssl_signature(private_key)
       setup_signature_buckets
 
+      # XXX this should use RFC6979 rather than temporary_key
       #puts "group: #{group} pk: #{private_key}"
       #puts "digest: #{digest.unpack("H*")}"; puts "tk: #{temporary_key}"
       @signature= ECDSA.sign(group, private_key, digest, temporary_key)
