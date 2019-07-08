@@ -96,14 +96,14 @@ RSpec.describe Chariwt::VoucherRequest do
     it "should create a CBOR format signed voucher request" do
       vr1 = Chariwt::VoucherRequest.new(:format => :cwt)
       vr1.assertion    = 'proximity'
-      vr1.serialNumber = 'JADA345768912'
+      vr1.serialNumber = name = 'JADA345768912'
       vr1.createdOn    = DateTime.parse('2016-11-07T19:31:42Z')
       vr1.nonce        = static_nonce
       vr1.proximityRegistrarPublicKey = sig01_pub_key
 
       vr1.cose_sign(sig01_priv_key, ECDSA::Group::Nistp256, temporary_key)
 
-      expect(diagdiff_sig(vr1.token, "pledge_jada345768912")).to be true
+      expect(Chariwt.cmp_vch_file(vr1.token, name)).to be_truthy
     end
   end
 
