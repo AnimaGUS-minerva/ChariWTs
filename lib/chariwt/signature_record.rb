@@ -9,6 +9,11 @@ module Chariwt
     def initialize
       @record ||= Hash.new
     end
+
+    def to_s
+      @record.to_json
+    end
+
     def title=(x)
       @record['title']=x
     end

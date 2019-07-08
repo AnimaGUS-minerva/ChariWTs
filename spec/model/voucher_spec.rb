@@ -156,6 +156,11 @@ RSpec.describe Chariwt::Voucher do
         f.write cv.token
       end
       expect(Chariwt.cmp_vch_voucher(name)).to be_truthy
+
+      cv.signing_object.signature_record.title="COSE Voucher case -- basic"
+      File.open("tmp/#{name}.cose.json","w") do |f|
+        f.write cv.signing_object.signature_record.to_s
+      end
     end
 
     it "should sign a voucher in COSE format with signing key in unprotected bucket" do

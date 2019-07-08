@@ -40,6 +40,7 @@ module Chariwt
     attr_accessor :token
     attr_accessor :pubkey
     attr_accessor :cert_chain
+    attr_accessor :signing_object
 
     class RequestFailedValidation < Exception; end
     class MissingPublicKey < Exception
@@ -667,18 +668,18 @@ module Chariwt
 
     def cose_sign(privkey, group = ECDSA::Group::Nistp256, temporary_key = nil)
       @sidhash = hash2yangsid(vrhash)
-      sig = Chariwt::CoseSign1.new
-      sig.content = @sidhash.to_cbor
+      @signing_object = Chariwt::CoseSign1.new
+      @signing_object.content = @sidhash.to_cbor
 
       case group
       when ECDSA::Group::Nistp256
-        sig.set_msg_alg_es256!
+        @signing_object.set_msg_alg_es256!
       else
         raise UnsupportedCOSEAlgorithm
       end
 
       if pubkey
-        sig.unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY] = pubkey.to_wireformat
+        @signing_object.unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY] = pubkey.to_wireformat
       end
 
       case privkey
@@ -690,7 +691,7 @@ module Chariwt
         # nothing else to do.
       end
 
-      @token = sig.generate_signature(group, privkey, temporary_key)
+      @token = @signing_object.generate_signature(group, privkey, temporary_key)
 
       @token
     end
