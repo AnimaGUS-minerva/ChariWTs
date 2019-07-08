@@ -14,6 +14,7 @@ module Chariwt
     attr_accessor :parsed, :validated, :valid, :signature, :signature_bytes
     attr_accessor :protected_bucket, :encoded_protected_bucket
     attr_accessor :unprotected_bucket, :contents, :signed_contents
+    attr_accessor :signature_record
 
     class InvalidKeyType < Exception; end
 
@@ -26,6 +27,10 @@ module Chariwt
       @raw_cbor = req
       @protected_bucket   ||= Hash.new
       @unprotected_bucket ||= Hash.new
+    end
+
+    def signature_record
+      @signature_record ||= SignatureRecord.new
     end
 
     def basic_validation
@@ -134,13 +139,16 @@ module Chariwt
       @encoded_protected_bucket = @protected_bucket.to_cbor
       sig_struct = ["Signature1", encoded_protected_bucket, Chariwt::CoseSign.empty_bstr, @content]
       @digested   = sig_struct.to_cbor
+      signature_record.plaintext = digested
       @digest     = Digest::SHA256.digest(digested)
+      signature_record.tobe_signed = @digest
     end
 
     def concat_signed_buckets(sig_bytes)
       # protected, unprotected, payload, signature
       sign1 = [ @encoded_protected_bucket, @unprotected_bucket, @content, sig_bytes ]
       @binary = CBOR::Tagged.new(18, sign1).to_cbor
+      signature_record.output_cbor = @binary
     end
 
     def generate_openssl_signature(private_key)

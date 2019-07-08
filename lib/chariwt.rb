@@ -9,4 +9,5 @@ require 'chariwt/assertion'
 require 'chariwt/voucher'
 require 'chariwt/voucher_sid'
 require 'chariwt/voucher_request'
+require 'chariwt/signature_record'
 
