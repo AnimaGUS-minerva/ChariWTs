@@ -170,9 +170,6 @@ RSpec.describe Chariwt::Voucher do
 
       cv.pubkey          = sig01_pub_key
 
-      # this is the MASA's public key.
-      cv.unprotected_bucket['key'] = sig01_pub_key.to_wireformat
-
       # this is the registrar's public key, not the MASA's public key
       cv.pinnedPublicKey = pubkey99.public_key
 
