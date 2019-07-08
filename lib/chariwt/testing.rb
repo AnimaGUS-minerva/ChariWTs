@@ -35,7 +35,7 @@ module Chariwt
                   basename, basename)
     #puts cmd
     exitcode = system(cmd)
-    unless exitcode==0
+    unless exitcode
       puts cmd
     end
     return exitcode
@@ -44,12 +44,15 @@ module Chariwt
   def self.cmp_vch_pretty_voucher(basename)
     cvtcmd = sprintf("cbor2pretty.rb tmp/%s.vch >tmp/%s.pretty",
                       basename, basename)
-    system(cvtcmd)
+    unless system(cvtcmd)
+      puts cvtcmd
+      return false
+    end
 
     diffcmd = sprintf("diff tmp/%s.pretty spec/files/%s.pretty",
                   basename, basename)
     exitcode = system(diffcmd)
-    unless exitcode==0
+    unless exitcode
       puts diffcmd
     end
     return exitcode
@@ -60,10 +63,15 @@ module Chariwt
     cvtcmd = sprintf("cbor2pretty.rb tmp/%s.vch >%s",
                       basename, pretty)
     system(cvtcmd)
+    unless system(cvtcmd)
+      puts cvtcmd
+      return false
+    end
+
     diffcmd = sprintf("diff %s spec/files/%s.pretty",
                       pretty, basename)
     exitcode = system(diffcmd)
-    unless exitcode==0
+    unless exitcode
       puts diffcmd
       return exitcode
     end
@@ -77,24 +85,32 @@ module Chariwt
       signedcbor = line.sub(/#.*/, '').scan(/[0-9a-fA-F][0-9a-fA-F]/).map {|b| b.to_i(16).chr(Encoding::BINARY)}.join
       break
     }
-    outfile=sprintf("tmp/%s.bag", basename)
-    bag2pretty=sprintf("tmp/%s.bag.pretty", basename)
-    open(outfile, "wb") {|f| f.syswrite signedcbor }
-    bagdcode = sprintf("cbor2pretty.rb %s >%s", outfile, bag2pretty)
-    system(bagdcode)
-    diff2cmd= sprintf("diff %s spec/files/%s.bag.pretty",
-                      bag2pretty, basename)
-    exitcode = system(diff2cmd)
-    unless exitcode==0
-      puts diff2cmd
+
+    if signedcbor
+      outfile=sprintf("tmp/%s.bag", basename)
+      bag2pretty=sprintf("tmp/%s.bag.pretty", basename)
+      open(outfile, "wb") {|f| f.syswrite signedcbor }
+      bagdcode = sprintf("cbor2pretty.rb %s >%s", outfile, bag2pretty)
+      unless system(bagdcode)
+        puts bagdcode
+        return false
+      end
+      diff2cmd= sprintf("diff %s spec/files/%s.bag.pretty",
+                        bag2pretty, basename)
+      exitcode = system(diff2cmd)
+      unless exitcode
+        puts diff2cmd
+      end
+      return exitcode
+    else
+      return true
     end
-    return exitcode
   end
 
   def self.cmp_vch_file(token, basename)
     ofile = File.join(tmpdir, basename + ".vch")
     File.open(ofile, "wb") do |f|     f.write token      end
-    return cmp_vch_voucher(basename)
+    return cmp_vch_detailed_voucher(basename)
   end
 
 
