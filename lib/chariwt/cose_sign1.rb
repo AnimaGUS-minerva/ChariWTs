@@ -111,6 +111,8 @@ module Chariwt
         pubkey_point= ECDSA::Format::PubKey.decode(cert)
       when OpenSSL::X509::Certificate
         pubkey_point = ECDSA::Format::PubKey.decode(pubkey)
+      when OpenSSL::PKey::EC
+        pubkey_point = ECDSA::Format::PubKey.decode(pubkey)
       when ECDSA::Point
         pubkey_point = pubkey
       else

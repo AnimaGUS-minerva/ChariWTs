@@ -250,11 +250,11 @@ module Chariwt
 
     def self.validate_from_chariwt(unverified, pubkey)
       begin
-        valid = unverified.validate(pubkey)
+        @valid = unverified.validate(pubkey)
       rescue Chariwt::CoseSign1::InvalidKeyType
         raise InvalidKeyType
       end
-      raise RequestFailedValidation.new("with key #{pubkey}") unless valid
+      raise RequestFailedValidation.new("with key #{pubkey}") unless @valid
       object = object_from_verified_cbor(unverified, pubkey)
       object.coseSignedPriorVoucherRequest!
       return object

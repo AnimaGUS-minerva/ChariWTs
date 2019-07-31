@@ -310,4 +310,18 @@ RSpec.describe CHex do
     end
   end
 
+  it "should load a COSE SIGN1 plaintext object from a CBOR-WG JSON format file and validate" do
+    file="spec/inputs/example-C.2-02.json"
+    example = JSON.parse(IO::read(file))
+    expect(example["input"]["plaintext_hex"]).to_not be_nil
+    expect(example["input"]["sign0"]["key"]["pkcs8_b64"]).to_not be_nil
+
+    vr_token = example["output"]["cbor"].scan(/[0-9a-fA-F][0-9a-fA-F]/).map {|b| b.to_i(16).chr(Encoding::BINARY)}.join
+    pubkey_bin = Base64.decode64(example["input"]["sign0"]["key"]["pkcs8_b64"])
+
+    pubkey = OpenSSL::PKey.read(pubkey_bin)
+    vr = Chariwt::VoucherRequest.from_cbor_cose(vr_token, pubkey)
+    expect(vr).to_not be_nil
+  end
+
 end
