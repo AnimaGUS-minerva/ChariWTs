@@ -322,6 +322,7 @@ RSpec.describe CHex do
     pubkey = OpenSSL::PKey.read(pubkey_bin)
     vr = Chariwt::VoucherRequest.from_cbor_cose(vr_token, pubkey)
     expect(vr).to_not be_nil
+    expect(vr.valid).to be true
   end
 
 end
