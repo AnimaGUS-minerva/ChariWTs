@@ -323,6 +323,9 @@ RSpec.describe CHex do
     vr = Chariwt::VoucherRequest.from_cbor_cose(vr_token, pubkey)
     expect(vr).to_not be_nil
     expect(vr.valid).to be true
+
+    sr = vr.signed_object.signature_record
+    expect(sr.tobe_signed.downcase).to eq(example["intermediates"]["ToBeSign_hex"].downcase)
   end
 
 end

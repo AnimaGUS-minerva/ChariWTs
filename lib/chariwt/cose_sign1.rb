@@ -121,6 +121,7 @@ module Chariwt
 
       sig_struct = ["Signature1", @encoded_protected_bucket, empty_bstr, @signed_contents]
       @digest     = sig_struct.to_cbor
+      signature_record.tobe_signed = @digest
 
       @sha256 = Digest::SHA256.digest(@digest)
       @valid = ECDSA.valid_signature?(pubkey_point, sha256, signature)

@@ -26,6 +26,9 @@ module Chariwt
     def output
       @record['output'] ||= Hash.new
     end
+    def tobe_signed
+      intermediates['ToBeSign_hex']
+    end
 
     def hexify(x)
       x.unpack("H*").first
