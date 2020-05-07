@@ -113,6 +113,24 @@ module Chariwt
     return cmp_vch_detailed_voucher(basename)
   end
 
+  def self.cmp_signing_record(record, basename)
+    cvtcmd = sprintf("cbor2pretty.rb tmp/%s.vch >tmp/%s.pretty",
+                      basename, basename)
+    unless system(cvtcmd)
+      puts cvtcmd
+      return false
+    end
+
+    diffcmd = sprintf("diff tmp/%s.pretty spec/files/%s.pretty",
+                  basename, basename)
+    exitcode = system(diffcmd)
+    unless exitcode
+      puts diffcmd
+    end
+    return exitcode
+  end
+
+
 
 end
 
