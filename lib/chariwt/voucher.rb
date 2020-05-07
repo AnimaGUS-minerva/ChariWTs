@@ -96,12 +96,17 @@ module Chariwt
     end
 
     def self.object_from_verified_cbor(signedobject, pubkey)
+      vr = object_from_cbor_contents(signedobject, signedobject.signed_contents, pubkey)
+      vr.signed_object = signedobject
+      vr
+    end
+
+    def self.object_from_cbor_contents(object, contents, pubkey)
       vr = new
       vr.coseSignedPriorVoucherRequest!
       vr.voucherType = voucher_type
       vr.token_format= :cose_cbor
-      vr.load_sid_attributes_hash(signedobject.signed_contents)
-      vr.signed_object = signedobject
+      vr.load_sid_attributes_hash(contents)
       if pubkey
         vr.pubkey       = pubkey
         vr.signing_cert = pubkey
@@ -110,16 +115,7 @@ module Chariwt
     end
 
     def self.object_from_unverified_cbor(unverifiedobject, pubkey)
-      vr = new
-      vr.coseSignedPriorVoucherRequest!
-      vr.voucherType = voucher_type
-      vr.token_format= :cose_cbor
-      vr.load_sid_attributes_hash(unverifiedobject.contents)
-      if pubkey
-        vr.pubkey       = pubkey
-        vr.signing_cert = pubkey
-      end
-      vr
+      object_from_cbor_contents(unverifiedobject, unverifiedobject.contents, pubkey)
     end
 
     def self.object_from_verified_json(json1, store0, signed_object = nil)
