@@ -27,7 +27,6 @@ module Chariwt
     attr_accessor :token_format
 
     attr_accessor :signing_cert
-    attr_accessor :signed_object
     attr_accessor :assertion, :createdOn, :voucherType
     attr_accessor :expiresOn, :serialNumber, :pinnedDomainCert
     attr_accessor :idevidIssuer, :domainCertRevocationChecks
@@ -97,7 +96,6 @@ module Chariwt
 
     def self.object_from_verified_cbor(signedobject, pubkey)
       vr = object_from_cbor_contents(signedobject, signedobject.signed_contents, pubkey)
-      vr.signed_object = signedobject
       vr
     end
 
@@ -107,6 +105,7 @@ module Chariwt
       vr.voucherType = voucher_type
       vr.token_format= :cose_cbor
       vr.load_sid_attributes_hash(contents)
+      vr.token       = object
       if pubkey
         vr.pubkey       = pubkey
         vr.signing_cert = pubkey
@@ -133,7 +132,7 @@ module Chariwt
         vr.signing_cert = pubkey
       end
       if signed_object
-        vr.signed_object = signed_object
+        vr.token        = signed_object
       end
       vr
     end
@@ -308,10 +307,10 @@ module Chariwt
         cert_store = OpenSSL::X509::Store.new
 
         # the data will be checked, but the certificate will be trusted, and not be validated.
-        return @signed_object.verify(certlist, cert_store, nil, OpenSSL::CMS::NOINTERN|OpenSSL::CMS::NO_SIGNER_CERT_VERIFY)
+        return @token.verify(certlist, cert_store, nil, OpenSSL::CMS::NOINTERN|OpenSSL::CMS::NO_SIGNER_CERT_VERIFY)
 
       when :cose_cbor, :cms_cbor
-        return @signed_object.validate(pubkey)
+        return @token.validate(pubkey)
       end
     end
 
