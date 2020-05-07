@@ -106,17 +106,7 @@ RSpec.describe Chariwt::VoucherRequest do
       expect(vr1.signing_object).to_not be_nil
       expect(vr1.signing_object.signature_record).to_not be_nil
 
-      outname="#{name}.example.json"
-      File.open("tmp/#{outname}", "w") {|f|
-        out=vr1.signing_object.signature_record.to_s.gsub(",",",\n")
-        f.puts out
-      }
-      diffcmd = sprintf("diff tmp/%s spec/files/%s",outname,outname)
-      exitcode = system(diffcmd)
-      unless exitcode
-        puts diffcmd
-      end
-      expect(exitcode).to be_truthy
+      expect(Chariwt.cmp_signing_record(vr1.signing_object.signature_record, name)).to be_truthy
     end
   end
 

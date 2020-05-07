@@ -114,23 +114,18 @@ module Chariwt
   end
 
   def self.cmp_signing_record(record, basename)
-    cvtcmd = sprintf("cbor2pretty.rb tmp/%s.vch >tmp/%s.pretty",
-                      basename, basename)
-    unless system(cvtcmd)
-      puts cvtcmd
-      return false
-    end
-
-    diffcmd = sprintf("diff tmp/%s.pretty spec/files/%s.pretty",
-                  basename, basename)
+    outname="#{basename}.example.json"
+    File.open("tmp/#{outname}", "w") {|f|
+      out=record.to_s.gsub(",",",\n")
+      f.puts out
+    }
+    diffcmd = sprintf("diff tmp/%s spec/files/%s",outname,outname)
     exitcode = system(diffcmd)
     unless exitcode
       puts diffcmd
     end
     return exitcode
   end
-
-
 
 end
 
