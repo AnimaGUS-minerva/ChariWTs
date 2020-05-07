@@ -13,8 +13,10 @@ module Chariwt
     attr_accessor :binary, :sha256, :digest, :digested, :raw_cbor
     attr_accessor :parsed, :validated, :valid, :signature, :signature_bytes
     attr_accessor :protected_bucket, :encoded_protected_bucket
-    attr_accessor :unprotected_bucket, :contents, :signed_contents
-    attr_accessor :signature_record
+    attr_accessor :unprotected_bucket
+    attr_accessor :contents              # hash of contents
+    attr_accessor :signed_contents       # thing that was signed
+    attr_accessor :signature_record      # record of intermediate things
 
     class InvalidKeyType < Exception; end
 
