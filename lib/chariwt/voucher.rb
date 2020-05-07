@@ -100,8 +100,21 @@ module Chariwt
       vr.coseSignedPriorVoucherRequest!
       vr.voucherType = voucher_type
       vr.token_format= :cose_cbor
-      vr.load_sid_attributes(signedobject)
+      vr.load_sid_attributes_hash(signedobject.signed_contents)
       vr.signed_object = signedobject
+      if pubkey
+        vr.pubkey       = pubkey
+        vr.signing_cert = pubkey
+      end
+      vr
+    end
+
+    def self.object_from_unverified_cbor(unverifiedobject, pubkey)
+      vr = new
+      vr.coseSignedPriorVoucherRequest!
+      vr.voucherType = voucher_type
+      vr.token_format= :cose_cbor
+      vr.load_sid_attributes_hash(unverifiedobject.contents)
       if pubkey
         vr.pubkey       = pubkey
         vr.signing_cert = pubkey
@@ -198,7 +211,7 @@ module Chariwt
       # because there was no key, must decode the signed content into content
       # directly here.
       unverified.parse_signed_contents
-      object_from_verified_cbor(unverified, nil)
+      object_from_unverified_cbor(unverified, nil)
     end
 
     def self.from_cose_withoutkey(token)
@@ -359,6 +372,9 @@ module Chariwt
 
     # this takes a CoseSign1 object
     def load_sid_attributes(cose1)
+      load_sig_attributes_hash(cose1.signed_contents)
+    end
+    def load_sid_attributes_hash(contents)
       #   +---- voucher
       #      +---- created-on?                      yang:date-and-time
       #      +---- expires-on?                      yang:date-and-time
@@ -375,7 +391,7 @@ module Chariwt
       # assignments are used whenever there are actually additional processing possible
       # for the assignment due to different formats.
 
-      thing = yangsid2hash(cose1.signed_contents)
+      thing = yangsid2hash(contents)
       load_attributes(thing)
       if thing
         self.priorSignedVoucherRequest = thing['prior-signed-voucher-request']

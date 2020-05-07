@@ -255,11 +255,10 @@ RSpec.describe Chariwt::VoucherRequest do
       token_io = open("spec/files/vr_00-D0-E5-F2-00-02.vrq")
       voucher1 = Chariwt::VoucherRequest.from_cose_withoutkey_io(token_io)
 
-      pending "requires updated vr_00-D0-E5-F2-00-02.vrq"
       expect(voucher1).to_not be_nil
       expect(voucher1.assertion).to    eq(:proximity)
       expect(voucher1.serialNumber).to eq('00-D0-E5-F2-00-02')
-      expect(voucher1.createdOn.utc).to eq(DateTime.parse('2019-06-17T18:14:09Z'))
+      expect(voucher1.createdOn.utc).to eq(DateTime.parse('2019-06-18T02:41:25Z'))
       expect(voucher1.voucherType).to eq(:request)
     end
 
