@@ -241,10 +241,6 @@ module Chariwt
       object_from_verified_json(voucher, pubkey)
     end
 
-    def self.from_cose_cbor(token, pubkey = nil)
-      return from_cbor_cose(token, pubkey)
-    end
-
     def self.from_cbor_cose(token, pubkey = nil)
       from_cbor_cose_io(StringIO.new(token), pubkey)
     end
