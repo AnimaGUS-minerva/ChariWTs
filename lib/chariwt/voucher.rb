@@ -95,7 +95,7 @@ module Chariwt
     end
 
     def self.object_from_verified_cbor(signedobject, pubkey)
-      vr = object_from_cbor_contents(signedobject, signedobject.signed_contents, pubkey)
+      vr = object_from_cbor_contents(signedobject, signedobject.contents, pubkey)
       vr
     end
 
