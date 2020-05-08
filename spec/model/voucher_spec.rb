@@ -195,7 +195,6 @@ RSpec.describe Chariwt::Voucher do
     it "should parse a public key out of the unprotected bucket" do
       voucher_binary=open(File.join("spec","files","voucher_jada123456789.vch"))
 
-      pending "test data needs to be built again with proper SIGN1"
       @cvoucher = Chariwt::Voucher.from_cbor_cose_io(voucher_binary)
       expect(@cvoucher.pubkey).to_not be_nil
       expect(@cvoucher.nonce).to eq("abcd12345")
