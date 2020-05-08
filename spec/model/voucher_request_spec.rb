@@ -220,19 +220,6 @@ RSpec.describe Chariwt::VoucherRequest do
       expect(voucher1.voucherType).to eq(:time_based)
     end
 
-    it "should load values from a JWT signed JSON file string" do
-      filen = "spec/files/voucher_request1.jwt"
-      token = IO::read(filen)
-      pending "pinned-domain-cert in JWT needs to be replaced with registrar-proximity-cert"
-      voucher1 = Chariwt::VoucherRequest.from_jose_json(token)
-      expect(voucher1).to_not be_nil
-
-      expect(voucher1.assertion).to    eq(:proximity)
-      expect(voucher1.serialNumber).to eq('JADA123456789')
-      expect(voucher1.createdOn).to  eq(DateTime.parse('2016-10-07T19:31:42Z'))
-      expect(voucher1.voucherType).to eq(:time_based)
-    end
-
     it "should validate a COSE signed file" do
       pending "THIS TEST DATA IS OLD"
       filen = "spec/files/vr_00-D0-E5-01-00-09.vch"
