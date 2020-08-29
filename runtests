@@ -1,2 +1,7 @@
+#!/bin/sh
+
+LD_PRELOAD=/sandel/3rd/openssl-dtls-api/lib/libcrypto.so.1.1:/sandel/3rd/openssl-dtls-api/lib/libssl.so.1.1
+export LD_PRELOAD
+
 bundle exec rspec -I. spec/model/signature_spec.rb spec/model/voucher_spec.rb spec/model/voucher_request_spec.rb
 
