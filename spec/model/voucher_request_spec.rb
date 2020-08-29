@@ -111,31 +111,6 @@ RSpec.describe Chariwt::VoucherRequest do
   end
 
   describe "registrar signing" do
-    it "should create a JSON format CMS-signed voucher request, with unsigned pledge request" do
-      vr0 = Chariwt::VoucherRequest.new
-      vr0.assertion    = 'proximity'
-      vr0.serialNumber = 'JADA123456789'
-      vr0.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
-      vr0.proximityRegistrarCert = pubkey99
-      vr0.generate_nonce
-      vr0.unsigned!
-
-      expect(JSON.parse(vr0.token_json)).to_not be_nil
-
-      # now make a voucher request with unsigned pledge request
-      vr1 = Chariwt::VoucherRequest.new
-      vr1.assertion    = 'proximity'
-      vr1.serialNumber = 'JADA123456789'
-      vr1.createdOn    = DateTime.parse('2016-10-07T19:31:42Z')
-      vr1.cmsSignedPriorVoucherRequest!
-      vr1.priorSignedVoucherRequest = vr0.token
-
-      vr1.signing_cert_file(File.join("spec","files","jrc_prime256v1.crt"))
-      vr1.pkcs_sign_file(File.join("spec","files","jrc_prime256v1.key"))
-
-      expect(Chariwt.cmp_pkcs_file(vr1.token, "parboiled_jada56789012")).to be true
-    end
-
     it "should JOSE sign a voucher request and save to a file" do
       vr1 = Chariwt::VoucherRequest.new
       vr1.assertion    = 'proximity'
