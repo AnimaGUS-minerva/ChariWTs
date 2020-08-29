@@ -19,6 +19,7 @@ module Chariwt
     attr_accessor :signature_record      # record of intermediate things
 
     class InvalidKeyType < Exception; end
+    class UnsupportedAlgorithm < Exception; end
 
     #
     # This creats a new signature object from a binary blob.  It does not
@@ -36,8 +37,20 @@ module Chariwt
     end
 
     def basic_validation
-      # verify that it is ECDSA with SHA-256.
-      @protected_bucket[Cose::Msg::ALG] == Cose::Msg::ES256
+      # verify that it is ECDSA with SHA-256, which all that is supported right now.
+      self.alg == Cose::Msg::ES256
+    end
+
+    def alg
+      @protected_bucket[Cose::Msg::ALG]
+    end
+    def alg=(x)
+      case x
+      when ECDSA::Group::Nistp256
+        @protected_bucket[Cose::Msg::ALG] = Cose::Msg::ES256
+      else
+        raise UnsupportedAlgorithm.new("#{x}")
+      end
     end
 
     def set_msg_alg_es256!

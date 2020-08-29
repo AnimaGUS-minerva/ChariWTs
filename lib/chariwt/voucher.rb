@@ -690,6 +690,7 @@ module Chariwt
       if pubkey
         @signing_object.unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY] = pubkey.to_wireformat
       end
+      @signing_object.alg = group
 
       case privkey
       when OpenSSL::PKey::EC
