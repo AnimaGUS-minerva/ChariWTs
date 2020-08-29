@@ -74,6 +74,7 @@ RSpec.describe Chariwt::Voucher do
       cv.pinnedDomainCert = pubkey99
       smime = cv.pkcs_sign_bin(privkey99)
 
+      # certs.crt can expire!
       expect(Chariwt.cmp_pkcs_file(smime, "thing_f2-00-99",
                                    "spec/files/certs.crt")).to be true
     end

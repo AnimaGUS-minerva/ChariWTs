@@ -1,0 +1,11 @@
+#!/bin/sh
+
+where=../../../fountain/db/cert
+echo updating from $where
+cp $where/jrc_prime256v1.crt .
+cp $where/jrc_prime256v1.key .
+for f in jrc_prime256v1.crt
+do
+        echo "# built from $f"
+        cat $f
+done >certs.crt
