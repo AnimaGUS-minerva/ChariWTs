@@ -92,18 +92,18 @@ module Chariwt
 
   class VoucherSID < VoucherSIDClass
     SIDKeys = {
-      1001100 => ['ietf-cwt-voucher', 'ietf-voucher:voucher'],
-      1001105 => 'assertion',
-      1001106 => 'created-on',
-      1001107 => 'domain-cert-revocation-checks',
-      1001108 => 'expires-on',
-      1001109 => 'idevid-issuer',
-      1001110 => 'last-renewal-date',
-      1001111 => 'nonce',
-      1001112 => 'pinned-domain-cert',
-      1001113 => 'pinned-domain-subject-public-key-info',
-      1001114 => 'serial-number',
-      1001115 => 'pinned-sha256-of-subject-public-key-info',
+      2451 => ['ietf-cwt-voucher', 'ietf-voucher:voucher'],
+      2452 => 'assertion',
+      2453 => 'created-on',
+      2454 => 'domain-cert-revocation-checks',
+      2455 => 'expires-on',
+      2456 => 'idevid-issuer',
+      2457 => 'last-renewal-date',
+      2458 => 'nonce',
+      2459 => 'pinned-domain-cert',
+      2460 => 'pinned-domain-subject-public-key-info',
+      2461 => 'pinned-sha256-of-subject-public-key-info',
+      2462 => 'serial-number',
     }
 
     # also Cose::Msg::VoucherPubkey
