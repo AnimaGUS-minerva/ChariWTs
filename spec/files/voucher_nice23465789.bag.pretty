@@ -1,21 +1,21 @@
 a1                                      # map(1)
-   1a 000f468c                          # unsigned(1001100)
+   19 0993                              # unsigned(2451)
    a6                                   # map(6)
-      05                                # unsigned(5)
+      01                                # unsigned(1)
       69                                # text(9)
          70726f78696d697479             # "proximity"
-      06                                # unsigned(6)
+      02                                # unsigned(2)
       c1                                # tag(1)
          1a 57f7f81e                    # unsigned(1475868702)
-      08                                # unsigned(8)
+      04                                # unsigned(4)
       c1                                # tag(1)
          1a 59d03000                    # unsigned(1506816000)
-      0e                                # unsigned(14)
+      0b                                # unsigned(11)
       6c                                # text(12)
          4e4943453233343635373839       # "NICE23465789"
-      0b                                # unsigned(11)
+      07                                # unsigned(7)
       69                                # text(9)
          616263643132333435             # "abcd12345"
-      0d                                # unsigned(13)
+      09                                # unsigned(9)
       78 7c                             # text(124)
          4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a304441516344516741456c6d5651636a53366e2b5864356c2f32384946763655696567517753427a74476a35646b4b324d416a51495056386c386c482b456a4c494f5964624a6949305674454966312f4a71742b544f4266696e544e4f4c4f673d3d # "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElmVQcjS6n+Xd5l/28IFv6UiegQwSBztGj5dkK2MAjQIPV8l8lH+EjLIOYdbJiI0VtEIf1/Jqt+TOBfinTNOLOg=="
