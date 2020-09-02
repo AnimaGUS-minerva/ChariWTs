@@ -1,5 +1,6 @@
 #!/bin/sh
 
+#set -x
 in=$1
 out=$2
 certfile=$3
@@ -16,3 +17,4 @@ extra='-noverify'
 (openssl cms -verify $certfilearg -inform der -in $in $extra 2>/dev/null \
         | sed -e's/,/,\n/g'; echo) >$out
 
+#ls -l $out

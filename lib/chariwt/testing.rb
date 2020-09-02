@@ -20,9 +20,11 @@ module Chariwt
 
     location = File.dirname(__FILE__) + "/../../bin"
     #puts "Location is: #{location}, wrote to #{ofile}, #{otfile}, #{base}"
-    system("#{location}/pkcs2json #{ofile} #{otfile} #{certfile}")
+    cmd0 = "#{location}/pkcs2json #{ofile} #{otfile} #{certfile}"
+    puts cmd0
+    system(cmd0)
     cmd = "diff #{otfile} spec/files/#{base}.txt"
-    #puts cmd
+    puts cmd
     system(cmd)
   end
 
