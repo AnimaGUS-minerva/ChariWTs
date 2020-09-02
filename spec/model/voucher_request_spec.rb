@@ -202,7 +202,7 @@ RSpec.describe Chariwt::VoucherRequest do
       expect(voucher1).to_not be_nil
       expect(voucher1.assertion).to    eq(:proximity)
       expect(voucher1.serialNumber).to eq('00-D0-E5-F2-00-02')
-      expect(voucher1.createdOn.utc).to eq(DateTime.parse('2019-06-18T02:41:25Z'))
+      expect(voucher1.createdOn.utc).to eq(DateTime.parse('2020-09-02 22:33:54'))
       expect(voucher1.voucherType).to eq(:request)
     end
 
