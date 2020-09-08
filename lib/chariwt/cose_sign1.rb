@@ -21,6 +21,8 @@ module Chariwt
     class InvalidKeyType < Exception; end
     class UnsupportedAlgorithm < Exception; end
 
+    COSE_SIGN_TAG = 18
+
     #
     # This creats a new signature object from a binary blob.  It does not
     # validate it until it is told to.
@@ -165,7 +167,7 @@ module Chariwt
     def concat_signed_buckets(sig_bytes)
       # protected, unprotected, payload, signature
       sign1 = [ @encoded_protected_bucket, @unprotected_bucket, @content, sig_bytes ]
-      @binary = CBOR::Tagged.new(18, sign1).to_cbor
+      @binary = CBOR::Tagged.new(COSE_SIGN_TAG, sign1).to_cbor
       signature_record.output_cbor = @binary
     end
 
