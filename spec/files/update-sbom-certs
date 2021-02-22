@@ -1,0 +1,7 @@
+#!/bin/sh
+
+openssl genpkey -algorithm ec \
+        -pkeyopt ec_paramgen_curve:prime256v1 \
+        -outform PEM -pkeyopt ec_param_enc:named_curve \
+        -out sbom_sag.key
+
