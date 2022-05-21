@@ -94,11 +94,18 @@ module Chariwt
             when "1.3.6.1.4.1.46930.1"
               eui64 = san.value[1].value[0].value
             end
-            #puts "#{num} #{oid} #{sanparsed}"
+            puts "#{num} #{oid} #{sanparsed}"
           }
         end
       }
       return eui64
+    end
+
+    def serialNumber_from_cert(cert = signing_cert)
+      cert.subject.to_a.each { |entry|
+        return entry[1] if entry[0]="serialNumber"
+      }
+      return nil
     end
 
     def load_json_attributes(jhash)
