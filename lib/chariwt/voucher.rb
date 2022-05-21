@@ -668,13 +668,6 @@ module Chariwt
       VoucherSID.hash2yangsid(vrhash)
     end
 
-    # turns a voucher into an unsinged CBOR/YANG array based
-    # upon the SID assignments
-    def cbor_unsign
-      @sidhash = hash2yangsid(vrhash)
-      @token = @sidhash.to_cbor
-    end
-
     def cose_sign(privkey, group = ECDSA::Group::Nistp256, temporary_key = nil)
       @sidhash = hash2yangsid(vrhash)
       @signing_object = Chariwt::CoseSign1.new
