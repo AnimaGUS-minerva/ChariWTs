@@ -94,7 +94,7 @@ module Chariwt
             when "1.3.6.1.4.1.46930.1"
               eui64 = san.value[1].value[0].value
             end
-            puts "#{num} #{oid} #{sanparsed}"
+            #puts "#{num} #{oid} #{sanparsed}"
           }
         end
       }
