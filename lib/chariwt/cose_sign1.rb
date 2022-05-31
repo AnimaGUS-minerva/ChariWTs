@@ -68,6 +68,9 @@ module Chariwt
       if @unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY]
         @pubkey ||= ECDSA::Format::PointOctetString.decode(@unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY], group)
       end
+      if @unprotected_bucket[Cose::Msg::KID]
+        @pubkey ||= ECDSA::Format::PointOctetString.decode(@unprotected_bucket[Cose::Msg::KID], group)
+      end
     end
 
     #
@@ -93,6 +96,7 @@ module Chariwt
 
       @signed_contents = @raw_cbor.value[2]
       @signature_bytes = @raw_cbor.value[3]
+
       @parsed = true
     end
 
