@@ -206,6 +206,19 @@ RSpec.describe Chariwt::VoucherRequest do
       expect(voucher1.voucherType).to eq(:request)
     end
 
+    it "should load values from a COSE signed CBOR parboiled request, using kid provided key" do
+      token_io = open("spec/files/parboiled_vr_vanderstok_00-d0-e5-02-00-36.vrq")
+      voucher1 = Chariwt::VoucherRequest.from_cbor_cose_io(token_io)
+
+      expect(voucher1).to_not be_nil
+      #expect(voucher1.assertion).to    eq(:proximity)
+      expect(voucher1.serialNumber).to eq('00-d0-e5-02-00-36')
+      expect(voucher1.createdOn.utc).to eq(DateTime.parse('2021-07-12T09:15:26Z'))
+      #expect(voucher1.voucherType).to eq(:request)
+      expect(voucher1.kid).to_not be_nil
+      expect(voucher1.alg).to be(:ES256k)
+    end
+
     it "should not barf on invalid date in JSON string" do
       voucher1 = Chariwt::Voucher.new
 

@@ -41,6 +41,7 @@ module Chariwt
     attr_accessor :pubkey
     attr_accessor :cert_chain
     attr_accessor :signing_object
+    attr_accessor :alg, :kid
 
     class RequestFailedValidation < Exception; end
     class MissingPublicKey < Exception
@@ -106,10 +107,27 @@ module Chariwt
       vr.token_format= :cose_cbor
       vr.load_sid_attributes_hash(contents)
       vr.token       = object
+
+      if object.unprotected_bucket
+        if object.unprotected_bucket[Cose::Msg::ALG]
+          vr.alg = Cose::Msg.alg_from_int(object.unprotected_bucket[Cose::Msg::ALG])
+        end
+        if object.unprotected_bucket[Cose::Msg::KID]
+          vr.kid = object.unprotected_bucket[Cose::Msg::KID]
+          vr.pubkey    = object.pubkey
+        end
+      end
+      if object.protected_bucket
+        if object.protected_bucket[Cose::Msg::ALG]
+          vr.alg = Cose::Msg.alg_from_int(object.protected_bucket[Cose::Msg::ALG])
+        end
+      end
+
       if pubkey
         vr.pubkey       = pubkey
         vr.signing_cert = pubkey
       end
+
       vr
     end
 
@@ -206,6 +224,7 @@ module Chariwt
       # because there was no key, must decode the signed content into content
       # directly here.
       unverified.parse_signed_contents
+
       object_from_unverified_cbor(unverified, nil)
     end
 
@@ -682,6 +701,7 @@ module Chariwt
 
       if pubkey
         @signing_object.unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY] = pubkey.to_wireformat
+        @signing_object.unprotected_bucket[Cose::Msg::X5BAG] = pubkey.to_wireformat
       end
       @signing_object.alg = group
 
