@@ -69,7 +69,11 @@ module Chariwt
         @pubkey ||= ECDSA::Format::PointOctetString.decode(@unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY], group)
       end
       if @unprotected_bucket[Cose::Msg::KID]
-        @pubkey ||= ECDSA::Format::PointOctetString.decode(@unprotected_bucket[Cose::Msg::KID], group)
+        begin
+          @pubkey ||= ECDSA::Format::PointOctetString.decode(@unprotected_bucket[Cose::Msg::KID], group)
+        rescue ECDSA::Format::DecodeError
+          # ignore decode errors, if it is not a public key
+        end
       end
     end
 
