@@ -1,9 +1,4 @@
 #!/bin/sh
 
-SSLDIR=/sandel/3rd/openssl-dtls-api
-LD_PRELOAD=$SSLDIR/lib/libcrypto.so.1.1:$SSLDIR/lib/libssl.so.1.1
-export LD_PRELOAD
-PATH=$SSLDIR/bin:$PATH export PATH
-
 bundle exec rspec -I. spec/model/signature_spec.rb spec/model/voucher_spec.rb spec/model/voucher_request_spec.rb
 
