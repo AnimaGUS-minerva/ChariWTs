@@ -193,9 +193,11 @@ RSpec.describe Chariwt::VoucherRequest do
       expect(voucher1.voucherType).to eq(:request)
     end
 
-    it "should load values from a COSE signed CBOR parboiled request, using kid provided key" do
+    it "should load values from a COSE signed CBOR parboiled request" do
       token_io = open("spec/files/parboiled_vr_vanderstok_00-d0-e5-02-00-36.vrq")
-      voucher1 = Chariwt::VoucherRequest.from_cbor_cose_io(token_io)
+      regcert  = OpenSSL::X509::Certificate.new(IO::read("spec/files/registrar_stok_nl-cert.crt"))
+      pending "does not have the correct vanderstok public key"
+      voucher1 = Chariwt::VoucherRequest.from_cbor_cose_io(token_io, regcert)
 
       expect(voucher1).to_not be_nil
       #expect(voucher1.assertion).to    eq(:proximity)

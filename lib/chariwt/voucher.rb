@@ -278,7 +278,7 @@ module Chariwt
       rescue Chariwt::CoseSign1::InvalidKeyType
         raise InvalidKeyType
       end
-      raise RequestFailedValidation.new("with key #{pubkey}") unless valid
+      raise RequestFailedValidation.new(format("with key %s", pubkey.subject)) unless valid
       object = object_from_verified_cbor(unverified, pubkey)
       object.valid = valid
       object.coseSignedPriorVoucherRequest!
