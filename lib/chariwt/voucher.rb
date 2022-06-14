@@ -289,7 +289,8 @@ module Chariwt
       unverified = from_cbor_cose_io_unverified(tokenio)
       pubkey ||= unverified.pubkey
 
-      raise MissingPublicKey.new("cose unprotected did include a key") unless pubkey
+      # unclear if this should be an exception.
+      raise MissingPublicKey.new("cose unprotected did not include a key") unless pubkey
       return validate_from_chariwt(unverified, pubkey)
     end
 
