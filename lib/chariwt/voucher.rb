@@ -264,14 +264,6 @@ module Chariwt
       from_cbor_cose_io(StringIO.new(token), pubkey)
     end
 
-    def self.from_cbor_cose_io_unverified(tokenio)
-      # first extract the public key so that it can be used to verify things.
-      unverified = Chariwt::CoseSign0.create_io(tokenio)
-
-      unverified.parse
-      return unverified
-    end
-
     def self.validate_from_chariwt(unverified, pubkey)
       begin
         valid = unverified.validate(pubkey)
@@ -286,7 +278,8 @@ module Chariwt
     end
 
     def self.from_cbor_cose_io(tokenio, pubkey = nil)
-      unverified = from_cbor_cose_io_unverified(tokenio)
+      unverified = Chariwt::CoseSign0.create_io(tokenio)
+      unverified.parse
       pubkey ||= unverified.pubkey
 
       # unclear if this should be an exception.
