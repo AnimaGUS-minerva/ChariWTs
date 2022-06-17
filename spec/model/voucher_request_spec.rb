@@ -8,6 +8,10 @@ require 'jwt'
 require 'chariwt'
 require 'model/test_keys'
 
+
+# The term "parboiled voucher request" has been replaced with "Registrar Voucher Request"
+# or RVR.
+
 $NonceNumber = 1
 
 # monkey patch generate_nonce to return deterministic nonces for testing
@@ -206,6 +210,27 @@ RSpec.describe Chariwt::VoucherRequest do
       #expect(voucher1.voucherType).to eq(:request)
       expect(voucher1.kid).to_not be_nil
       expect(voucher1.alg).to be(:ES256k)
+    end
+
+    it "should load values from a COSE unverified Registrar Voucher Request" do
+      token_io = open("spec/files/parboiled_vr_vanderstok_00-d0-e5-02-00-36.vrq")
+      voucher1 = Chariwt::VoucherRequest.from_cbor_cose_io_unverified(token_io)
+
+      expect(voucher1).to_not be_nil
+      byebug
+      expect(voucher1.assertion).to    eq(:proximity)
+      expect(voucher1.serialNumber.upcase).to eq('00-D0-E5-02-00-36')
+      expect(voucher1.createdOn.utc).to eq(DateTime.parse('2021-07-12T09:15:26Z'))
+      expect(voucher1.voucherType).to eq(:request)
+      expect(voucher1.kid).to_not be_nil
+      expect(voucher1.alg).to be(:ES256k)
+    end
+
+    it "should raise exception because of mismatched public key from COSE format Registrar Voucher Request" do
+      token_io = open("spec/files/parboiled_vr_vanderstok_00-d0-e5-02-00-36.vrq")
+      regcert  = OpenSSL::X509::Certificate.new(IO::read("spec/files/registrar_stok_nl-cert.crt"))
+      expect { voucher1 = Chariwt::VoucherRequest.from_cbor_cose_io(token_io, regcert)}
+        .to raise_error
     end
 
     it "should not barf on invalid date in JSON string" do

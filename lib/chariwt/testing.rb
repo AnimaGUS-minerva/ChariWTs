@@ -78,35 +78,7 @@ module Chariwt
       return exitcode
     end
 
-    # grab the tenth line, and convert it back to cbor, for decoding.
-    n=0
-    signedcbor=nil
-    IO.readlines(pretty).each { |line|
-      n += 1
-      next unless n==10
-      signedcbor = line.sub(/#.*/, '').scan(/[0-9a-fA-F][0-9a-fA-F]/).map {|b| b.to_i(16).chr(Encoding::BINARY)}.join
-      break
-    }
-
-    if signedcbor
-      outfile=sprintf("tmp/%s.bag", basename)
-      bag2pretty=sprintf("tmp/%s.bag.pretty", basename)
-      open(outfile, "wb") {|f| f.syswrite signedcbor }
-      bagdcode = sprintf("cbor2pretty.rb %s >%s", outfile, bag2pretty)
-      unless system(bagdcode)
-        puts bagdcode
-        return false
-      end
-      diff2cmd= sprintf("diff %s spec/files/%s.bag.pretty",
-                        bag2pretty, basename)
-      exitcode = system(diff2cmd)
-      unless exitcode
-        puts diff2cmd
-      end
-      return exitcode
-    else
-      return true
-    end
+    return true
   end
 
   def self.cmp_vch_file(token, basename)
