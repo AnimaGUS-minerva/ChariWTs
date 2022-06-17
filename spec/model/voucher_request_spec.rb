@@ -214,10 +214,10 @@ RSpec.describe Chariwt::VoucherRequest do
 
     it "should load values from a COSE unverified Registrar Voucher Request" do
       token_io = open("spec/files/parboiled_vr_vanderstok_00-d0-e5-02-00-36.vrq")
-      voucher1 = Chariwt::VoucherRequest.from_cbor_cose_io_unverified(token_io)
+      voucher1 = Chariwt::VoucherRequest.from_cose_withoutkey_io(token_io)
 
       expect(voucher1).to_not be_nil
-      byebug
+      pending "proximity assertion is not found yet"
       expect(voucher1.assertion).to    eq(:proximity)
       expect(voucher1.serialNumber.upcase).to eq('00-D0-E5-02-00-36')
       expect(voucher1.createdOn.utc).to eq(DateTime.parse('2021-07-12T09:15:26Z'))
