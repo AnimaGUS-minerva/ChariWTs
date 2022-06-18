@@ -106,9 +106,6 @@ module Chariwt
       2462 => 'serial-number',
     }
 
-    # also Cose::Msg::VoucherPubkey
-    VoucherPubkey = 60299
-
     def self.hashkeys
       SIDKeys
     end
@@ -137,9 +134,6 @@ module Chariwt
       2513    => 'proximity-registrar-subject-public-key-info',
       2514    => 'serial-number',
     }
-
-    # also Cose::Msg::VoucherPubkey
-    VoucherPubkey = 60299
 
     def self.hashkeys
       SIDKeys
