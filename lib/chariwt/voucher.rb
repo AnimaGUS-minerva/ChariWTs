@@ -693,9 +693,12 @@ module Chariwt
         raise UnsupportedCOSEAlgorithm
       end
 
+      # this is wrong, because pubkey is not necessary a PKIX certificate
       if pubkey
-        @signing_object.unprotected_bucket[Cose::Msg::VOUCHER_PUBKEY] = pubkey.to_wireformat
-        @signing_object.unprotected_bucket[Cose::Msg::X5BAG] = pubkey.to_wireformat
+        case pubkey
+        when OpenSSL::X509::Certificate
+          @signing_object.unprotected_bucket[Cose::Msg::X5BAG] = pubkey.to_wireformat
+        end
       end
       @signing_object.alg = group
 
