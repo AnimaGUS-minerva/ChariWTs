@@ -21,11 +21,19 @@ module Chariwt
     location = File.dirname(__FILE__) + "/../../bin"
     #puts "Location is: #{location}, wrote to #{ofile}, #{otfile}, #{base}"
     cmd0 = "#{location}/pkcs2json #{ofile} #{otfile} #{certfile}"
-    puts cmd0
-    system(cmd0)
+    exitcode = system(cmd0)
+    unless exitcode
+      puts sprintf("CMD FAILED: %s\n", cmd0);
+      return false
+    end
+
     cmd = "diff #{otfile} spec/files/#{base}.txt"
-    puts cmd
-    system(cmd)
+    exitcode = system(cmd)
+    unless exitcode
+      puts sprintf("CMD FAILED: %s\n", cmd);
+      return false
+    end
+    return exitcode
   end
 
   def self.cmp_vch_voucher(basename)
@@ -66,7 +74,7 @@ module Chariwt
                       basename, pretty)
     system(cvtcmd)
     unless system(cvtcmd)
-      puts cvtcmd
+      puts sprintf("\nCONVERT FAILED: %s\n", cvtcmd)
       return false
     end
 
@@ -74,7 +82,7 @@ module Chariwt
                       pretty, basename)
     exitcode = system(diffcmd)
     unless exitcode
-      puts diffcmd
+      puts sprintf("\nFAILED: %s\n", diffcmd)
       return exitcode
     end
 
@@ -96,7 +104,7 @@ module Chariwt
     diffcmd = sprintf("diff tmp/%s spec/files/%s",outname,outname)
     exitcode = system(diffcmd)
     unless exitcode
-      puts diffcmd
+      puts sprintf("\nFAILED: %s\n", diffcmd)
     end
     return exitcode
   end
