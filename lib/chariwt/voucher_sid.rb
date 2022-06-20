@@ -36,8 +36,36 @@ module Chariwt
       end
     end
 
-    # this method rewrites a hash based upon deltas against the parent
-    # SID, which is not modified.  The input has should look like:
+    def self.translate_assertion_fromsid(assertion)
+      case assertion
+      when 0
+        :verified
+      when 1
+        :logged
+      when 2
+        :proximity
+      else
+        assertion
+      end
+    end
+
+    def self.translate_assertion_tosid(assertion)
+      case assertion.to_s
+      when "verified"
+        0
+      when "logged"
+        1
+      when "proximity"
+        2
+      else
+        assertion
+      end
+    end
+
+    # This method rewrites a hash based upon deltas against the parent
+    # SID, which is not modified.
+    # It is used when mapping into constrained SID based YANG.
+    # The input has should look like:
     #
     #   { NUM1 => { NUM2 => 'stuff' }}
     # and results in:
@@ -51,6 +79,11 @@ module Chariwt
         #byebug unless kn
         raise MissingSIDMapping.new("missing mapping", k) unless kn
         sidkey = kn - base
+
+        if(k.to_s == "assertion")
+          v = translate_assertion_tosid(v)
+        end
+
         case v
         when Hash
           nhash[sidkey] = mapkeys(sidkey, v)
@@ -76,13 +109,19 @@ module Chariwt
       return nil unless hash.kind_of? Hash
       hash.each { |k,v|
         basenum = k
-        v.each { |k,v|
-          val = hashkeys[basenum+k]
-          if val
-            nhash[val] = v
+        v.each { |relk,v|
+
+          abskey = basenum+relk
+          yangkey = hashkeys[abskey]
+
+          if yangkey
+            if(abskey == 2502 || abskey == 2452)
+              v = translate_assertion_fromsid(v)
+            end
+            nhash[yangkey] = v
           else
             nhash['unknown'] ||= []
-            nhash['unknown'] << [basenum+k,v]
+            nhash['unknown'] << [abskey,v]
           end
         }
       }
