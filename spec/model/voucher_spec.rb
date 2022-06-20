@@ -165,7 +165,7 @@ RSpec.describe Chariwt::Voucher do
       end
     end
 
-    it "should sign a voucher in COSE format with signing key in unprotected bucket" do
+    it "should sign a voucher in COSE format" do
 
       cv = Chariwt::Voucher.new
       cv.assertion = 'proximity'
@@ -174,8 +174,6 @@ RSpec.describe Chariwt::Voucher do
       cv.nonce = 'abcd12345'
       cv.createdOn = DateTime.parse('2016-10-07T19:31:42Z')
       cv.expiresOn = DateTime.parse('2017-10-01T00:00:00Z')
-
-      cv.pubkey          = sig01_pub_key
 
       # this is the registrar's public key, not the MASA's public key
       cv.pinnedPublicKey = pubkey99.public_key

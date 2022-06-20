@@ -2,13 +2,7 @@ d2                                      # tag(18)
    84                                   # array(4)
       43                                # bytes(3)
          a10126                         # "\xA1\x01&"
-      a2                                # map(2)
-         19 eb8b                        # unsigned(60299)
-         58 41                          # bytes(65)
-            04bac5b11cad8f99f9c72b05cf4b9e26d244dc189f745228255a219a86d6a09eff20138bf82dc1b6d562be0fa54ab7804a3a64b6d72ccfed6b6fb6ed28bbfc117e # "\x04\xBA\xC5\xB1\x1C\xAD\x8F\x99\xF9\xC7+\x05\xCFK\x9E&\xD2D\xDC\x18\x9FtR(%Z!\x9A\x86\xD6\xA0\x9E\xFF \x13\x8B\xF8-\xC1\xB6\xD5b\xBE\x0F\xA5J\xB7\x80J:d\xB6\xD7,\xCF\xEDko\xB6\xED(\xBB\xFC\x11~"
-         18 20                          # unsigned(32)
-         58 41                          # bytes(65)
-            04bac5b11cad8f99f9c72b05cf4b9e26d244dc189f745228255a219a86d6a09eff20138bf82dc1b6d562be0fa54ab7804a3a64b6d72ccfed6b6fb6ed28bbfc117e # "\x04\xBA\xC5\xB1\x1C\xAD\x8F\x99\xF9\xC7+\x05\xCFK\x9E&\xD2D\xDC\x18\x9FtR(%Z!\x9A\x86\xD6\xA0\x9E\xFF \x13\x8B\xF8-\xC1\xB6\xD5b\xBE\x0F\xA5J\xB7\x80J:d\xB6\xD7,\xCF\xEDko\xB6\xED(\xBB\xFC\x11~"
+      a0                                # map(0)
       58 b6                             # bytes(182)
          a1190993a6016970726f78696d69747902c11a57f7f81e04c11a59d030000b6c4e4943453233343635373839076961626364313233343509787c4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a304441516344516741456c6d5651636a53366e2b5864356c2f32384946763655696567517753427a74476a35646b4b324d416a51495056386c386c482b456a4c494f5964624a6949305674454966312f4a71742b544f4266696e544e4f4c4f673d3d # "\xA1\x19\t\x93\xA6\x01iproximity\x02\xC1\x1AW\xF7\xF8\x1E\x04\xC1\x1AY\xD00\x00\vlNICE23465789\aiabcd12345\tx|MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAElmVQcjS6n+Xd5l/28IFv6UiegQwSBztGj5dkK2MAjQIPV8l8lH+EjLIOYdbJiI0VtEIf1/Jqt+TOBfinTNOLOg=="
       58 40                             # bytes(64)
