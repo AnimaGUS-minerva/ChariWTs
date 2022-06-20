@@ -192,10 +192,12 @@ RSpec.describe Chariwt::Voucher do
       end
     end
 
-    it "should parse a public key out of the unprotected bucket" do
+    it "should verify a voucher in COSE format, given key" do
       voucher_binary=open(File.join("spec","files","voucher_jada123456789.vch"))
 
-      @cvoucher = Chariwt::Voucher.from_cbor_cose_io(voucher_binary)
+      @cvoucher = Chariwt::Voucher.from_cbor_cose_io(voucher_binary, sig01_pub_key)
+
+      # the pubkey used to viery gets recorded into the voucher.
       expect(@cvoucher.pubkey).to_not be_nil
       expect(@cvoucher.nonce).to eq("abcd12345")
     end
