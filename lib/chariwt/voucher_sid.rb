@@ -45,7 +45,7 @@ module Chariwt
       when 2
         :proximity
       else
-        assertion
+        assertion.to_sym
       end
     end
 
@@ -111,17 +111,21 @@ module Chariwt
         basenum = k
         v.each { |relk,v|
 
-          abskey = basenum+relk
-          yangkey = hashkeys[abskey]
+          if relk.is_a? Integer
+            abskey = basenum+relk
+            yangkey = hashkeys[abskey]
 
-          if yangkey
-            if(abskey == 2502 || abskey == 2452)
-              v = translate_assertion_fromsid(v)
+            if yangkey
+              if(abskey == 2502 || abskey == 2452)
+                v = translate_assertion_fromsid(v)
+              end
+              nhash[yangkey] = v
+            else
+              nhash['unknown'] ||= []
+              nhash['unknown'] << [abskey,v]
             end
-            nhash[yangkey] = v
           else
-            nhash['unknown'] ||= []
-            nhash['unknown'] << [abskey,v]
+            nhash[relk] = v
           end
         }
       }

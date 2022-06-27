@@ -357,10 +357,10 @@ module Chariwt
 
       @attributes   = thing
       @nonce        = thing['nonce']
-      self.assertion     = thing['assertion']
+      self.assertion= thing['assertion']
       @serialNumber = thing['serial-number']
-      self.createdOn     = thing['created-on']
-      self.expiresOn    = thing['expires-on']
+      self.createdOn= thing['created-on']
+      self.expiresOn= thing['expires-on']
       @idevidIssuer = thing['idevid-issuer']
       self.pinnedDomainCert = thing['pinned-domain-cert']
       @domainCertRevocationChecks = thing['domain-cert-revocation-checks']
@@ -485,7 +485,7 @@ module Chariwt
 
     def assertion=(x)
       if x
-        @assertion = x.to_sym
+        @assertion = VoucherSIDClass.translate_assertion_fromsid(x)
       end
     end
 
