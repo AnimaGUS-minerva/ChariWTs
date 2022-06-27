@@ -228,8 +228,13 @@ RSpec.describe Chariwt::VoucherRequest do
 
     it "should load values from an RVR in yang-cbor name format" do
       token_pretty = open("spec/files/rvr_iotconsult01.pretty")
-      token_io = CBOR.extractbytes(token_pretty)
-      expect(token_io).to_not be_nil
+      token = CBOR.extract_bytes_from_hex(token_pretty)
+      expect(token).to_not be_nil
+
+      voucher1 = Chariwt::VoucherRequest.from_cose_withoutkey(token)
+      expect(voucher1).to_not be_nil
+      expect(voucher1.assertion).to eq(:proximity)
+      expect(voucher1.createdOn.utc).to eq(DateTime.parse('2022-06-17T09:21:32.299Z'))
     end
 
     it "should raise exception because of mismatched public key from COSE format Registrar Voucher Request" do
