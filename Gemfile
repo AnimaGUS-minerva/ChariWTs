@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem "cbor",  "~> 0.5.9.2"
-gem "cbor-diag"
+gem 'cbor-diag', :git => 'https://github.com/AnimaGUS-minerva/cbor-diag', :branch => 'put-pretty-extract-into-library'
 gem "json"
 gem 'jwt'
 #gem 'openssl', :git => 'https://github.com/mcr/ruby-openssl.git'

@@ -1,9 +1,9 @@
 d2                                      # tag(18)
    84                                   # array(4)
       43                                # bytes(3)
-         a10126                         # "\xA1\x01&"
+         a10126                         # "\xA1\u0001&"
       a0                                # map(0)
       74                                # text(20)
          546869732069732074686520636f6e74656e742e # "This is the content."
       58 40                             # bytes(64)
-         eae868ecc176883766c5dc5ba5b8dca25dab3c2e56a551ce5705b793914348e15eddbb3c6c5b01e8cdd4d72e4109ed3e1bdbd14ca539a5a8844ed7942c559532 # "\xEA\xE8h\xEC\xC1v\x887f\xC5\xDC[\xA5\xB8\xDC\xA2]\xAB<.V\xA5Q\xCEW\x05\xB7\x93\x91CH\xE1^\xDD\xBB<l[\x01\xE8\xCD\xD4\xD7.A\t\xED>\e\xDB\xD1L\xA59\xA5\xA8\x84N\xD7\x94,U\x952"
+         eae868ecc176883766c5dc5ba5b8dca25dab3c2e56a551ce5705b793914348e15eddbb3c6c5b01e8cdd4d72e4109ed3e1bdbd14ca539a5a8844ed7942c559532 # "\xEA\xE8h\xEC\xC1v\x887f\xC5\xDC[\xA5\xB8ܢ]\xAB<.V\xA5Q\xCEW\u0005\xB7\x93\x91CH\xE1^ݻ<l[\u0001\xE8\xCD\xD4\xD7.A\t\xED>\e\xDB\xD1L\xA59\xA5\xA8\x84Nה,U\x952"

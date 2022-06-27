@@ -7,7 +7,7 @@ require 'byebug'
 require 'jwt'
 require 'chariwt'
 require 'model/test_keys'
-
+require 'cbor-pretty'
 
 # The term "parboiled voucher request" has been replaced with "Registrar Voucher Request"
 # or RVR.
@@ -224,6 +224,12 @@ RSpec.describe Chariwt::VoucherRequest do
       expect(voucher1.voucherType).to eq(:request)
       expect(voucher1.kid).to_not be_nil
       expect(voucher1.alg).to be(:ES256k)
+    end
+
+    it "should load values from an RVR in yang-cbor name format" do
+      token_pretty = open("spec/files/rvr_iotconsult01.pretty")
+      token_io = CBOR.extractbytes(token_pretty)
+      expect(token_io).to_not be_nil
     end
 
     it "should raise exception because of mismatched public key from COSE format Registrar Voucher Request" do

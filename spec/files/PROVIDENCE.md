@@ -22,6 +22,10 @@ This example voucher request comes from operating the reach/fountain/highway tes
 The script in fountain, spec/curltest/07-update-constrained-request-03.sh invokes the adjacent reach
 toolkit to generate a new voucher request.
 
+# rvr_iotconsult01.pretty
+
+This was provided by Esko as the output of his Registrar on 2022-06-17.
+
 # not yet categorized
 
 voucher_jada123456789_bad.vch
