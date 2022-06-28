@@ -88,6 +88,10 @@ module Chariwt
           v = v.force_encoding('ASCII-8BIT')
         end
 
+        if v.is_a? DateTime
+          v = v.iso8601(0)  # this turns it into a string.
+        end
+
         case v
         when Hash
           nhash[sidkey] = mapkeys(sidkey, v)
