@@ -80,8 +80,12 @@ module Chariwt
         raise MissingSIDMapping.new("missing mapping", k) unless kn
         sidkey = kn - base
 
-        if(k.to_s == "assertion")
+        case k.to_s
+        when "assertion"
           v = translate_assertion_tosid(v)
+        when "nonce"
+          # this forces nonce to be a bstr rather than a tstr
+          v = v.force_encoding('ASCII-8BIT')
         end
 
         case v
