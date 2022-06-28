@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/AnimaGUS-minerva/cbor-diag
-  revision: 00f1b281c8e97d034ec47d6c3be0ee594d50b0f8
+  revision: 5f25aa314484f8bbec1f45f4e1011e164c45aa76
   branch: put-pretty-extract-into-library
   specs:
     cbor-diag (0.7.6)
@@ -41,7 +41,7 @@ GEM
     ffi (1.13.1)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
-    json (2.3.1)
+    json (2.6.2)
     jwt (2.2.2)
     minitest (5.14.1)
     neatjson (0.9)
