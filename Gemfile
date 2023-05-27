@@ -13,10 +13,12 @@ gem 'ecdsa',   :git => 'https://github.com/AnimaGUS-minerva/ruby_ecdsa.git', :br
 gem 'rbnacl-libsodium'
 gem 'rbnacl', "<5.0.0"
 gem 'rake'
-gem 'tzinfo', "~> 1.2.5"
+
+# dependabot reports
+gem 'tzinfo', "~> 2.0"
 
 # for acts_like?
-gem 'activesupport', "~> 5.2.0"
+gem 'activesupport', "~> 6.1.7.1"
 
 group :test do
   gem 'byebug'
