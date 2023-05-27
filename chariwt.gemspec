@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'chariwt'
-  s.version     = '0.11.1'
-  s.date        = '2020-05-08'
+  s.version     = '0.11.2'
+  s.date        = '2023-05-28'
   s.summary     = "Chariot provides a ruby library for managing CWT and JWT base vouchers"
   s.description = "A basic CWT library"
   s.authors     = ["Michael Richardson"]
