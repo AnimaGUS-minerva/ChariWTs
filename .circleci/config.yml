@@ -7,13 +7,12 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-       - image: cimg/ruby:2.7.1
+      - image: cimg/ruby:2.7.1
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
+    # Specify service dependencies here if necessary
+    # CircleCI maintains a library of pre-built images
+    # documented at https://circleci.com/docs/2.0/circleci-images/
+    # - image: circleci/postgres:9.4
     working_directory: ~/repo
 
     steps:
@@ -22,9 +21,9 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+            - v1-dependencies-{{ checksum "Gemfile.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
 
       - run:
           name: install dependencies
@@ -55,8 +54,9 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
+    # The resource_class feature allows configuring CPU and RAM resources for each job. Different resource classes are available for different executors. https://circleci.com/docs/2.0/configuration-reference/#resourceclass
+    resource_class: large
 
 dependencies:
   pre:
     - sudo apt-get update; sudo apt-get install libsodium-dev
-          
