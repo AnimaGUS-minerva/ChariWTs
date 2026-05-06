@@ -18,13 +18,13 @@ gem 'rake'
 gem 'tzinfo', "~> 2.0"
 
 # for acts_like?
-gem 'activesupport', "~> 7.1.0"
+gem 'activesupport', "~> 7.2.3.1"
+gem 'stringio', "~> 3.2.0"
 gem 'logger'
 
 group :test do
   gem 'byebug'
   gem "rspec"
-  gem "stringio"
   gem "rspec-core"
   gem "rspec_junit_formatter"
 end
