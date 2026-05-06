@@ -4,8 +4,8 @@ gem "cbor",  "~> 0.5.9.2"
 gem 'cbor-diag', :git => 'https://github.com/AnimaGUS-minerva/cbor-diag', :branch => 'put-pretty-extract-into-library'
 gem "json"
 gem 'jwt'
-#gem 'openssl', :git => 'https://github.com/mcr/ruby-openssl.git'
-gem 'openssl', :path => '../minerva/ruby-openssl'
+#gem 'openssl', :git => 'https://github.com:mcr/ruby-openssl.git', :branch => 'mcr-202507-hacks'
+gem 'openssl', :path => '../minerva/ruby3-openssl'
 
 gem 'ecdsa',   :git => 'https://github.com/AnimaGUS-minerva/ruby_ecdsa.git', :branch => 'ecdsa_interface_openssl'
 #gem 'ecdsa',   :path => '../minerva/ruby_ecdsa'
@@ -18,11 +18,13 @@ gem 'rake'
 gem 'tzinfo', "~> 2.0"
 
 # for acts_like?
-gem 'activesupport', "~> 6.1.7.1"
+gem 'activesupport', "~> 7.1.0"
+gem 'logger'
 
 group :test do
   gem 'byebug'
   gem "rspec"
+  gem "stringio"
   gem "rspec-core"
   gem "rspec_junit_formatter"
 end
